@@ -14,6 +14,7 @@ import path from 'path';
 import { app, BrowserWindow, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import { menubar } from 'menubar';
 import MenuBuilder from './menu';
 
 export default class AppUpdater {
@@ -85,12 +86,12 @@ const createWindow = async () => {
     if (!mainWindow) {
       throw new Error('"mainWindow" is not defined');
     }
-    if (process.env.START_MINIMIZED) {
-      mainWindow.minimize();
-    } else {
-      mainWindow.show();
-      mainWindow.focus();
-    }
+    // if (process.env.START_MINIMIZED) {
+    //   mainWindow.minimize();
+    // } else {
+    //   mainWindow.show();
+    //   mainWindow.focus();
+    // }
   });
 
   mainWindow.on('closed', () => {
@@ -104,6 +105,20 @@ const createWindow = async () => {
   mainWindow.webContents.on('new-window', (event, url) => {
     event.preventDefault();
     shell.openExternal(url);
+  });
+
+  const mb = menubar({
+    icon: getAssetPath('icon.png'),
+    tooltip: 'Transmission Buddy',
+    browserWindow: {
+      show: false,
+      width: 1024,
+      height: 728,
+      icon: getAssetPath('icon.png'),
+      webPreferences: {
+        nodeIntegration: true,
+      },
+    },
   });
 
   // Remove this if your app does not use auto updates
