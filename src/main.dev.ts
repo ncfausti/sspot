@@ -107,19 +107,19 @@ const createWindow = async () => {
     shell.openExternal(url);
   });
 
-  const mb = menubar({
-    icon: getAssetPath('icon.png'),
-    tooltip: 'Transmission Buddy',
-    browserWindow: {
-      show: false,
-      width: 1024,
-      height: 728,
-      icon: getAssetPath('icon.png'),
-      webPreferences: {
-        nodeIntegration: true,
-      },
-    },
-  });
+  // const mb = menubar({
+  //   icon: getAssetPath('icon.png'),
+  //   tooltip: 'SaleSpot',
+  //   browserWindow: {
+  //     show: false,
+  //     width: 1024,
+  //     height: 728,
+  //     icon: getAssetPath('icon.png'),
+  //     webPreferences: {
+  //       nodeIntegration: true,
+  //     },
+  //   },
+  // });
 
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
