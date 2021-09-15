@@ -118,6 +118,7 @@ const createWindow = async () => {
       webPreferences: {
         nodeIntegration: true,
       },
+      alwaysOnTop: true,
     },
   });
 
