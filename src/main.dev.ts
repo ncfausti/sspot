@@ -119,6 +119,8 @@ const createWindow = async () => {
         nodeIntegration: true,
       },
       alwaysOnTop: true,
+      transparent: true,
+      frame: false,
     },
   });
 
