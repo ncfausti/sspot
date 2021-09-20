@@ -70,12 +70,16 @@ const createWindow = async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1024,
-    height: 728,
+    width: 800,
+    height: 600,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       nodeIntegration: true,
     },
+    alwaysOnTop: true,
+    transparent: true,
+    frame: false,
+    backgroundColor: '#00000000',
   });
 
   mainWindow.loadURL(`file://${__dirname}/index.html`);
@@ -121,6 +125,7 @@ const createWindow = async () => {
       alwaysOnTop: true,
       transparent: true,
       frame: false,
+      backgroundColor: '#00000000',
     },
   });
 
