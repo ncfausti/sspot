@@ -5,8 +5,9 @@ import {
   ChevronRightIcon,
   CogIcon,
 } from '@heroicons/react/solid';
-import { useAuth } from '../../contexts/AuthContext';
+import log from 'electron-log';
 
+import { useAuth } from '../../contexts/AuthContext';
 import { prettyDate } from '../../utils';
 
 export default function Meetings() {
@@ -31,6 +32,12 @@ export default function Meetings() {
           ? prevState.meetingIndex + 1
           : prevState.meetingIndex,
     }));
+  }
+
+  function handleJoinClick() {
+    log.info('clicked join')
+    window.open('/', '_blank', 
+    'top=500,left=200,frame=false,nodeIntegration=yes');
   }
   return (
     <div className="bg-white overflow-hidden shadow rounded-lg divide-y divide-gray-200">
@@ -106,6 +113,7 @@ export default function Meetings() {
                     </div>
                   </div>
                   <button
+                    onClick={()=>handleJoinClick()}
                     type="button"
                     className="-ml-px relative inline-flex items-center px-3 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
                   >

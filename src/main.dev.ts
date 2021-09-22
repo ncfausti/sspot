@@ -25,7 +25,7 @@ export default class AppUpdater {
   }
 }
 
-let mainWindow: BrowserWindow | null = null;
+// let mainWindow: BrowserWindow | null = null;
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -68,49 +68,52 @@ const createWindow = async () => {
     return path.join(RESOURCES_PATH, ...paths);
   };
 
-  mainWindow = new BrowserWindow({
-    show: false,
-    width: 800,
-    height: 600,
-    icon: getAssetPath('icon.png'),
-    webPreferences: {
-      nodeIntegration: true,
-    },
-    alwaysOnTop: true,
-    transparent: true,
-    frame: false,
-    backgroundColor: '#00000000',
-  });
+  // Detached window
+  // mainWindow = new BrowserWindow({
+  //   show: false,
+  //   width: 800,
+  //   height: 600,
+  //   icon: getAssetPath('icon.png'),
+  //   webPreferences: {
+  //     nodeIntegration: true,
+  //   },
+  //   // alwaysOnTop: true,
+  //   // transparent: true,
+  //   // frame: false,
+  //   // backgroundColor: '#00000000',
+  // });
 
-  mainWindow.loadURL(`file://${__dirname}/index.html`);
+  // url that is passed to callback for 'new-window' event
+  // mainWindow.loadURL(`file://${__dirname}/index.html`);
 
   // @TODO: Use 'ready-to-show' event
   //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
-  mainWindow.webContents.on('did-finish-load', () => {
-    if (!mainWindow) {
-      throw new Error('"mainWindow" is not defined');
-    }
-    // if (process.env.START_MINIMIZED) {
-    //   mainWindow.minimize();
-    // } else {
-    //   mainWindow.show();
-    //   mainWindow.focus();
-    // }
-  });
+  // mainWindow.webContents.on('did-finish-load', () => {
+  //   if (!mainWindow) {
+  //     throw new Error('"mainWindow" is not defined');
+  //   }
+  //   if (process.env.START_MINIMIZED) {
+  //     mainWindow.minimize();
+  //   } else {
+  //     mainWindow.show();
+  //     mainWindow.focus();
+  //   }
+  // });
 
-  mainWindow.on('closed', () => {
-    mainWindow = null;
-  });
+  // mainWindow.on('closed', () => {
+  //   mainWindow = null;
+  // });
 
-  const menuBuilder = new MenuBuilder(mainWindow);
-  menuBuilder.buildMenu();
+  // const menuBuilder = new MenuBuilder(mainWindow);
+  // menuBuilder.buildMenu();
 
   // Open urls in the user's browser
-  mainWindow.webContents.on('new-window', (event, url) => {
-    event.preventDefault();
-    shell.openExternal(url);
-  });
+  // mainWindow.webContents.on('new-window', (event, url) => {
+  //   event.preventDefault();
+  //   shell.openExternal(url);
+  // });
 
+  // Tray popout
   menubar({
     icon: getAssetPath('icon.png'),
     tooltip: 'SaleSpot',
@@ -122,10 +125,10 @@ const createWindow = async () => {
       webPreferences: {
         nodeIntegration: true,
       },
-      alwaysOnTop: true,
-      transparent: true,
-      frame: false,
-      backgroundColor: '#00000000',
+      // alwaysOnTop: true,
+      // transparent: true,
+      // frame: false,
+      // backgroundColor: '#00000000',
     },
   });
 
@@ -151,5 +154,5 @@ app.whenReady().then(createWindow).catch(console.log);
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (mainWindow === null) createWindow();
+  // if (mainWindow === null) createWindow();
 });
