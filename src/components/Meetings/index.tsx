@@ -37,10 +37,10 @@ export default function Meetings() {
   function handleJoinClick() {
     log.info('clicked join');
     window.open(`file://${__dirname}/index.html#/live`, '_blank', 
-    'top=500,left=200,frame=false,nodeIntegration=yes,');
+    `top=500,left=200,frame=false,transparent=true, backgroundColor=#00000000`);
   }
   return (
-    <div className="bg-white overflow-hidden shadow rounded-lg divide-y divide-gray-200">
+    <div className="overflow-hidden shadow rounded-lg divide-y divide-gray-200">
       <div className="px-4 py-5 sm:px-6">
         <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
           Sale Spot - {currentUser.email}

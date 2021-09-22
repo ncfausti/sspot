@@ -4,11 +4,11 @@ import React from 'react';
 
 export default function Hud() {
   return (
-    <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
+    <div className="min-h-screen py-6 flex flex-col justify-center sm:py-12">
       <div className="w-full text-centerrelative py-3 sm:max-w-xl sm:mx-auto">
-        <div className="w-full bg-cyan-900 p-6 rounded-full">
-          <div className="w-full bg-cyan-400 p-4 rounded-full">
-            <div className="flex justify-between w-full bg-cyan-100 rounded-full">
+        <div className="w-full bg-green-900 p-6 rounded-full">
+          <div className="w-full bg-green-400 p-4 rounded-full">
+            <div className="flex justify-between w-full bg-green-100 rounded-full">
               <div className="w-36 bg-white p-6 rounded-full text-center">
                 0:45
                 <br />
