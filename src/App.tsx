@@ -4,6 +4,7 @@ import './App.global.css';
 import { AuthProvider } from './contexts/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
 import Meetings from './components/Meetings';
+import Hud from './components/Hud';
 import SignIn from './components/SignIn';
 
 export default function App() {
@@ -13,6 +14,7 @@ export default function App() {
         <Switch>
           <Route path="/login" component={SignIn} />
           <PrivateRoute exact path="/" component={Meetings} />
+          <PrivateRoute path="/live" component={Hud} />
         </Switch>
       </AuthProvider>
     </Router>

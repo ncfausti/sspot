@@ -35,9 +35,9 @@ export default function Meetings() {
   }
 
   function handleJoinClick() {
-    log.info('clicked join')
-    window.open('/', '_blank', 
-    'top=500,left=200,frame=false,nodeIntegration=yes');
+    log.info('clicked join');
+    window.open(`file://${__dirname}/index.html#/live`, '_blank', 
+    'top=500,left=200,frame=false,nodeIntegration=yes,');
   }
   return (
     <div className="bg-white overflow-hidden shadow rounded-lg divide-y divide-gray-200">

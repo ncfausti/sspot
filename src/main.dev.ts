@@ -124,6 +124,7 @@ const createWindow = async () => {
       icon: getAssetPath('icon.png'),
       webPreferences: {
         nodeIntegration: true,
+        nativeWindowOpen: true,
       },
       // alwaysOnTop: true,
       // transparent: true,
