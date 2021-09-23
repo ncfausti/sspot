@@ -6,6 +6,7 @@ export default function Hud() {
   // const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState(0);
   const webSocket = useRef(null);
+  const [elapsed, setElapsed] = useState(0);
 
   useEffect(() => {
     webSocket.current = new WebSocket('ws://localhost:8080');
@@ -13,8 +14,16 @@ export default function Hud() {
       // setMessages((prev) => [...prev, message.data]);
       setMessage(message);
     };
-    return () => webSocket.current.close();
-  }, []);
+    const timer = setTimeout(
+      setElapsed((prev) => prev + 1),
+      1000
+    );
+
+    return () => {
+      webSocket.current.close();
+      clearTimeout(timer);
+    };
+  }, [message]);
 
   return (
     <div className="flex flex-col justify-center">
@@ -22,7 +31,7 @@ export default function Hud() {
         <div className="w-full bg-gray-600 p-4 rounded-full">
           <div className="flex justify-between h-24 w-full bg-gray-600 rounded-full">
             <div className="w-36 bg-gray-400 text-white p-3 rounded-full text-center">
-              0:45
+              {elapsed}
               <br />
               Time Elapsed
             </div>
