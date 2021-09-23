@@ -37,7 +37,7 @@ export default function Meetings() {
   function handleJoinClick() {
     log.info('clicked join');
     window.open(`file://${__dirname}/index.html#/live`, '_blank', 
-    `top=500,left=200,frame=false,transparent=true, backgroundColor=#00000000`);
+    `top=80,left=200,frame=false,transparent=true, backgroundColor=#00000000`);
   }
   return (
     <div className="overflow-hidden shadow rounded-lg divide-y divide-gray-200">
