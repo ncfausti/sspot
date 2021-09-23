@@ -1,8 +1,21 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/destructuring-assignment */
-import React from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 
 export default function Hud() {
+  // const [messages, setMessages] = useState([]);
+  const [message, setMessage] = useState(0);
+  const webSocket = useRef(null);
+
+  useEffect(() => {
+    webSocket.current = new WebSocket('ws://localhost:8080');
+    webSocket.current.onmessage = (message) => {
+      // setMessages((prev) => [...prev, message.data]);
+      setMessage(message);
+    };
+    return () => webSocket.current.close();
+  }, []);
+
   return (
     <div className="flex flex-col justify-center">
       <div className="w-full text-centerrelative py-3 sm:max-w-xl sm:mx-auto">
@@ -18,7 +31,7 @@ export default function Hud() {
               Score
             </div>
             <div className="w-36 bg-gray-400 text-white p-3 rounded-full text-center">
-              114 WPM
+              {parseInt(message.data, 10) + 110} WPM
               <br />
               Talk
             </div>
