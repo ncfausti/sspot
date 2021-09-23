@@ -3,7 +3,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 
 export default function Hud() {
-  // const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState(0);
   const webSocket = useRef(null);
   const [elapsed, setElapsed] = useState(0);
@@ -11,19 +10,25 @@ export default function Hud() {
   useEffect(() => {
     webSocket.current = new WebSocket('ws://localhost:8080');
     webSocket.current.onmessage = (message) => {
-      // setMessages((prev) => [...prev, message.data]);
       setMessage(message);
     };
+
+    return () => {
+      webSocket.current.close();
+    };
+  }, []);
+
+  useEffect(() => {
     const timer = setTimeout(
-      setElapsed((prev) => prev + 1),
+      () => setElapsed((prev) => prev + 1),
       1000
     );
 
     return () => {
-      webSocket.current.close();
       clearTimeout(timer);
     };
-  }, [message]);
+
+  }, [elapsed]);
 
   return (
     <div className="flex flex-col justify-center">
