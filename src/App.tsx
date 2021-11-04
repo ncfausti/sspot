@@ -12,9 +12,9 @@ export default function App() {
     <Router>
       <AuthProvider>
         <Switch>
-          <Route path="/login" component={SignIn} />
-          <PrivateRoute exact path="/" component={Meetings} />
-          <PrivateRoute path="/live" component={Hud} />
+          {/* <Route path="/login" component={SignIn} /> */}
+          <Route exact path="/" component={Meetings} />
+          <Route path="/live" component={Hud} />
         </Switch>
       </AuthProvider>
     </Router>
