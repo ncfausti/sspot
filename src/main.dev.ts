@@ -11,7 +11,7 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
-import { app, BrowserWindow, shell } from 'electron';
+import { app, BrowserWindow, screen, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import { menubar } from 'menubar';
@@ -148,6 +148,14 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
+});
+
+app.on('ready', () => {
+  console.log('app is ready');
+  const interval = setInterval(() => {
+    const mousePos = screen.getCursorScreenPoint();
+    console.log(mousePos);
+  }, 50);
 });
 
 app.whenReady().then(createWindow).catch(console.log);
