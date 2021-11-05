@@ -98,15 +98,31 @@ export default function Hud() {
     // </div>
     <div className="flex flex-grow flex-col bg-white p-3 min-h-screen content-center">
       <div className="flex flex-grow flex-wrap justify-between">
-        <div className="text-xs text-gray-800 font-semibold">
-          {dateStyle.format(time)}
+        <div className="text-md text-gray-800 font-semibold">
+          {timeStyle.format(time)}
         </div>
-        <div className="text-xs font-light">{timeStyle.format(time)}</div>
+        <div className="text-md font-light">
+          <button
+            className="bg-white border-2 rounded border-gray-600 px-3 py-1 cursor-pointer"
+            type="button"
+          >
+            End
+          </button>
+        </div>
       </div>
       <div className="flex flex-grow space-x-2 justify-between">
-        <div className="bg-red-500 flex-1">abc</div>
-        <div className="bg-blue-500 flex-1">def</div>
-        <div className="bg-green-500 flex-1">ghi</div>
+        <div className="flex flex-col justify-end bg-red-500 flex-1 p-3">
+          <div>--</div>
+          <div>Time Elapsed</div>
+        </div>
+        <div className="flex flex-col justify-end bg-blue-500 flex-1 p-3">
+          <div>--</div>
+          <div>Monologue</div>
+        </div>
+        <div className="flex flex-col justify-end bg-green-500 flex-1 p-3">
+          <div>--</div>
+          <div>Talk Ratio</div>
+        </div>
       </div>
       <div className="flex flex-grow flex-wrap justify-between items-center">
         <div className="">
