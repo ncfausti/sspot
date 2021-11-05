@@ -1,10 +1,6 @@
 /* eslint-disable react/forbid-prop-types */
 import React, { useState } from 'react';
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  CogIcon,
-} from '@heroicons/react/solid';
+import { CogIcon } from '@heroicons/react/solid';
 import log from 'electron-log';
 
 import { useAuth } from '../../contexts/AuthContext';
@@ -42,13 +38,14 @@ export default function Meetings() {
       `top=80,left=200,frame=false,transparent=true, backgroundColor=#00000000`
     );
   }
+  const date = new Date();
   return (
-    <div className="flex flex-grow flex-col bg-red-100">
+    <div className="flex flex-grow flex-col bg-red-100 min-h-screen content-center">
       <div className="flex flex-grow bg-blue-100 flex-wrap justify-between">
-        <div className="bg-blue-300">1</div>
-        <div className="bg-red-300">2</div>
+        <div className="bg-blue-300">{date.toLocaleDateString()}</div>
+        <div className="bg-red-300">{date.toLocaleTimeString()}</div>
       </div>
-      <div className="flex flex-grow">
+      <div className="flex flex-grow m-8">
         <button
           type="button"
           className="w-full px-3 py-2
@@ -61,8 +58,10 @@ export default function Meetings() {
         </button>
       </div>
       <div className="flex flex-grow flex-wrap justify-between">
-        <div className="bg-blue-300">1</div>
-        <div className="bg-red-300">2</div>
+        <div className="bg-blue-300">SaleSpot LOGO HERE</div>
+        <div className="bg-red-300">
+          <CogIcon className="h-5 w-5 cursor-pointer" />
+        </div>
       </div>
     </div>
   );
