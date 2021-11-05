@@ -4,6 +4,7 @@ import playIcon from '../../../assets/play.png';
 import blindIcon from '../../../assets/blind.png';
 import resetIcon from '../../../assets/reset.png';
 import expandIcon from '../../../assets/expand.png';
+import log from 'electron-log';
 
 interface Message {
   data: number;
@@ -69,6 +70,22 @@ export default function Hud() {
     timeZoneName: 'short',
   });
 
+  function clickPlay() {
+    log.info('play clicked');
+  }
+  function clickReset() {
+    log.info('reset clicked');
+  }
+  function clickBlind() {
+    log.info('blind clicked');
+  }
+  function clickSpotting() {
+    log.info('spotting clicked');
+  }
+  function clickExpand() {
+    log.info('expand clicked');
+  }
+
   return (
     // <div className="flex flex-col justify-center">
     //   <div className="w-full text-centerrelative py-3 sm:max-w-xl sm:mx-auto">
@@ -111,37 +128,34 @@ export default function Hud() {
         </div>
       </div>
       <div className="flex flex-grow space-x-2 justify-between">
-        <div className="flex flex-col justify-end bg-red-500 flex-1 p-3">
+        <div className="flex flex-col justify-end bg-gray-100 flex-1 p-3">
           <div>--</div>
           <div>Time Elapsed</div>
         </div>
-        <div className="flex flex-col justify-end bg-blue-500 flex-1 p-3">
+        <div className="flex flex-col justify-end bg-gray-100 flex-1 p-3">
           <div>--</div>
           <div>Monologue</div>
         </div>
-        <div className="flex flex-col justify-end bg-green-500 flex-1 p-3">
+        <div className="flex flex-col justify-end bg-gray-100 flex-1 p-3">
           <div>--</div>
           <div>Talk Ratio</div>
         </div>
       </div>
       <div className="flex flex-grow flex-wrap justify-between items-center">
         <div className="">
-          <img src={playIcon} className="inline w-8 h-8 mr-1" alt="SaleSpot" />
+          <img onClick={clickPlay} src={playIcon} className="inline p-1 w-7 h-7 cursor-pointer mr-1" alt="SaleSpot" />
         </div>
         <div className="text-gray-700">
           {/* <SpottingIcon className="h-4 w-4 cursor-pointer" /> */}
-          <img src={resetIcon} className="inline w-8 h-8 mr-1" alt="SaleSpot" />
-          <img src={blindIcon} className="inline w-8 h-8 mr-1" alt="SaleSpot" />
-          <img
+          <img onClick={clickReset} src={resetIcon} className="inline p-1 w-7 h-7 cursor-pointer mr-1" alt="reset" />
+          <img onClick={clickBlind} src={blindIcon} className="inline p-1 w-7 h-7 cursor-pointer mr-1" alt="blind" />
+          <img onClick={clickSpotting}
             src={spottingIcon}
-            className="inline w-8 h-8 mr-1"
-            alt="SaleSpot"
+            className="inline p-1 w-7 h-7 cursor-pointer mr-1"
+            alt="spotting"
+
           />
-          <img
-            src={expandIcon}
-            className="inline w-8 h-8 mr-1"
-            alt="SaleSpot"
-          />
+          <img onClick={clickExpand} src={expandIcon} className="inline p-1 w-7 h-7 cursor-pointer mr-1" alt="expand" />
         </div>
       </div>
     </div>
