@@ -11,7 +11,7 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
-import { app, BrowserWindow, screen, shell } from 'electron';
+import { app, screen } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import { menubar } from 'menubar';
@@ -119,8 +119,8 @@ const createWindow = async () => {
     tooltip: 'SaleSpot',
     browserWindow: {
       show: false,
-      width: 1024,
-      height: 728,
+      width: 400,
+      height: 200,
       icon: getAssetPath('icon.png'),
       webPreferences: {
         nodeIntegration: true,
