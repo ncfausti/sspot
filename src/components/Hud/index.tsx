@@ -115,12 +115,12 @@ export default function Hud() {
     // </div>
     <div className="flex flex-grow flex-col bg-white p-3 min-h-screen content-center">
       <div className="flex flex-grow flex-wrap justify-between">
-        <div className="text-md text-gray-800 font-semibold">
+        <div className="text-md text-gray-800 font-semibold justify-center">
           {timeStyle.format(time)}
         </div>
         <div className="text-md font-light">
           <button
-            className="bg-white border-2 rounded border-gray-600 px-3 py-1 cursor-pointer"
+            className="cursor-pointer bg-white border-2 rounded-lg border-gray-500 font-light px-6 py-1"
             type="button"
           >
             End
@@ -143,15 +143,15 @@ export default function Hud() {
       </div>
       <div className="flex flex-grow flex-wrap justify-between items-center">
         <div className="">
-          <img onClick={clickPlay} src={playIcon} className="inline p-1 w-7 h-7 cursor-pointer mr-1" alt="SaleSpot" />
+          <img onClick={clickPlay} src={playIcon} className="inline w-7 h-7 cursor-pointer mr-1" alt="SaleSpot" />
         </div>
-        <div className="text-gray-700">
+        <div className="text-gray-700 space-x-4">
           {/* <SpottingIcon className="h-4 w-4 cursor-pointer" /> */}
-          <img onClick={clickReset} src={resetIcon} className="inline p-1 w-7 h-7 cursor-pointer mr-1" alt="reset" />
-          <img onClick={clickBlind} src={blindIcon} className="inline p-1 w-7 h-7 cursor-pointer mr-1" alt="blind" />
+          <img onClick={clickReset} src={resetIcon} className="inline w-7 h-7 cursor-pointer mr-1" alt="reset" />
+          <img onClick={clickBlind} src={blindIcon} className="inline w-7 h-7 cursor-pointer mr-1" alt="blind" />
           <img onClick={clickSpotting}
             src={spottingIcon}
-            className="inline p-1 w-7 h-7 cursor-pointer mr-1"
+            className="inline w-7 h-7 cursor-pointer mr-1"
             alt="spotting"
 
           />
