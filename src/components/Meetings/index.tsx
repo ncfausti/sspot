@@ -84,7 +84,10 @@ export default function Meetings() {
       <div className="flex flex-grow flex-wrap justify-between items-center">
         <div className="">
           <img src={logo} className="inline w-16 mr-1" alt="SaleSpot" />
-          <span className="inline text-xs text-gray-400 font-light">
+          <span
+            style={{ fontSize: '8px' }}
+            className="inline text-xs text-gray-400 font-light"
+          >
             ⌘ + Y to toggle
           </span>
         </div>
