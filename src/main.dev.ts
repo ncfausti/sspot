@@ -15,7 +15,6 @@ import { app, screen } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import { menubar } from 'menubar';
-import MenuBuilder from './menu';
 
 export default class AppUpdater {
   constructor() {

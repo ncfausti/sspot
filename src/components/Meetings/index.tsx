@@ -31,12 +31,12 @@ export default function Meetings() {
   //   }));
   // }
 
-  function handleJoinClick() {
-    log.info('clicked join');
+  function handleLaunchClick() {
+    log.info('clicked launch');
     window.open(
       `file://${__dirname}/index.html#/live`,
       '_blank',
-      `top=80,left=200,frame=false,transparent=true, backgroundColor=#00000000`
+      `top=80,left=200,frame=false,transparent=false, backgroundColor=#00000000`
     );
   }
   const [time, setTime] = useState(new Date());
@@ -55,7 +55,6 @@ export default function Meetings() {
   });
 
   const timeStyle = new Intl.DateTimeFormat('en', {
-    // timeStyle: 'short',
     hour: 'numeric',
     minute: 'numeric',
     timeZoneName: 'short',
@@ -72,6 +71,7 @@ export default function Meetings() {
       <div className="flex flex-grow">
         <button
           type="button"
+          onClick={handleLaunchClick}
           className="w-full
           border border-transparent text-xs font-semibold
           font-medium rounded-md shadow-sm text-white
