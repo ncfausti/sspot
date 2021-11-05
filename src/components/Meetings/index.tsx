@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { CogIcon } from '@heroicons/react/solid';
 import log from 'electron-log';
-import logo from '../../../assets/salespot-logo-long.png';
+import logo from '../../../assets/salespot-logo-red.png';
 // import { useAuth } from '../../contexts/AuthContext';
 // import { prettyDate } from '../../utils';
 
