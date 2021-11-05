@@ -103,10 +103,10 @@ export default function Hud() {
         </div>
         <div className="text-xs font-light">{timeStyle.format(time)}</div>
       </div>
-      <div className="flex flex-grow justify-between">
-        <div className="bg-red-500">abc</div>
-        <div className="bg-blue-500">def</div>
-        <div className="bg-green-500">ghi</div>
+      <div className="flex flex-grow space-x-2 justify-between">
+        <div className="bg-red-500 flex-1">abc</div>
+        <div className="bg-blue-500 flex-1">def</div>
+        <div className="bg-green-500 flex-1">ghi</div>
       </div>
       <div className="flex flex-grow flex-wrap justify-between items-center">
         <div className="">
