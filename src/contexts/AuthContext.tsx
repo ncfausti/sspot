@@ -24,12 +24,13 @@ export function AuthProvider({ children }) {
 
   // useEffect so not in render and only runs once
   useEffect(() => {
-    return auth.onAuthStateChanged((user) => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
       // Do not render application until we have a user set for the
       // first time
       setCurrentUser(user);
       setLoading(false);
     });
+    return unsubscribe;
   }, []);
 
   const value = {

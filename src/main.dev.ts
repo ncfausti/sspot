@@ -119,8 +119,8 @@ const createWindow = async () => {
     tooltip: 'SaleSpot',
     browserWindow: {
       show: false,
-      width: 400,
-      height: 200,
+      width: 300,
+      height: 120,
       icon: getAssetPath('icon.png'),
       webPreferences: {
         nodeIntegration: true,
