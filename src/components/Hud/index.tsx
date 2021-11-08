@@ -1,10 +1,10 @@
 import React, { useRef, useState, useEffect } from 'react';
+import log from 'electron-log';
 import spottingIcon from '../../../assets/spotting-icon.png';
 import playIcon from '../../../assets/play.png';
 import blindIcon from '../../../assets/blind.png';
 import resetIcon from '../../../assets/reset.png';
 import expandIcon from '../../../assets/expand.png';
-import log from 'electron-log';
 
 interface Message {
   data: number;
@@ -14,6 +14,7 @@ export default function Hud() {
   const [message, setMessage] = useState({ data: 0 });
   const ws = useRef(new WebSocket('ws://localhost:8080'));
   const [elapsed, setElapsed] = useState(0);
+  const [expanded, setExpanded] = useState(true);
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
@@ -84,6 +85,8 @@ export default function Hud() {
   }
   function clickExpand() {
     log.info('expand clicked');
+    setExpanded((prev) => !prev);
+    return expanded ? window.resizeTo(600, 120) : window.resizeTo(300, 120);
   }
 
   return (
@@ -113,9 +116,9 @@ export default function Hud() {
     //     </div>
     //   </div>
     // </div>
-    <div className="flex flex-grow flex-col bg-white p-3 min-h-screen content-center">
-      <div className="flex flex-grow flex-wrap justify-between">
-        <div className="text-md text-gray-800 font-semibold justify-center">
+    <div className="flex flex-grow flex-col bg-white p-3 min-h-screen content-center md:w-1/2 rounded-xl">
+      <div className="flex flex-grow flex-wrap justify-between content-center">
+        <div className="text-md text-gray-800  mt-1.5 font-semibold">
           {timeStyle.format(time)}
         </div>
         <div className="text-md font-light">
@@ -143,19 +146,39 @@ export default function Hud() {
       </div>
       <div className="flex flex-grow flex-wrap justify-between items-center">
         <div className="">
-          <img onClick={clickPlay} src={playIcon} className="inline w-7 h-7 cursor-pointer mr-1" alt="SaleSpot" />
+          <img
+            onClick={clickPlay}
+            src={playIcon}
+            className="inline w-7 h-7 cursor-pointer mr-1"
+            alt="SaleSpot"
+          />
         </div>
         <div className="text-gray-700 space-x-4">
           {/* <SpottingIcon className="h-4 w-4 cursor-pointer" /> */}
-          <img onClick={clickReset} src={resetIcon} className="inline w-7 h-7 cursor-pointer mr-1" alt="reset" />
-          <img onClick={clickBlind} src={blindIcon} className="inline w-7 h-7 cursor-pointer mr-1" alt="blind" />
-          <img onClick={clickSpotting}
+          <img
+            onClick={clickReset}
+            src={resetIcon}
+            className="inline w-7 h-7 cursor-pointer mr-1"
+            alt="reset"
+          />
+          <img
+            onClick={clickBlind}
+            src={blindIcon}
+            className="inline w-7 h-7 cursor-pointer mr-1"
+            alt="blind"
+          />
+          <img
+            onClick={clickSpotting}
             src={spottingIcon}
             className="inline w-7 h-7 cursor-pointer mr-1"
             alt="spotting"
-
           />
-          <img onClick={clickExpand} src={expandIcon} className="inline p-1 w-7 h-7 cursor-pointer mr-1" alt="expand" />
+          <img
+            onClick={clickExpand}
+            src={expandIcon}
+            className="inline p-1 w-7 h-7 cursor-pointer mr-1 md:transform md:rotate-180"
+            alt="expand"
+          />
         </div>
       </div>
     </div>
