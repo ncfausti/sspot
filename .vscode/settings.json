@@ -5,11 +5,12 @@
     ".prettierrc": "jsonc",
     ".eslintignore": "ignore"
   },
-
-  "javascript.validate.enable": false,
-  "javascript.format.enable": false,
-  "typescript.format.enable": false,
-
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "javascript.validate.enable": true,
+  "javascript.format.enable": true,
+  "typescript.format.enable": true,
   "search.exclude": {
     ".git": true,
     ".eslintcache": true,
@@ -24,5 +25,6 @@
     "test/**/__snapshots__": true,
     "yarn.lock": true,
     "*.{css,sass,scss}.d.ts": true
-  }
+  },
+  "jest.jestCommandLine": "yarn test"
 }

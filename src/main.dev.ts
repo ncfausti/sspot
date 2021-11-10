@@ -123,6 +123,7 @@ const createWindow = async () => {
       icon: getAssetPath('icon.png'),
       webPreferences: {
         nodeIntegration: true,
+        additionalArguments: [`--USER-DATA-DIR=${app.getPath('userData')}`],
         nativeWindowOpen: false,
       },
       // alwaysOnTop: true,
@@ -153,7 +154,7 @@ app.on('ready', () => {
   console.log('app is ready');
   const interval = setInterval(() => {
     const mousePos = screen.getCursorScreenPoint();
-    console.log(mousePos);
+    // console.log(mousePos);
   }, 50);
 });
 
