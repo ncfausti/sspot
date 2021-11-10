@@ -47,6 +47,9 @@ export default function Hud() {
   const [expanded, setExpanded] = useState(true);
   const [time, setTime] = useState(new Date());
   const [spotting, setSpotting] = useState(true);
+  const [monologue, setMonologue] = useState(0);
+  const [talkRatio, setTalkRatio] = useState(0);
+  const [responseObject, setResponseObject] = useState(null);
   const ws = useRef(null);
   const interval = useRef(null);
   // const [resp, setResp] = useRef(null);
@@ -165,14 +168,21 @@ export default function Hud() {
         // List of faces
         faces: [],
       };
-
       await ws.current.send(JSON.stringify(request));
 
       try {
         const [response] = await ws.current.receive();
-
-        log.info(response.toString());
         const msg = JSON.parse(response.toString());
+        // setMonologue(msg.current_monologue);
+        // setTalkRatio(msg.talk_ratio);
+        // audio_location: "test.mp4"
+        // faces: []
+        // status_code: 1
+        // voice_metrics:
+        // current_monologue: 0
+        // is_talking: false
+        // longest_monologue: 0
+        // talk_ratio: 0
 
         // const statusCode = msg.status_code;
         // if (statusCode === 0) {
@@ -180,14 +190,27 @@ export default function Hud() {
         // } else if (statusCode === 2) return;
 
         // await ws.current.send(JSON.stringify(request));
+        // log.info(msg);
+        // log.info(msg.voice_metrics.current_monologue);
+        // setMonologue(msg.voice_metrics.current_monologue);
+        // setTalkRatio(msg.voice_metrics.talk_ratio);
+        // () => setResponseObject(msg);
         log.info(msg);
+        return msg;
       } catch (e) {
         log.info(e);
       }
     }
 
     Spot()
-      .then((fileInfo) => log.info(fileInfo))
+      .then((response) => {
+        setMonologue(response.voice_metrics.current_monologue);
+        return response;
+      })
+      .then((response) => {
+        setTalkRatio(response.voice_metrics.talk_ratio);
+        return response;
+      })
       .catch((e) => log.info(e));
   });
 
@@ -236,15 +259,15 @@ export default function Hud() {
         </div>
         <div className="flex flex-grow space-x-2 justify-between">
           <div className="flex flex-col justify-end bg-gray-100 flex-1 p-3">
-            <div>{elapsed}</div>
+            <div>{Math.floor(elapsed / 60)}m</div>
             <div>Time Elapsed</div>
           </div>
           <div className="flex flex-col justify-end bg-gray-100 flex-1 p-3">
-            <div>--</div>
+            <div>{monologue}</div>
             <div>Monologue</div>
           </div>
           <div className="flex flex-col justify-end bg-gray-100 flex-1 p-3">
-            <div>--</div>
+            <div>{talkRatio}</div>
             <div>Talk Ratio</div>
           </div>
         </div>
