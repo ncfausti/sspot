@@ -263,11 +263,11 @@ export default function Hud() {
             <div>Time Elapsed</div>
           </div>
           <div className="flex flex-col justify-end bg-gray-100 flex-1 p-3">
-            <div>{monologue}</div>
+            <div>{monologue}m</div>
             <div>Monologue</div>
           </div>
           <div className="flex flex-col justify-end bg-gray-100 flex-1 p-3">
-            <div>{talkRatio}</div>
+            <div>{talkRatio}%</div>
             <div>Talk Ratio</div>
           </div>
         </div>

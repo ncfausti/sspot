@@ -67,51 +67,6 @@ const createWindow = async () => {
     return path.join(RESOURCES_PATH, ...paths);
   };
 
-  // Detached window
-  // mainWindow = new BrowserWindow({
-  //   show: false,
-  //   width: 800,
-  //   height: 600,
-  //   icon: getAssetPath('icon.png'),
-  //   webPreferences: {
-  //     nodeIntegration: true,
-  //   },
-  //   // alwaysOnTop: true,
-  //   // transparent: true,
-  //   // frame: false,
-  //   // backgroundColor: '#00000000',
-  // });
-
-  // url that is passed to callback for 'new-window' event
-  // mainWindow.loadURL(`file://${__dirname}/index.html`);
-
-  // @TODO: Use 'ready-to-show' event
-  //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
-  // mainWindow.webContents.on('did-finish-load', () => {
-  //   if (!mainWindow) {
-  //     throw new Error('"mainWindow" is not defined');
-  //   }
-  //   if (process.env.START_MINIMIZED) {
-  //     mainWindow.minimize();
-  //   } else {
-  //     mainWindow.show();
-  //     mainWindow.focus();
-  //   }
-  // });
-
-  // mainWindow.on('closed', () => {
-  //   mainWindow = null;
-  // });
-
-  // const menuBuilder = new MenuBuilder(mainWindow);
-  // menuBuilder.buildMenu();
-
-  // Open urls in the user's browser
-  // mainWindow.webContents.on('new-window', (event, url) => {
-  //   event.preventDefault();
-  //   shell.openExternal(url);
-  // });
-
   // Tray popout
   menubar({
     icon: getAssetPath('icon.png'),
