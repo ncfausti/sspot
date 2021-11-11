@@ -1,7 +1,8 @@
 import React, { useRef, useState, useEffect } from 'react';
 import log from 'electron-log';
 import { ipcRenderer } from 'electron';
-import { Request } from 'zeromq';
+// import { Request } from 'zeromq';
+import WebSocket from 'ws';
 import child_process from 'child_process';
 import path from 'path';
 import { uuid } from 'uuidv4';
@@ -11,6 +12,7 @@ import playIcon from '../../../assets/play.png';
 import blindIcon from '../../../assets/blind.png';
 import resetIcon from '../../../assets/reset.png';
 import expandIcon from '../../../assets/expand.png';
+import { startServer } from '../../utils';
 
 interface RequestMessage {
   // Where the zip should get created
@@ -54,38 +56,42 @@ export default function Hud() {
   const interval = useRef(null);
   // const [resp, setResp] = useRef(null);
 
+  useEffect(() => {
+    const server = startServer();
+  }, []);
+
   // This only runs once on initial render...
   useEffect(() => {
-    ws.current = new Request();
-    ws.current.connect('tcp://localhost:5555');
+    async function Spot() {
+      const request = {
+        // Where the zip should get created
+        destination_directory: path.join(userDataDir(), 'SaleSpot', uuid()),
+        // 1 == run, 0 == stop server
+        status_code: 1,
+        // List of faces
+        faces: [],
+      };
+      await ws.current.send(JSON.stringify(request));
+      // await wsRef.send(JSON.stringify(request));
+    }
 
-    // ws.current.onopen = () => console.log("ws opened");
-    // ws.current.onclose = () => console.log("ws closed");
+    ws.current = new window.WebSocket('ws://localhost:8765');
+    ws.current.onopen = function (event) {
+      // ws.current.send("Here's some text that the server is urgently awaiting!");
+      Spot();
+      // .catch((e) => log.info(e));
+    };
 
+    ws.current.onmessage = function (event) {
+      log.info('msg from server says:');
+      log.info(event.data);
+    };
     const wsCurrent = ws.current;
     // ...and is cleaned up on unload of component
     return () => {
-      wsCurrent.disconnect('tcp://localhost:5555');
+      wsCurrent.close();
     };
   }, []);
-
-  // const request = {
-  //   // Where the zip should get created
-  //   destination_directory: path.join(userDataDir(), 'SaleSpot', uuid()),
-  //   // 1 == run, 0 == stop server
-  //   status_code: 1,
-  //   // List of faces
-  //   faces: [],
-  // };
-
-  // wsCurrent.send(JSON.stringify(request));
-
-  // Remember! The client sets the cadence for request/reply
-  // We can do this in a setInterval that executes a request/read every 50ms
-  // if (spotting)
-  //    execute a request/read
-  // else
-  //    clear the interval
 
   useEffect(() => {
     const timer = setTimeout(() => setElapsed((prev) => prev + 1), 1000);
@@ -94,36 +100,6 @@ export default function Hud() {
       clearTimeout(timer);
     };
   }, [elapsed]);
-
-  const timeDisplay = (seconds: number) => {
-    if (Number.isNaN(parseInt(seconds, 10))) return '00:00:00';
-
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds - minutes * 60;
-    const hours = Math.floor(seconds / 3600);
-    seconds -= hours * 3600;
-
-    function fmtPadLeft(string, pad, length) {
-      return (new Array(length + 1).join(pad) + string).slice(-length);
-    }
-
-    return `${fmtPadLeft(minutes, '0', 2)}:${fmtPadLeft(seconds, '0', 2)}`;
-  };
-
-  // TODO: change sentiment score with ws server input
-  // TODO: change background color of senti-score bubble based on sentiment score
-  // useEffect(() => {
-  //   const interval = setInterval(() => setTime(new Date()), 1000);
-  //   return () => {
-  //     clearInterval(interval);
-  //   };
-  // }, []);
-
-  const dateStyle = new Intl.DateTimeFormat('en', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
 
   const timeStyle = new Intl.DateTimeFormat('en', {
     hour: 'numeric',
@@ -157,90 +133,7 @@ export default function Hud() {
   function keyPressed(e) {
     log.info(e);
   }
-
-  useEffect(() => {
-    async function Spot() {
-      const request = {
-        // Where the zip should get created
-        destination_directory: path.join(userDataDir(), 'SaleSpot', uuid()),
-        // 1 == run, 0 == stop server
-        status_code: 1,
-        // List of faces
-        faces: [],
-      };
-      await ws.current.send(JSON.stringify(request));
-
-      try {
-        const [response] = await ws.current.receive();
-        const msg = JSON.parse(response.toString());
-        // setMonologue(msg.current_monologue);
-        // setTalkRatio(msg.talk_ratio);
-        // audio_location: "test.mp4"
-        // faces: []
-        // status_code: 1
-        // voice_metrics:
-        // current_monologue: 0
-        // is_talking: false
-        // longest_monologue: 0
-        // talk_ratio: 0
-
-        // const statusCode = msg.status_code;
-        // if (statusCode === 0) {
-        //   log.info(msg.error_message);
-        // } else if (statusCode === 2) return;
-
-        // await ws.current.send(JSON.stringify(request));
-        // log.info(msg);
-        // log.info(msg.voice_metrics.current_monologue);
-        // setMonologue(msg.voice_metrics.current_monologue);
-        // setTalkRatio(msg.voice_metrics.talk_ratio);
-        // () => setResponseObject(msg);
-        log.info(msg);
-        return msg;
-      } catch (e) {
-        log.info(e);
-      }
-    }
-
-    Spot()
-      .then((response) => {
-        setMonologue(response.voice_metrics.current_monologue);
-        return response;
-      })
-      .then((response) => {
-        setTalkRatio(response.voice_metrics.talk_ratio);
-        return response;
-      })
-      .catch((e) => log.info(e));
-  });
-
   return (
-    // <div className="flex flex-col justify-center">
-    //   <div className="w-full text-centerrelative py-3 sm:max-w-xl sm:mx-auto">
-    //     <div className="w-full bg-gray-600 p-4 rounded-full">
-    //       <div className="flex justify-between h-24 w-full bg-gray-600 rounded-full">
-    //         <div className="w-36 bg-gray-400 text-white p-3 rounded-full text-center">
-    //           <span className="text-2xl">{timeDisplay(elapsed)}</span>
-    //           <br />
-    //           Time Elapsed
-    //         </div>
-    //         <div
-    //           className={`w-32 h-32 ${
-    //             message.data > 5 ? 'bg-green-400' : 'bg-red-400'
-    //           } text-white p-6 rounded-full text-center -mb-12 mt-12 border-8 border-gray-600`}
-    //         >
-    //           <div className="text-2xl">{parseInt(message.data, 10) * 10}</div>
-    //           Score
-    //         </div>
-    //         <div className="w-36 bg-gray-400 text-white p-3 rounded-full text-center">
-    //           {parseInt(message.data, 10) + 110} WPM
-    //           <br />
-    //           Talk
-    //         </div>
-    //       </div>
-    //     </div>
-    //   </div>
-    // </div>
     <div className="flex">
       <div className="flex flex-grow flex-col bg-white p-3 min-h-screen content-center md:w-1/2 rounded-xl">
         <div className="flex flex-grow flex-wrap justify-between content-center">
@@ -263,7 +156,7 @@ export default function Hud() {
             <div>Time Elapsed</div>
           </div>
           <div className="flex flex-col justify-end bg-gray-100 flex-1 p-3">
-            <div>{monologue}m</div>
+            <div>{Math.floor(monologue / 60)}m</div>
             <div>Monologue</div>
           </div>
           <div className="flex flex-col justify-end bg-gray-100 flex-1 p-3">

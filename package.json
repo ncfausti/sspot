@@ -32,6 +32,7 @@
   "build": {
     "productName": "SaleSpot",
     "appId": "com.smile-ml.salespot",
+    "asar": false,
     "files": [
       "dist/",
       "node_modules/",
@@ -42,13 +43,9 @@
     ],
     "afterSign": ".erb/scripts/Notarize.js",
     "mac": {
-      "target": {
-        "target": "default",
-        "arch": [
-          "x64",
-          "arm64"
-        ]
-      },
+      "target": [
+        "dmg"
+      ],
       "type": "distribution",
       "hardenedRuntime": true,
       "entitlements": "assets/entitlements.mac.plist",
@@ -269,7 +266,8 @@
     "react-router-dom": "^5.2.0",
     "regenerator-runtime": "^0.13.5",
     "source-map-support": "^0.5.19",
-    "uuidv4": "^6.2.12"
+    "uuidv4": "^6.2.12",
+    "zeromq": "5"
   },
   "devEngines": {
     "node": ">=10.x",

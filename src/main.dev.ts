@@ -81,10 +81,6 @@ const createWindow = async () => {
         additionalArguments: [`--USER-DATA-DIR=${app.getPath('userData')}`],
         nativeWindowOpen: false,
       },
-      // alwaysOnTop: true,
-      // transparent: true,
-      // frame: false,
-      // backgroundColor: '#00000000',
     },
   });
 

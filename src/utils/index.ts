@@ -77,7 +77,7 @@ export const startServer = () => {
   const curDir = process.cwd();
   const pythonServerBin =
     process.platform === 'darwin' ? 'server' : 'server.exe';
-  const assets = path.join(__dirname, '..', '..', 'assets');
+  const assets = path.join(__dirname, '..', 'assets');
   const binDir = path.join(assets, 'server');
   process.chdir(binDir);
   const child = spawn(`./${pythonServerBin}`);
