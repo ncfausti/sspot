@@ -9,7 +9,6 @@ import playIcon from '../../../assets/play.png';
 import blindIcon from '../../../assets/blind.png';
 import resetIcon from '../../../assets/reset.png';
 import expandIcon from '../../../assets/expand.png';
-import { startServer } from '../../utils';
 
 interface RequestMessage {
   // Where the zip should get created
@@ -70,12 +69,12 @@ export default function Hud() {
 
   function respond(isSpotting: boolean) {
     if (!wsRef.current) return;
-    wsRef.current.onmessage = (e) => {
-      if (!isSpotting) return;
-      const msg = JSON.parse(e.data);
-      // log.info('e', msg);
-      setVoiceMetrics(msg.voice_metrics);
-    };
+    if (wsRef)
+      wsRef.current.onmessage = (e) => {
+        if (!isSpotting) return;
+        const msg = JSON.parse(e.data);
+        setVoiceMetrics(msg.voice_metrics);
+      };
   }
 
   useEffect(() => {
@@ -128,6 +127,7 @@ export default function Hud() {
 
   function sendReq() {
     try {
+      // if (wsRef.current.readyState !== 1) return;
       wsRef.current.send(
         JSON.stringify({
           destination_directory:

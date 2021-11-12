@@ -56,7 +56,8 @@ export const prettyDate = (date) => {
 };
 
 export const validEmail = (email) => {
-  const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  const re =
+    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(String(email).toLowerCase());
 };
 
@@ -76,9 +77,9 @@ export function userDataDir() {
 export const startServer = () => {
   const curDir = process.cwd();
   const pythonServerBin =
-    process.platform === 'darwin' ? 'server' : 'server.exe';
+    process.platform === 'darwin' ? 'ws_server' : 'ws_server.exe';
   const assets = path.join(__dirname, '..', 'assets');
-  const binDir = path.join(assets, 'server');
+  const binDir = path.join(assets, 'ws_server');
   process.chdir(binDir);
   const child = spawn(`./${pythonServerBin}`);
   log.info(`STARTING SERVER FROM: ${binDir}`);

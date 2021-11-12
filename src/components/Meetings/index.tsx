@@ -3,12 +3,12 @@ import React, { useEffect, useState } from 'react';
 import { CogIcon } from '@heroicons/react/solid';
 import log from 'electron-log';
 import logo from '../../../assets/salespot-logo-red.png';
+import { startServer } from '../../utils';
 // import { useAuth } from '../../contexts/AuthContext';
 // import { prettyDate } from '../../utils';
 
 export default function Meetings() {
   // const { currentUser } = useAuth();
-  log.info('in meetings');
   // const [meetingIndex] = useState(0);
   // const [eventList, setEventList] = useState([
   //   { startTime: '10:00AM', startDate: '1/1/2000', id: -1 },
@@ -32,16 +32,16 @@ export default function Meetings() {
   // }
 
   function handleLaunchClick() {
-    log.info('clicked launch');
     window.open(
       `file://${__dirname}/index.html#/live`,
       '_blank',
-      `top=80,left=200,frame=false,transparent=false, backgroundColor=#00000000`
+      `top=40,left=600,frame=false,transparent=false, backgroundColor=#00000000`
     );
   }
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
+    startServer();
     const interval = setInterval(() => setTime(new Date()), 1000);
     return () => {
       clearInterval(interval);
