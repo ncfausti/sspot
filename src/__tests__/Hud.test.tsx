@@ -17,9 +17,9 @@ describe('Hud', () => {
 describe('Zeromq socket tests', () => {
   it('should start the python spotting server', () => {
     const pythonServerBin =
-      process.platform === 'darwin' ? 'server' : 'server.exe';
+      process.platform === 'darwin' ? 'ws_server' : 'ws_server.exe';
     const assets = path.join(process.cwd(), 'assets');
-    const binDir = path.join(assets, 'server');
+    const binDir = path.join(assets, 'ws_server');
     process.chdir(binDir);
 
     const child = spawn(`./${pythonServerBin}`);
