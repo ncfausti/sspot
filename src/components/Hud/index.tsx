@@ -1,11 +1,8 @@
 import React, { useRef, useState, useEffect } from 'react';
 import log from 'electron-log';
-import { ipcRenderer } from 'electron';
-// import { Request } from 'zeromq';
-import WebSocket from 'ws';
-import child_process from 'child_process';
 import path from 'path';
 import { uuid } from 'uuidv4';
+import { w3cwebsocket as W3CWebSocket } from 'websocket';
 import ParticipantsList from './ParticipantsList';
 import spottingIcon from '../../../assets/spotting-icon.png';
 import playIcon from '../../../assets/play.png';
@@ -42,56 +39,48 @@ function userDataDir() {
   }
 }
 
+const voiceMetricsDefault = {
+  current_monologue: 0,
+  is_talking: false,
+  longest_monologue: 5,
+  talk_ratio: 0,
+};
+
 export default function Hud() {
   const [message, setMessage] = useState<RequestMessage>();
-  // const ws = useRef(new WebSocket('tcp://localhost:5555'));
   const [elapsed, setElapsed] = useState(0);
   const [expanded, setExpanded] = useState(true);
   const [time, setTime] = useState(new Date());
   const [spotting, setSpotting] = useState(true);
   const [monologue, setMonologue] = useState(0);
   const [talkRatio, setTalkRatio] = useState(0);
-  const [responseObject, setResponseObject] = useState(null);
-  const ws = useRef(null);
-  const interval = useRef(null);
-  // const [resp, setResp] = useRef(null);
+  const [voiceMetrics, setVoiceMetrics] = useState(voiceMetricsDefault);
+  const [currentMsg, setCurrentMsg] = useState(null);
+  const wsRef = useRef(null);
 
   useEffect(() => {
-    const server = startServer();
+    wsRef.current = new window.WebSocket('ws://localhost:8765');
+    wsRef.current.onmessage = function (event) {
+      setCurrentMsg(event.data);
+      wsRef.current.send(JSON.stringify(event.data));
+    };
+    wsRef.current.onopen = () => log.info('ws opened');
+    wsRef.current.onclose = () => log.info('ws closed');
   }, []);
 
-  // This only runs once on initial render...
+  function respond(isSpotting: boolean) {
+    if (!wsRef.current) return;
+    wsRef.current.onmessage = (e) => {
+      if (!isSpotting) return;
+      const msg = JSON.parse(e.data);
+      // log.info('e', msg);
+      setVoiceMetrics(msg.voice_metrics);
+    };
+  }
+
   useEffect(() => {
-    async function Spot() {
-      const request = {
-        // Where the zip should get created
-        destination_directory: path.join(userDataDir(), 'SaleSpot', uuid()),
-        // 1 == run, 0 == stop server
-        status_code: 1,
-        // List of faces
-        faces: [],
-      };
-      await ws.current.send(JSON.stringify(request));
-      // await wsRef.send(JSON.stringify(request));
-    }
-
-    ws.current = new window.WebSocket('ws://localhost:8765');
-    ws.current.onopen = function (event) {
-      // ws.current.send("Here's some text that the server is urgently awaiting!");
-      Spot();
-      // .catch((e) => log.info(e));
-    };
-
-    ws.current.onmessage = function (event) {
-      log.info('msg from server says:');
-      log.info(event.data);
-    };
-    const wsCurrent = ws.current;
-    // ...and is cleaned up on unload of component
-    return () => {
-      wsCurrent.close();
-    };
-  }, []);
+    respond(spotting);
+  }, [spotting, voiceMetrics]);
 
   useEffect(() => {
     const timer = setTimeout(() => setElapsed((prev) => prev + 1), 1000);
@@ -110,15 +99,19 @@ export default function Hud() {
   function clickPlay() {
     log.info('play clicked');
   }
+
   function clickReset() {
     log.info('reset clicked');
   }
+
   function clickBlind() {
     log.info('blind clicked');
   }
+
   function clickSpotting() {
     log.info('spotting clicked');
   }
+
   function clickExpand() {
     log.info('expand clicked');
     setExpanded((prev) => !prev);
@@ -126,13 +119,37 @@ export default function Hud() {
   }
 
   function clickEnd() {
-    setSpotting(false);
-    ws.current.disconnect('tcp://localhost:5555');
+    setSpotting((prev) => !prev);
   }
 
   function keyPressed(e) {
     log.info(e);
   }
+
+  function sendReq() {
+    try {
+      wsRef.current.send(
+        JSON.stringify({
+          destination_directory:
+            '/Users/nick/smile-ml/salespot-desktop/assets/no-user.png',
+          status_code: 1,
+          faces: [],
+        })
+      );
+    } catch (e) {
+      log.error(e);
+    }
+  }
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      sendReq();
+    }, 50);
+    return () => {
+      clearInterval(id);
+    };
+  });
+
   return (
     <div className="flex">
       <div className="flex flex-grow flex-col bg-white p-3 min-h-screen content-center md:w-1/2 rounded-xl">
@@ -146,7 +163,7 @@ export default function Hud() {
               className="cursor-pointer bg-white border-2 rounded-lg border-gray-500 font-light px-6 py-1"
               type="button"
             >
-              End
+              {spotting ? 'End' : 'Start'}
             </button>
           </div>
         </div>
@@ -156,11 +173,11 @@ export default function Hud() {
             <div>Time Elapsed</div>
           </div>
           <div className="flex flex-col justify-end bg-gray-100 flex-1 p-3">
-            <div>{Math.floor(monologue / 60)}m</div>
+            <div>{Math.floor(voiceMetrics.current_monologue / 60)}m</div>
             <div>Monologue</div>
           </div>
           <div className="flex flex-col justify-end bg-gray-100 flex-1 p-3">
-            <div>{talkRatio}%</div>
+            <div>{voiceMetrics.talk_ratio}%</div>
             <div>Talk Ratio</div>
           </div>
         </div>
@@ -169,9 +186,12 @@ export default function Hud() {
             <img
               onClick={clickPlay}
               src={playIcon}
-              className="inline w-7 h-7 cursor-pointer mr-1"
+              className="hidden inline w-7 h-7 cursor-pointer mr-1"
               alt="SaleSpot"
             />
+            <span className="text-2xl">
+              {voiceMetrics.is_talking ? '🗣' : '😶'}
+            </span>
           </div>
           <div className="text-gray-700 space-x-4">
             {/* <SpottingIcon className="h-4 w-4 cursor-pointer" /> */}
