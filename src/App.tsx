@@ -9,7 +9,6 @@ import Hud from './components/Hud';
 // import SignIn from './components/SignIn';
 
 export default function App() {
-  log.info('in App()');
   return (
     <Router>
       {/* <AuthProvider> */}

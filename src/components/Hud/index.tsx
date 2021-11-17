@@ -1,8 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
 import log from 'electron-log';
-import path from 'path';
-import { uuid } from 'uuidv4';
-import { w3cwebsocket as W3CWebSocket } from 'websocket';
 import ParticipantsList from './ParticipantsList';
 import spottingIcon from '../../../assets/spotting-icon.png';
 import playIcon from '../../../assets/play.png';
@@ -25,42 +22,24 @@ interface Face {
   y: number;
 }
 
-// Get the OS specific appData folder from the additional
-// additionalArgs. values passed at startup in the Main process
-function userDataDir() {
-  try {
-    return window.process.argv
-      .filter((v) => v.startsWith('--USER-DATA-DIR'))[0]
-      .split('=')[1];
-  } catch (e) {
-    log.info('Info: --USER-DATA-DIR not specified on process.argv');
-    return null;
-  }
-}
-
 const voiceMetricsDefault = {
   current_monologue: 0,
   is_talking: false,
-  longest_monologue: 5,
+  longest_monologue: 0,
   talk_ratio: 0,
 };
 
 export default function Hud() {
-  const [message, setMessage] = useState<RequestMessage>();
   const [elapsed, setElapsed] = useState(0);
   const [expanded, setExpanded] = useState(true);
   const [time, setTime] = useState(new Date());
   const [spotting, setSpotting] = useState(true);
-  const [monologue, setMonologue] = useState(0);
-  const [talkRatio, setTalkRatio] = useState(0);
   const [voiceMetrics, setVoiceMetrics] = useState(voiceMetricsDefault);
-  const [currentMsg, setCurrentMsg] = useState(null);
   const wsRef = useRef(null);
 
   useEffect(() => {
     wsRef.current = new window.WebSocket('ws://localhost:8765');
     wsRef.current.onmessage = function (event) {
-      setCurrentMsg(event.data);
       wsRef.current.send(JSON.stringify(event.data));
     };
     wsRef.current.onopen = () => log.info('ws opened');
