@@ -30,10 +30,12 @@ export default function Meetings() {
   //         : prevState.meetingIndex,
   //   }));
   // }
+  const [childId, setChildId] = useState(-1);
 
   function handleLaunchClick() {
+    if (childId === -1) return;
     window.open(
-      `file://${__dirname}/index.html#/live`,
+      `file://${__dirname}/index.html#/live?server_id=${childId}`,
       '_blank',
       `top=40,left=600,frame=false,transparent=false, backgroundColor=#00000000`
     );
@@ -41,10 +43,12 @@ export default function Meetings() {
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
-    startServer();
+    const child = startServer();
+    setChildId(child.pid);
     const interval = setInterval(() => setTime(new Date()), 1000);
     return () => {
       clearInterval(interval);
+      child.kill(9);
     };
   }, []);
 
