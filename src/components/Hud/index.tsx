@@ -56,6 +56,12 @@ export default function Hud() {
       };
   }
 
+  function killServer() {
+    const pid = window.location.href.split('server_id=')[1];
+    if (parseInt(pid, 10) === -1) return;
+    process.kill(parseInt(pid, 10));
+  }
+
   useEffect(() => {
     respond(spotting);
   }, [spotting, voiceMetrics]);
@@ -98,6 +104,8 @@ export default function Hud() {
 
   function clickEnd() {
     setSpotting((prev) => !prev);
+    setTimeout(() => killServer(), 0);
+    window.close();
   }
 
   function keyPressed(e) {

@@ -48,7 +48,6 @@ export default function Meetings() {
     const interval = setInterval(() => setTime(new Date()), 1000);
     return () => {
       clearInterval(interval);
-      child.kill(9);
     };
   }, []);
 
