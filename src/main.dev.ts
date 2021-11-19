@@ -107,6 +107,16 @@ app.on('window-all-closed', () => {
   }
 });
 
+app.on('will-quit', () => {
+  // kill the processing server
+  log.info('killing server before quit');
+  try {
+    process.kill(global.myGlobalVariable);
+  } catch (e) {
+    log.error(e);
+  }
+});
+
 app.on('ready', () => {
   console.log('app is ready');
   const interval = setInterval(() => {
