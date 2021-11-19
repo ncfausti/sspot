@@ -34,6 +34,7 @@ export default function Meetings() {
 
   function handleLaunchClick() {
     if (childId === -1) return;
+    setChildId(-1);
     window.open(
       `file://${__dirname}/index.html#/live?server_id=${childId}`,
       '_blank',
@@ -51,6 +52,23 @@ export default function Meetings() {
     };
   }, []);
 
+  useEffect(() => {
+    // Only run if user has started a spotting (childId is -1)
+    // AND user has clicked end.
+    // How can Meetings know that Hud clicked 'End'?
+    //   option 1: just keep trying until successful
+    //   option 2:
+    if (childId === -1) {
+      try {
+        log.info('getting a new python server via websockets');
+        const child = startServer();
+        setChildId(child.pid);
+      } catch (e) {
+        log.error(e);
+      }
+    }
+  }, [childId]);
+
   const dateStyle = new Intl.DateTimeFormat('en', {
     year: 'numeric',
     month: 'long',
@@ -67,7 +85,7 @@ export default function Meetings() {
     <div className="flex flex-grow flex-col p-3 min-h-screen content-center">
       <div className="flex flex-grow flex-wrap justify-between">
         <div className="text-xs text-gray-800 font-semibold">
-          {dateStyle.format(time)}
+          {dateStyle.format(time)} - {childId}
         </div>
         <div className="text-xs font-light">{timeStyle.format(time)}</div>
       </div>

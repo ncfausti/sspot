@@ -142,7 +142,8 @@ export default function Hud() {
       <div className="flex flex-grow flex-col bg-white p-3 min-h-screen content-center md:w-1/2 rounded-xl">
         <div className="flex flex-grow flex-wrap justify-between content-center">
           <div className="text-md text-gray-800  mt-1.5 font-semibold">
-            {timeStyle.format(time)}
+            {timeStyle.format(time)}{' '}
+            {window.location.href.split('server_id=')[1]}
           </div>
           <div className="text-md font-light">
             <button
