@@ -263,7 +263,6 @@
     "electron-updater": "^4.3.4",
     "find-process": "^1.4.7",
     "firebase": "^8.6.7",
-    "fkill": "^8.0.0",
     "history": "^5.0.0",
     "menubar": "^9.0.4",
     "react": "^17.0.1",

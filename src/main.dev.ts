@@ -11,7 +11,7 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
-import { app, screen } from 'electron';
+import { app, screen, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import { menubar } from 'menubar';
@@ -80,6 +80,7 @@ const createWindow = async () => {
         nodeIntegration: true,
         additionalArguments: [`--USER-DATA-DIR=${app.getPath('userData')}`],
         nativeWindowOpen: false,
+        enableRemoteModule: true,
       },
     },
   });
@@ -92,6 +93,11 @@ const createWindow = async () => {
 /**
  * Add event listeners...
  */
+ipcMain.on('setMyGlobalVariable', (event, myGlobalVariableValue) => {
+  log.info('setttttinggggg');
+  log.info(myGlobalVariableValue);
+  global.myGlobalVariable = myGlobalVariableValue;
+});
 
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even

@@ -1,73 +1,23 @@
 /* eslint-disable react/forbid-prop-types */
 import React, { useEffect, useState } from 'react';
 import { CogIcon } from '@heroicons/react/solid';
-import log from 'electron-log';
+import { ipcRenderer } from 'electron';
 import logo from '../../../assets/salespot-logo-red.png';
 import { startServer } from '../../utils';
-// import { useAuth } from '../../contexts/AuthContext';
-// import { prettyDate } from '../../utils';
 
 export default function Meetings() {
-  // const { currentUser } = useAuth();
-  // const [meetingIndex] = useState(0);
-  // const [eventList, setEventList] = useState([
-  //   { startTime: '10:00AM', startDate: '1/1/2000', id: -1 },
-  // ]);
-  // const { logout } = useAuth();
-
-  // function showPrev() {
-  //   setEventList((prevState) => ({
-  //     meetingIndex:
-  //       prevState.meetingIndex - 1 >= 0 ? prevState.meetingIndex - 1 : 0,
-  //   }));
-  // }
-
-  // function showNext() {
-  //   setEventList((prevState) => ({
-  //     meetingIndex:
-  //       prevState.meetingIndex + 1 < prevState.eventList.length
-  //         ? prevState.meetingIndex + 1
-  //         : prevState.meetingIndex,
-  //   }));
-  // }
-  const [childId, setChildId] = useState(-1);
-
-  function handleLaunchClick() {
-    if (childId === -1) return;
-    setChildId(-1);
-    window.open(
-      `file://${__dirname}/index.html#/live?server_id=${childId}`,
-      '_blank',
-      `top=40,left=600,frame=false,transparent=false, backgroundColor=#00000000`
-    );
-  }
   const [time, setTime] = useState(new Date());
 
+  // on initial load only
   useEffect(() => {
     const child = startServer();
-    setChildId(child.pid);
+    ipcRenderer.send('setMyGlobalVariable', child.pid);
+
     const interval = setInterval(() => setTime(new Date()), 1000);
     return () => {
       clearInterval(interval);
     };
   }, []);
-
-  useEffect(() => {
-    // Only run if user has started a spotting (childId is -1)
-    // AND user has clicked end.
-    // How can Meetings know that Hud clicked 'End'?
-    //   option 1: just keep trying until successful
-    //   option 2:
-    if (childId === -1) {
-      try {
-        log.info('getting a new python server via websockets');
-        const child = startServer();
-        setChildId(child.pid);
-      } catch (e) {
-        log.error(e);
-      }
-    }
-  }, [childId]);
 
   const dateStyle = new Intl.DateTimeFormat('en', {
     year: 'numeric',
@@ -81,11 +31,19 @@ export default function Meetings() {
     timeZoneName: 'short',
   });
 
+  function handleLaunchClick() {
+    window.open(
+      `file://${__dirname}/index.html#/live`,
+      '_blank',
+      `top=40,left=600,frame=false,transparent=false, backgroundColor=#00000000`
+    );
+  }
+
   return (
     <div className="flex flex-grow flex-col p-3 min-h-screen content-center">
       <div className="flex flex-grow flex-wrap justify-between">
         <div className="text-xs text-gray-800 font-semibold">
-          {dateStyle.format(time)} - {childId}
+          {dateStyle.format(time)}
         </div>
         <div className="text-xs font-light">{timeStyle.format(time)}</div>
       </div>

@@ -1,11 +1,13 @@
 import React, { useRef, useState, useEffect } from 'react';
 import log from 'electron-log';
+import { remote, ipcRenderer } from 'electron';
 import ParticipantsList from './ParticipantsList';
 import spottingIcon from '../../../assets/spotting-icon.png';
 import playIcon from '../../../assets/play.png';
 import blindIcon from '../../../assets/blind.png';
 import resetIcon from '../../../assets/reset.png';
 import expandIcon from '../../../assets/expand.png';
+import { startServer } from '../../utils';
 
 interface RequestMessage {
   // Where the zip should get created
@@ -56,12 +58,6 @@ export default function Hud() {
       };
   }
 
-  function killServer() {
-    const pid = window.location.href.split('server_id=')[1];
-    if (parseInt(pid, 10) === -1) return;
-    process.kill(parseInt(pid, 10));
-  }
-
   useEffect(() => {
     respond(spotting);
   }, [spotting, voiceMetrics]);
@@ -104,7 +100,17 @@ export default function Hud() {
 
   function clickEnd() {
     setSpotting((prev) => !prev);
-    setTimeout(() => killServer(), 0);
+
+    // Read MyGlobalVariable.
+    const pid = remote.getGlobal('myGlobalVariable');
+    log.info('killlinggggg');
+    log.info(pid);
+    process.kill(pid);
+
+    // restart the server
+    log.info('restartinggggg');
+    const child = startServer();
+    ipcRenderer.send('setMyGlobalVariable', child.pid);
     window.close();
   }
 
@@ -142,8 +148,7 @@ export default function Hud() {
       <div className="flex flex-grow flex-col bg-white p-3 min-h-screen content-center md:w-1/2 rounded-xl">
         <div className="flex flex-grow flex-wrap justify-between content-center">
           <div className="text-md text-gray-800  mt-1.5 font-semibold">
-            {timeStyle.format(time)}{' '}
-            {window.location.href.split('server_id=')[1]}
+            {timeStyle.format(time)}
           </div>
           <div className="text-md font-light">
             <button
