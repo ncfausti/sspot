@@ -74,14 +74,12 @@ export function userDataDir() {
   }
 }
 
-export const startServer = (testDir = '') => {
+export const startServer = () => {
   const curDir = process.cwd();
   const pythonServerBin =
     process.platform === 'darwin' ? 'ws_server' : 'ws_server.exe';
-  const assets = path.join(__dirname, '..', testDir, 'assets');
+  const assets = path.join(__dirname, '..', 'assets');
   const binDir = path.join(assets, 'ws_server');
-  log.info('binDir:');
-  log.info(binDir);
   process.chdir(binDir);
   const child = spawn(`./${pythonServerBin}`);
   log.info(`STARTING SERVER FROM: ${binDir}`);

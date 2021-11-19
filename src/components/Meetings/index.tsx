@@ -4,23 +4,39 @@ import { CogIcon } from '@heroicons/react/solid';
 import log from 'electron-log';
 import logo from '../../../assets/salespot-logo-red.png';
 import { startServer } from '../../utils';
+// import { useAuth } from '../../contexts/AuthContext';
+// import { prettyDate } from '../../utils';
 
 export default function Meetings() {
+  // const { currentUser } = useAuth();
+  // const [meetingIndex] = useState(0);
+  // const [eventList, setEventList] = useState([
+  //   { startTime: '10:00AM', startDate: '1/1/2000', id: -1 },
+  // ]);
+  // const { logout } = useAuth();
+
+  // function showPrev() {
+  //   setEventList((prevState) => ({
+  //     meetingIndex:
+  //       prevState.meetingIndex - 1 >= 0 ? prevState.meetingIndex - 1 : 0,
+  //   }));
+  // }
+
+  // function showNext() {
+  //   setEventList((prevState) => ({
+  //     meetingIndex:
+  //       prevState.meetingIndex + 1 < prevState.eventList.length
+  //         ? prevState.meetingIndex + 1
+  //         : prevState.meetingIndex,
+  //   }));
+  // }
   const [childId, setChildId] = useState(-1);
 
   function handleLaunchClick() {
-    // if (childId === -1) {
-    // try {
-    log.info('getting a new python server via websockets');
-    const child = startServer();
-    setChildId(child.pid);
-    // } catch (e) {
-    //   log.error(e);
-    // }
-    // }
-
+    if (childId === -1) return;
+    setChildId(-1);
     window.open(
-      `file://${__dirname}/index.html#/live?server_id=${child.pid}`,
+      `file://${__dirname}/index.html#/live?server_id=${childId}`,
       '_blank',
       `top=40,left=600,frame=false,transparent=false, backgroundColor=#00000000`
     );
@@ -28,8 +44,8 @@ export default function Meetings() {
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
-    // const child = startServer();
-    // setChildId(child.pid);
+    const child = startServer();
+    setChildId(child.pid);
     const interval = setInterval(() => setTime(new Date()), 1000);
     return () => {
       clearInterval(interval);
@@ -37,16 +53,21 @@ export default function Meetings() {
   }, []);
 
   useEffect(() => {
-    // if (childId === -1) {
-    //   try {
-    //     log.info('getting a new python server via websockets');
-    //     const child = startServer();
-    //     setChildId(child.pid);
-    //   } catch (e) {
-    //     log.error(e);
-    //   }
-    // }
-  }, []);
+    // Only run if user has started a spotting (childId is -1)
+    // AND user has clicked end.
+    // How can Meetings know that Hud clicked 'End'?
+    //   option 1: just keep trying until successful
+    //   option 2:
+    if (childId === -1) {
+      try {
+        log.info('getting a new python server via websockets');
+        const child = startServer();
+        setChildId(child.pid);
+      } catch (e) {
+        log.error(e);
+      }
+    }
+  }, [childId]);
 
   const dateStyle = new Intl.DateTimeFormat('en', {
     year: 'numeric',
