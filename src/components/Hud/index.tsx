@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import log from 'electron-log';
-import { remote, ipcRenderer } from 'electron';
+import { remote, screen, ipcRenderer } from 'electron';
 import ParticipantsList from './ParticipantsList';
 import spottingIcon from '../../../assets/spotting-icon.png';
 import playIcon from '../../../assets/play.png';
@@ -90,7 +90,15 @@ export default function Hud() {
 
   function clickSpotting() {
     log.info('spotting clicked');
+    // request cursor position from main
   }
+
+  useEffect(() => {
+    window.addEventListener('blur', () => {
+      log.info('blurrred');
+      ipcRenderer.send('cursorpos');
+    });
+  }, []);
 
   function clickExpand() {
     log.info('expand clicked');

@@ -11,7 +11,7 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
-import { app, screen, ipcMain } from 'electron';
+import { app, globalShortcut, screen, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import { menubar } from 'menubar';
@@ -76,6 +76,7 @@ const createWindow = async () => {
       width: 300,
       height: 120,
       icon: getAssetPath('icon.png'),
+      acceptFirstMouse: true,
       webPreferences: {
         nodeIntegration: true,
         additionalArguments: [`--USER-DATA-DIR=${app.getPath('userData')}`],
@@ -121,8 +122,13 @@ app.on('ready', () => {
   console.log('app is ready');
   const interval = setInterval(() => {
     const mousePos = screen.getCursorScreenPoint();
-    // console.log(mousePos);
+    console.log(mousePos);
   }, 50);
+});
+
+ipcMain.on('cursorpos', () => {
+  const mousePos = screen.getCursorScreenPoint();
+  log.info(mousePos);
 });
 
 app.whenReady().then(createWindow).catch(console.log);
