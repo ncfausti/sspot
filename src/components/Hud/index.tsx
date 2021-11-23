@@ -31,27 +31,22 @@ const voiceMetricsDefault = {
   talk_ratio: 0,
 };
 
+// just run once on window display
+const windowSock = new window.WebSocket('ws://localhost:8765');
+windowSock.onopen = () => log.info('ws opened');
+windowSock.onclose = () => log.info('ws closed');
+
 export default function Hud() {
   const [elapsed, setElapsed] = useState(0);
   const [expanded, setExpanded] = useState(true);
   const [time, setTime] = useState(new Date());
   const [spotting, setSpotting] = useState(true);
   const [voiceMetrics, setVoiceMetrics] = useState(voiceMetricsDefault);
-  const wsRef = useRef(null);
-
-  useEffect(() => {
-    wsRef.current = new window.WebSocket('ws://localhost:8765');
-    wsRef.current.onmessage = function (event) {
-      wsRef.current.send(JSON.stringify(event.data));
-    };
-    wsRef.current.onopen = () => log.info('ws opened');
-    wsRef.current.onclose = () => log.info('ws closed');
-  }, []);
 
   function respond(isSpotting: boolean) {
-    if (!wsRef.current) return;
-    if (wsRef)
-      wsRef.current.onmessage = (e) => {
+    if (!windowSock) return;
+    if (windowSock)
+      windowSock.onmessage = (e) => {
         if (!isSpotting) return;
         const msg = JSON.parse(e.data);
         setVoiceMetrics(msg.voice_metrics);
@@ -128,8 +123,8 @@ export default function Hud() {
 
   function sendReq() {
     try {
-      // if (wsRef.current.readyState !== 1) return;
-      wsRef.current.send(
+      // if (windowSock.readyState !== 1) return;
+      windowSock.send(
         JSON.stringify({
           destination_directory:
             '/Users/nick/smile-ml/salespot-desktop/assets/no-user.png',

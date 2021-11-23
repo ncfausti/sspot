@@ -107,18 +107,7 @@
     "email": "nick@smile-ml.com",
     "url": "https://smile-ml.com"
   },
-  "contributors": [
-    {
-      "name": "Amila Welihinda",
-      "email": "amilajack@gmail.com",
-      "url": "https://github.com/amilajack"
-    },
-    {
-      "name": "John Tran",
-      "email": "jptran318@gmail.com",
-      "url": "https://github.com/jooohhn"
-    }
-  ],
+  "contributors": [],
   "license": "UNLICENSED",
   "bugs": {
     "url": "https://github.com/vizaiapp/salespot-desktop/issues"
