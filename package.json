@@ -9,6 +9,7 @@
     "rebuild": "electron-rebuild --trace-deprecation --parallel --types prod,dev,optional --module-dir src",
     "lint": "cross-env NODE_ENV=development eslint . --cache --ext .js,.jsx,.ts,.tsx",
     "package": "rm -rf src/dist && yarn build && electron-builder build --publish never",
+    "package:win": "rm -rf src/dist && yarn build && electron-builder build --win --x64 --publish never",
     "postinstall": "node -r @babel/register .erb/scripts/CheckNativeDep.js && electron-builder install-app-deps && yarn cross-env NODE_ENV=development webpack --config ./.erb/configs/webpack.config.renderer.dev.dll.babel.js && opencollective-postinstall && yarn-deduplicate yarn.lock",
     "start": "node -r @babel/register ./.erb/scripts/CheckPortInUse.js && yarn start:renderer",
     "start:main": "cross-env NODE_ENV=development electron -r ./.erb/scripts/BabelRegister ./src/main.dev.ts",
@@ -32,7 +33,7 @@
   "build": {
     "productName": "SaleSpot",
     "appId": "com.smile-ml.salespot",
-    "asar": false,
+    "asar": true,
     "files": [
       "dist/",
       "node_modules/",
@@ -97,12 +98,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/electron-react-boilerplate/electron-react-boilerplate.git"
+    "url": "git+https://github.com/vizaiapp/salespot-desktop"
   },
   "author": {
-    "name": "Electron React Boilerplate Maintainers",
-    "email": "electronreactboilerplate@gmail.com",
-    "url": "https://electron-react-boilerplate.js.org"
+    "name": "smileML",
+    "email": "nick@smile-ml.com",
+    "url": "https://smile-ml.com"
   },
   "contributors": [
     {
@@ -116,9 +117,9 @@
       "url": "https://github.com/jooohhn"
     }
   ],
-  "license": "MIT",
+  "license": "UNLICENSED",
   "bugs": {
-    "url": "https://github.com/electron-react-boilerplate/electron-react-boilerplate/issues"
+    "url": "https://github.com/vizaiapp/salespot-desktop/issues"
   },
   "keywords": [
     "electron",
@@ -129,9 +130,10 @@
     "sass",
     "webpack",
     "hot",
-    "reload"
+    "reload",
+    "salespot"
   ],
-  "homepage": "https://github.com/electron-react-boilerplate/electron-react-boilerplate#readme",
+  "homepage": "https://github.com/vizaiapp/salespot-desktop#readme",
   "jest": {
     "testURL": "http://localhost/",
     "moduleNameMapper": {
