@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import log from 'electron-log';
 import { remote, screen, ipcRenderer } from 'electron';
+import { uuid } from 'uuidv4';
 import ParticipantsList from './ParticipantsList';
 import spottingIcon from '../../../assets/spotting-icon.png';
 import playIcon from '../../../assets/play.png';
@@ -19,9 +20,12 @@ interface RequestMessage {
 }
 
 interface Face {
+  directory: string;
   id: string;
   x: number;
   y: number;
+  image_path: string;
+  status: number;
 }
 
 const voiceMetricsDefault = {
@@ -31,35 +35,66 @@ const voiceMetricsDefault = {
   talk_ratio: 0,
 };
 
-// just run once on window display
-const windowSock = new window.WebSocket('ws://localhost:8765');
-windowSock.onopen = () => log.info('ws opened');
-windowSock.onclose = () => log.info('ws closed');
-
 export default function Hud() {
   const [elapsed, setElapsed] = useState(0);
   const [expanded, setExpanded] = useState(true);
   const [time, setTime] = useState(new Date());
   const [spotting, setSpotting] = useState(true);
   const [voiceMetrics, setVoiceMetrics] = useState(voiceMetricsDefault);
+  const [currentFaces, setCurrentFaces] = useState([]);
+  const [newFace, setNewFace] = useState(null);
+  const [sendingNewFace, setSendingNewFace] = useState(false);
 
-  function respond(isSpotting: boolean) {
-    if (!windowSock) return;
-    if (windowSock)
-      windowSock.onmessage = (e) => {
-        if (!isSpotting) return;
-        const msg = JSON.parse(e.data);
-        setVoiceMetrics(msg.voice_metrics);
-      };
+  function readResponseAndSendAnotherRequestAfterNMs(
+    socket: WebSocket,
+    e: any,
+    msWait: number
+  ) {
+    if (!socket) return;
+
+    const msg = JSON.parse(e.data);
+    log.info(`Server says`);
+    log.info(msg);
+    setVoiceMetrics(msg.voice_metrics);
+    setCurrentFaces(msg.faces);
+
+    // if a face has been clicked, add those details to msg
+    if (sendingNewFace) {
+      msg.faces.push(newFace);
+    }
+
+    // send back what the server sent us after msWait milliseconds
+    setTimeout(() => {
+      log.info(`Client sending:`);
+      log.info(msg);
+      socket.send(JSON.stringify(msg));
+    }, msWait);
   }
 
   useEffect(() => {
-    respond(spotting);
-  }, [spotting, voiceMetrics]);
+    // just run once on window init
+    const windowSock = new window.WebSocket('ws://localhost:8765');
+    windowSock.onopen = () => {
+      log.info('ws opened');
+      const initMessage = JSON.stringify({
+        destination_directory: '/Users/nick/Desktop/',
+        status_code: 1,
+        faces: [],
+      });
+      // send init message to kickoff client <--> server talking
+      windowSock.send(initMessage);
+    };
+
+    // recv message from the server
+    windowSock.onmessage = (e) => {
+      readResponseAndSendAnotherRequestAfterNMs(windowSock, e, 1000);
+    };
+
+    windowSock.onclose = () => log.info('ws closed');
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => setElapsed((prev) => prev + 1), 1000);
-
     return () => {
       clearTimeout(timer);
     };
@@ -79,8 +114,20 @@ export default function Hud() {
     log.info('reset clicked');
   }
 
+  // simulate clicking on a face for now
   function clickBlind() {
     log.info('blind clicked');
+    // set face coords
+    const exampleFace = {
+      directory: '/Users/nick/Desktop/',
+      id: 'xyz128228xzfa',
+      x: 200,
+      y: 200,
+      image_path: '/Users/nick/smile-ml/salespot-desktop/assets/no-user.png',
+      status: 2,
+    };
+    setSendingNewFace(false);
+    setNewFace(exampleFace);
   }
 
   function clickSpotting() {
@@ -121,30 +168,14 @@ export default function Hud() {
     log.info(e);
   }
 
-  function sendReq() {
-    try {
-      // if (windowSock.readyState !== 1) return;
-      windowSock.send(
-        JSON.stringify({
-          destination_directory:
-            '/Users/nick/smile-ml/salespot-desktop/assets/no-user.png',
-          status_code: 1,
-          faces: [],
-        })
-      );
-    } catch (e) {
-      log.error(e);
-    }
-  }
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      sendReq();
-    }, 50);
-    return () => {
-      clearInterval(id);
-    };
-  });
+  // useEffect(() => {
+  //   const id = setInterval(() => {
+  //     sendReq(windowSock);
+  //   }, 500);
+  //   return () => {
+  //     clearInterval(id);
+  //   };
+  // });
 
   return (
     <div className="flex">

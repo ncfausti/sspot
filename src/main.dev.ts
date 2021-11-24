@@ -120,10 +120,10 @@ app.on('will-quit', () => {
 
 app.on('ready', () => {
   console.log('app is ready');
-  const interval = setInterval(() => {
-    const mousePos = screen.getCursorScreenPoint();
-    console.log(mousePos);
-  }, 50);
+  // const interval = setInterval(() => {
+  //   const mousePos = screen.getCursorScreenPoint();
+  //   // console.log(mousePos);
+  // }, 50);
 });
 
 ipcMain.on('cursorpos', () => {
