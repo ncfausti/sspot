@@ -79,14 +79,10 @@ export const startServer = () => {
   const pythonServerBin =
     process.platform === 'darwin' ? 'ws_server' : 'ws_server.exe';
   const assets = path.join(__dirname, '..', 'assets');
-  const binDir = path.join(assets, 'ws_server');
-  process.chdir(binDir);
+  // const binDir = path.join(assets, 'ws_server');
+  process.chdir(assets);
   const child = spawn(`./${pythonServerBin}`);
-  log.info(`STARTING SERVER FROM: ${binDir}`);
+  log.info(`STARTING SERVER FROM: ${assets}`);
   process.chdir(curDir);
   return child;
-};
-
-export const getAssetPath = (...paths: string[]): string => {
-  return path.join(RESOURCES_PATH, ...paths);
 };

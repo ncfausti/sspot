@@ -10,6 +10,8 @@ import resetIcon from '../../../assets/reset.png';
 import expandIcon from '../../../assets/expand.png';
 import { startServer } from '../../utils';
 
+const ws = new window.WebSocket('ws://localhost:8765');
+
 interface RequestMessage {
   // Where the zip should get created
   destination_directory: string;
@@ -28,6 +30,12 @@ interface Face {
   status: number;
 }
 
+const timeStyle = new Intl.DateTimeFormat('en', {
+  hour: 'numeric',
+  minute: 'numeric',
+  timeZoneName: 'short',
+});
+
 const voiceMetricsDefault = {
   current_monologue: 0,
   is_talking: false,
@@ -35,63 +43,72 @@ const voiceMetricsDefault = {
   talk_ratio: 0,
 };
 
+const exampleFace = {
+  directory: '/Users/nick/Desktop/',
+  id: 'xyz128228xzfa',
+  x: 1195,
+  y: 225,
+  image_path: '/Users/nick/smile-ml/salespot-desktop/assets/no-user.png',
+  status: 2,
+};
+
+function readResponseAndSendAnotherRequestAfterNMs(
+  socket,
+  e,
+  facelist,
+  msWait
+) {
+  if (!socket) return;
+
+  const msg = JSON.parse(e.data);
+  console.log(`Server says`);
+  if (msg.faces.length > 0) {
+    console.log(msg.faces[0].status);
+    console.log(msg.faces[0].x, ',', msg.faces[0].y);
+    console.log(msg.faces[0].label);
+    console.log(msg.faces[0].sentiment);
+  }
+
+  setTimeout(() => {
+    console.log('inside readRespons...');
+    console.log(facelist);
+    msg.faces.push(...facelist);
+    console.log(`Client sending:`);
+    console.log(msg.faces);
+    ws.send(JSON.stringify(msg));
+
+    // Clear faces and let the server control facelist on
+    // next message recv
+    faces = [];
+  }, msWait);
+}
+
 export default function Hud() {
   const [elapsed, setElapsed] = useState(0);
   const [expanded, setExpanded] = useState(true);
   const [time, setTime] = useState(new Date());
-  const [spotting, setSpotting] = useState(true);
+  const [faces, setFaces] = useState([]);
   const [voiceMetrics, setVoiceMetrics] = useState(voiceMetricsDefault);
-  const [currentFaces, setCurrentFaces] = useState([]);
-  const [newFace, setNewFace] = useState(null);
-  const [sendingNewFace, setSendingNewFace] = useState(false);
 
-  function readResponseAndSendAnotherRequestAfterNMs(
-    socket: WebSocket,
-    e: any,
-    msWait: number
-  ) {
-    if (!socket) return;
+  ws.onopen = (e) => {
+    log.info('ws opened');
+    const initMessage = JSON.stringify({
+      destination_directory: '/Users/nick/Desktop/',
+      status_code: 1,
+      faces,
+    });
+    ws.send(initMessage);
+  };
 
-    const msg = JSON.parse(e.data);
-    log.info(`Server says`);
-    log.info(msg);
-    setVoiceMetrics(msg.voice_metrics);
-    setCurrentFaces(msg.faces);
+  // recv message from the server
+  ws.onmessage = (e) => {
+    log.info('onmessage faces');
+    readResponseAndSendAnotherRequestAfterNMs(ws, e, faces, 0);
+  };
 
-    // if a face has been clicked, add those details to msg
-    if (sendingNewFace) {
-      msg.faces.push(newFace);
-    }
-
-    // send back what the server sent us after msWait milliseconds
-    setTimeout(() => {
-      log.info(`Client sending:`);
-      log.info(msg);
-      socket.send(JSON.stringify(msg));
-    }, msWait);
-  }
-
-  useEffect(() => {
-    // just run once on window init
-    const windowSock = new window.WebSocket('ws://localhost:8765');
-    windowSock.onopen = () => {
-      log.info('ws opened');
-      const initMessage = JSON.stringify({
-        destination_directory: '/Users/nick/Desktop/',
-        status_code: 1,
-        faces: [],
-      });
-      // send init message to kickoff client <--> server talking
-      windowSock.send(initMessage);
-    };
-
-    // recv message from the server
-    windowSock.onmessage = (e) => {
-      readResponseAndSendAnotherRequestAfterNMs(windowSock, e, 1000);
-    };
-
-    windowSock.onclose = () => log.info('ws closed');
-  }, []);
+  ws.onclose = (e) => {
+    log.info('ws closed');
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => setElapsed((prev) => prev + 1), 1000);
@@ -100,41 +117,7 @@ export default function Hud() {
     };
   }, [elapsed]);
 
-  const timeStyle = new Intl.DateTimeFormat('en', {
-    hour: 'numeric',
-    minute: 'numeric',
-    timeZoneName: 'short',
-  });
-
-  function clickPlay() {
-    log.info('play clicked');
-  }
-
-  function clickReset() {
-    log.info('reset clicked');
-  }
-
-  // simulate clicking on a face for now
-  function clickBlind() {
-    log.info('blind clicked');
-    // set face coords
-    const exampleFace = {
-      directory: '/Users/nick/Desktop/',
-      id: 'xyz128228xzfa',
-      x: 200,
-      y: 200,
-      image_path: '/Users/nick/smile-ml/salespot-desktop/assets/no-user.png',
-      status: 2,
-    };
-    setSendingNewFace(false);
-    setNewFace(exampleFace);
-  }
-
-  function clickSpotting() {
-    log.info('spotting clicked');
-    // request cursor position from main
-  }
-
+  // for getting x,y of click
   useEffect(() => {
     window.addEventListener('blur', () => {
       log.info('blurrred');
@@ -149,8 +132,6 @@ export default function Hud() {
   }
 
   function clickEnd() {
-    setSpotting((prev) => !prev);
-
     // Read MyGlobalVariable.
     const pid = remote.getGlobal('myGlobalVariable');
     log.info('killlinggggg');
@@ -164,19 +145,6 @@ export default function Hud() {
     window.close();
   }
 
-  function keyPressed(e) {
-    log.info(e);
-  }
-
-  // useEffect(() => {
-  //   const id = setInterval(() => {
-  //     sendReq(windowSock);
-  //   }, 500);
-  //   return () => {
-  //     clearInterval(id);
-  //   };
-  // });
-
   return (
     <div className="flex">
       <div className="flex flex-grow flex-col bg-white p-3 min-h-screen content-center md:w-1/2 rounded-xl">
@@ -184,13 +152,22 @@ export default function Hud() {
           <div className="text-md text-gray-800  mt-1.5 font-semibold">
             {timeStyle.format(time)}
           </div>
+          <button
+            type="button"
+            onClick={() => {
+              setFaces(exampleFace);
+              log.info(faces);
+            }}
+          >
+            Send Face
+          </button>
           <div className="text-md font-light">
             <button
               onClick={clickEnd}
               className="cursor-pointer bg-white border-2 rounded-lg border-gray-500 font-light px-6 py-1"
               type="button"
             >
-              {spotting ? 'End' : 'Start'}
+              End
             </button>
           </div>
         </div>
@@ -211,7 +188,7 @@ export default function Hud() {
         <div className="flex flex-grow flex-wrap justify-between items-center">
           <div className="">
             <img
-              onClick={clickPlay}
+              // onClick={clickPlay}
               src={playIcon}
               className="hidden inline w-7 h-7 cursor-pointer mr-1"
               alt="SaleSpot"
@@ -223,26 +200,25 @@ export default function Hud() {
           <div className="text-gray-700 space-x-4">
             {/* <SpottingIcon className="h-4 w-4 cursor-pointer" /> */}
             <img
-              onClick={clickReset}
+              // onClick={clickReset}
               src={resetIcon}
               className="inline w-7 h-7 cursor-pointer mr-1"
               alt="reset"
             />
             <img
-              onClick={clickBlind}
+              // onClick={clickBlind}
               src={blindIcon}
               className="inline w-7 h-7 cursor-pointer mr-1"
               alt="blind"
             />
             <img
-              onClick={clickSpotting}
+              // onClick={clickSpotting}
               src={spottingIcon}
               className="inline w-7 h-7 cursor-pointer mr-1"
               alt="spotting"
             />
             <img
               onClick={clickExpand}
-              onKeyPress={keyPressed}
               src={expandIcon}
               className="inline p-1 w-7 h-7 cursor-pointer mr-1 md:transform md:rotate-180"
               alt="expand"
