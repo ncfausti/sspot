@@ -1,16 +1,14 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import log from 'electron-log';
 import { remote, screen, ipcRenderer } from 'electron';
 import { uuid } from 'uuidv4';
+import useWebSocket, { ReadyState } from 'react-use-websocket';
 import ParticipantsList from './ParticipantsList';
 import spottingIcon from '../../../assets/spotting-icon.png';
 import playIcon from '../../../assets/play.png';
 import blindIcon from '../../../assets/blind.png';
 import resetIcon from '../../../assets/reset.png';
 import expandIcon from '../../../assets/expand.png';
-import { startServer } from '../../utils';
-
-const ws = new window.WebSocket('ws://localhost:8765');
 
 interface RequestMessage {
   // Where the zip should get created
@@ -52,36 +50,7 @@ const exampleFace = {
   status: 2,
 };
 
-function readResponseAndSendAnotherRequestAfterNMs(
-  socket,
-  e,
-  facelist,
-  msWait
-) {
-  if (!socket) return;
-
-  const msg = JSON.parse(e.data);
-  console.log(`Server says`);
-  if (msg.faces.length > 0) {
-    console.log(msg.faces[0].status);
-    console.log(msg.faces[0].x, ',', msg.faces[0].y);
-    console.log(msg.faces[0].label);
-    console.log(msg.faces[0].sentiment);
-  }
-
-  setTimeout(() => {
-    console.log('inside readRespons...');
-    console.log(facelist);
-    msg.faces.push(...facelist);
-    console.log(`Client sending:`);
-    console.log(msg.faces);
-    ws.send(JSON.stringify(msg));
-
-    // Clear faces and let the server control facelist on
-    // next message recv
-    faces = [];
-  }, msWait);
-}
+const SOCKET_URL = 'ws://localhost:8765';
 
 export default function Hud() {
   const [elapsed, setElapsed] = useState(0);
@@ -89,26 +58,117 @@ export default function Hud() {
   const [time, setTime] = useState(new Date());
   const [faces, setFaces] = useState([]);
   const [voiceMetrics, setVoiceMetrics] = useState(voiceMetricsDefault);
+  const [messageHistory, setMessageHistory] = useState([]);
+  const { sendMessage, sendJsonMessage, lastMessage, readyState } =
+    useWebSocket(SOCKET_URL, {
+      onOpen: () => {
+        log.info('ws opened');
+        const initMessage = JSON.stringify({
+          destination_directory: '/Users/nick/Desktop/',
+          status_code: 1,
+          faces,
+        });
+        sendMessage(initMessage);
+      },
+      onClose: () => log.info('ws closed'),
+      onMessage: (e) => {
+        log.info('onmessage');
+        const msg = JSON.parse(e.data);
+        // log.info(msg);
 
-  ws.onopen = (e) => {
-    log.info('ws opened');
-    const initMessage = JSON.stringify({
-      destination_directory: '/Users/nick/Desktop/',
-      status_code: 1,
-      faces,
+        log.info(`Server says`);
+        if (msg.faces.length > 0) {
+          log.info(msg.faces[0].status);
+          log.info(msg.faces[0].x, ',', msg.faces[0].y);
+          log.info(msg.faces[0].label);
+          log.info(msg.faces[0].sentiment);
+        }
+        log.info(msg.voice_metrics);
+
+        setVoiceMetrics(msg.voice_metrics);
+
+        setTimeout(() => {
+          log.info('inside readRespons...');
+          msg.faces.push(...faces);
+          log.info(`Client sending:`);
+          log.info(msg.faces);
+          // socket.send(JSON.stringify(msg));
+          sendJsonMessage(msg);
+
+          // Clear faces and let the server control facelist on
+          // next message recv
+          setFaces([]);
+        }, 1000);
+      },
+      // Will attempt to reconnect on all close events, such as server shutting down
+      shouldReconnect: (closeEvent) => true,
     });
-    ws.send(initMessage);
-  };
 
-  // recv message from the server
-  ws.onmessage = (e) => {
-    log.info('onmessage faces');
-    readResponseAndSendAnotherRequestAfterNMs(ws, e, faces, 0);
-  };
+  function readResponseAndSendAnotherRequestAfterNMs(
+    e,
+    facelist,
+    msWait: number
+  ) {
+    const msg = JSON.parse(e.data);
 
-  ws.onclose = (e) => {
-    log.info('ws closed');
-  };
+    log.info(`Server says`);
+    if (msg.faces.length > 0) {
+      log.info(msg.faces[0].status);
+      log.info(msg.faces[0].x, ',', msg.faces[0].y);
+      log.info(msg.faces[0].label);
+      log.info(msg.faces[0].sentiment);
+    }
+
+    setTimeout(() => {
+      log.info('inside readRespons...');
+      log.info(facelist);
+      msg.faces.push(...facelist);
+      log.info(`Client sending:`);
+      log.info(msg.faces);
+      // socket.send(JSON.stringify(msg));
+      sendJsonMessage(msg);
+
+      // Clear faces and let the server control facelist on
+      // next message recv
+      setFaces([]);
+    }, msWait);
+  }
+
+  // useEffect(() => {
+  //   if (lastMessage !== null) {
+  //     setMessageHistory((prev) => prev.concat(lastMessage));
+  //   }
+  // }, [lastMessage, setMessageHistory]);
+
+  const handleClickSendMessage = useCallback(() => sendJsonMessage(), []);
+
+  const connectionStatus = {
+    [ReadyState.CONNECTING]: 'Connecting',
+    [ReadyState.OPEN]: 'Open',
+    [ReadyState.CLOSING]: 'Closing',
+    [ReadyState.CLOSED]: 'Closed',
+    [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
+  }[readyState];
+
+  // ws.current.onopen = (e) => {
+  //   log.info('ws opened');
+  //   const initMessage = JSON.stringify({
+  //     destination_directory: '/Users/nick/Desktop/',
+  //     status_code: 1,
+  //     faces,
+  //   });
+  //   ws.current.send(initMessage);
+  // };
+
+  // // recv message from the server
+  // ws.current.onmessage = (e) => {
+  //   log.info('onmessage faces');
+  //   readResponseAndSendAnotherRequestAfterNMs(ws, e, faces, 0);
+  // };
+
+  // ws.current.onclose = (e) => {
+  //   log.info('ws closed');
+  // };
 
   useEffect(() => {
     const timer = setTimeout(() => setElapsed((prev) => prev + 1), 1000);
@@ -120,7 +180,6 @@ export default function Hud() {
   // for getting x,y of click
   useEffect(() => {
     window.addEventListener('blur', () => {
-      log.info('blurrred');
       ipcRenderer.send('cursorpos');
     });
   }, []);
@@ -133,15 +192,10 @@ export default function Hud() {
 
   function clickEnd() {
     // Read MyGlobalVariable.
-    const pid = remote.getGlobal('myGlobalVariable');
+    const pid = remote.getGlobal('serverPID');
     log.info('killlinggggg');
     log.info(pid);
     process.kill(pid);
-
-    // restart the server
-    log.info('restartinggggg');
-    const child = startServer();
-    ipcRenderer.send('setMyGlobalVariable', child.pid);
     window.close();
   }
 
@@ -152,10 +206,11 @@ export default function Hud() {
           <div className="text-md text-gray-800  mt-1.5 font-semibold">
             {timeStyle.format(time)}
           </div>
+          <span>The WebSocket is currently {connectionStatus}</span>
           <button
             type="button"
             onClick={() => {
-              setFaces((prev) => [...prev, exampleFace]);
+              // setFaces((prev) => [...prev, exampleFace]);
               log.info(faces);
             }}
           >
@@ -163,7 +218,7 @@ export default function Hud() {
           </button>
           <div className="text-md font-light">
             <button
-              onClick={clickEnd}
+              onClick={() => clickEnd()}
               className="cursor-pointer bg-white border-2 rounded-lg border-gray-500 font-light px-6 py-1"
               type="button"
             >
@@ -173,7 +228,7 @@ export default function Hud() {
         </div>
         <div className="flex flex-grow space-x-2 justify-between">
           <div className="flex flex-col justify-end bg-gray-100 flex-1 p-3">
-            <div>{Math.floor(elapsed / 60)}m</div>
+            <div>{Math.floor(elapsed)}m</div>
             <div>Time Elapsed</div>
           </div>
           <div className="flex flex-col justify-end bg-gray-100 flex-1 p-3">

@@ -94,10 +94,10 @@ const createWindow = async () => {
 /**
  * Add event listeners...
  */
-ipcMain.on('setMyGlobalVariable', (event, myGlobalVariableValue) => {
-  log.info('setttttinggggg');
-  log.info(myGlobalVariableValue);
-  global.myGlobalVariable = myGlobalVariableValue;
+ipcMain.on('setGlobalServerPID', (event, serverPID) => {
+  log.info('setting global.serverPID');
+  log.info(serverPID);
+  global.serverPID = serverPID;
 });
 
 app.on('window-all-closed', () => {
@@ -112,7 +112,7 @@ app.on('will-quit', () => {
   // kill the processing server
   log.info('killing server before quit');
   try {
-    process.kill(global.myGlobalVariable);
+    process.kill(global.serverPID);
   } catch (e) {
     log.error(e);
   }

@@ -1,5 +1,4 @@
 import log from 'electron-log';
-import { app } from 'electron';
 import path from 'path';
 import { spawn } from 'child_process';
 
@@ -79,8 +78,8 @@ export const startServer = () => {
   const pythonServerBin =
     process.platform === 'darwin' ? 'ws_server' : 'ws_server.exe';
   const assets = path.join(__dirname, '..', 'assets');
-  // const binDir = path.join(assets, 'ws_server');
-  process.chdir(assets);
+  const binDir = path.join(assets, 'ws_server');
+  process.chdir(binDir);
   const child = spawn(`./${pythonServerBin}`);
   log.info(`STARTING SERVER FROM: ${assets}`);
   process.chdir(curDir);

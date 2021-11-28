@@ -1,6 +1,7 @@
 /* eslint-disable react/forbid-prop-types */
 import React, { useEffect, useState } from 'react';
 import { CogIcon } from '@heroicons/react/solid';
+import log from 'electron-log';
 import { ipcRenderer } from 'electron';
 import logo from '../../../assets/salespot-logo-red.png';
 import { startServer } from '../../utils';
@@ -10,8 +11,8 @@ export default function Meetings() {
 
   // on initial load only
   useEffect(() => {
-    const child = startServer();
-    ipcRenderer.send('setMyGlobalVariable', child.pid);
+    // const child = startServer();
+    // ipcRenderer.send('setGlobalServerPID', child.pid);
 
     const interval = setInterval(() => setTime(new Date()), 1000);
     return () => {
@@ -32,6 +33,9 @@ export default function Meetings() {
   });
 
   function handleLaunchClick() {
+    log.info('running launch click');
+    const child = startServer();
+    ipcRenderer.send('setGlobalServerPID', child.pid);
     window.open(
       `file://${__dirname}/index.html#/live`,
       '_blank',
