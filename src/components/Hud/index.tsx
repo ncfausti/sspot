@@ -155,7 +155,7 @@ export default function Hud() {
           <button
             type="button"
             onClick={() => {
-              setFaces(exampleFace);
+              setFaces((prev) => [...prev, exampleFace]);
               log.info(faces);
             }}
           >
