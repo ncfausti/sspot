@@ -156,26 +156,6 @@ export default function Hud() {
     [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
   }[readyState];
 
-  // ws.current.onopen = (e) => {
-  //   log.info('ws opened');
-  //   const initMessage = JSON.stringify({
-  //     destination_directory: '/Users/nick/Desktop/',
-  //     status_code: 1,
-  //     faces,
-  //   });
-  //   ws.current.send(initMessage);
-  // };
-
-  // // recv message from the server
-  // ws.current.onmessage = (e) => {
-  //   log.info('onmessage faces');
-  //   readResponseAndSendAnotherRequestAfterNMs(ws, e, faces, 0);
-  // };
-
-  // ws.current.onclose = (e) => {
-  //   log.info('ws closed');
-  // };
-
   useEffect(() => {
     const timer = setTimeout(() => setElapsed((prev) => prev + 1), 1000);
     return () => {
@@ -238,7 +218,7 @@ export default function Hud() {
         </div>
         <div className="flex flex-grow space-x-2 justify-between">
           <div className="flex flex-col justify-end bg-gray-100 flex-1 p-3">
-            <div>{Math.floor(elapsed)}m</div>
+            <div>{Math.floor(elapsed / 60)}m</div>
             <div>Time Elapsed</div>
           </div>
           <div className="flex flex-col justify-end bg-gray-100 flex-1 p-3">

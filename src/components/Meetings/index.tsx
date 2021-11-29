@@ -71,7 +71,7 @@ export default function Meetings() {
     window.open(
       `file://${__dirname}/index.html#/live`,
       '_blank',
-      `top=40,left=600,frame=false,transparent=false, backgroundColor=#00000000`
+      `top=40,left=600,frame=false,transparent=false,alwaysOnTop=true,backgroundColor=#00000000`
     );
   }
 
