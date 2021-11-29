@@ -44,8 +44,8 @@ const voiceMetricsDefault = {
 const exampleFace = {
   directory: '/Users/nick/Desktop/',
   id: 'xyz128228xzfa',
-  x: 1195,
-  y: 225,
+  x: 1225,
+  y: 245,
   image_path: '/Users/nick/smile-ml/salespot-desktop/assets/no-user.png',
   status: 2,
 };
@@ -72,9 +72,10 @@ export default function Hud() {
       },
       onClose: () => log.info('ws closed'),
       onMessage: (e) => {
-        log.info('onmessage');
+        log.info('onmessage msg, faces');
         const msg = JSON.parse(e.data);
-        // log.info(msg);
+        log.info(msg);
+        log.info(msg.faces);
 
         log.info(`Server says`);
         if (msg.faces.length > 0) {
@@ -83,7 +84,7 @@ export default function Hud() {
           log.info(msg.faces[0].label);
           log.info(msg.faces[0].sentiment);
         }
-        log.info(msg.voice_metrics);
+        // log.info(msg.voice_metrics);
 
         setVoiceMetrics(msg.voice_metrics);
 
@@ -93,12 +94,17 @@ export default function Hud() {
           log.info(`Client sending:`);
           log.info(msg.faces);
           // socket.send(JSON.stringify(msg));
+
+          // WHY DOES THIS STOP SENDING AFTER A FEW SECONDS???
           sendJsonMessage(msg);
 
-          // Clear faces and let the server control facelist on
-          // next message recv
-          setFaces([]);
-        }, 1000);
+          // clear out faces to send queue here ONLY IF
+          // the lenght is greater than 0, since it will have
+          // sent the face above
+          if (faces.length > 0) {
+            setFaces([]);
+          }
+        }, 50);
       },
       // Will attempt to reconnect on all close events, such as server shutting down
       shouldReconnect: (closeEvent) => true,
@@ -210,7 +216,11 @@ export default function Hud() {
           <button
             type="button"
             onClick={() => {
-              // setFaces((prev) => [...prev, exampleFace]);
+              log.info();
+              // debugger;
+              // on the very next call to sendJsonMessage
+              // add in the face
+              setFaces((prev) => [...prev, exampleFace]);
               log.info(faces);
             }}
           >
