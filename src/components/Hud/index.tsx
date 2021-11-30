@@ -9,6 +9,7 @@ import playIcon from '../../../assets/play.png';
 import blindIcon from '../../../assets/blind.png';
 import resetIcon from '../../../assets/reset.png';
 import expandIcon from '../../../assets/expand.png';
+import defaultImg from '../../../assets/no-user.png';
 
 interface RequestMessage {
   // Where the zip should get created
@@ -46,7 +47,7 @@ const exampleFace = {
   id: uuid(),
   x: 1225,
   y: 245,
-  image_path: '/Users/nick/smile-ml/salespot-desktop/assets/no-user.png',
+  image_path: defaultImg,
   status: 2,
 };
 
@@ -56,7 +57,7 @@ const newFace = (x, y) => {
     id: uuid(),
     x,
     y,
-    image_path: '/Users/nick/smile-ml/salespot-desktop/assets/no-user.png',
+    image_path: defaultImg,
     status: 2,
   };
 };
@@ -70,6 +71,7 @@ export default function Hud() {
   const [expanded, setExpanded] = useState(true);
   const [time, setTime] = useState(new Date());
   const [faces, setFaces] = useState([]);
+  const [propFaces, setPropFaces] = useState([]);
   const [voiceMetrics, setVoiceMetrics] = useState(voiceMetricsDefault);
   const [messageHistory, setMessageHistory] = useState([]);
   const [isSpotting, setIsSpotting] = useState(false);
@@ -99,7 +101,7 @@ export default function Hud() {
           log.info(msg.faces[0].sentiment);
         }
         // log.info(msg.voice_metrics);
-
+        setPropFaces(() => msg.faces);
         setVoiceMetrics(msg.voice_metrics);
 
         setTimeout(() => {
@@ -189,7 +191,7 @@ export default function Hud() {
   };
 
   return (
-    <div className="flex items-start bg-gray-100 lg:w-1/2 lg:m-auto lg:items-stretch">
+    <div className="flex items-start bg-gray-100 md:w-full xl:w-1/2 lg:m-auto lg:items-stretch">
       <div className="flex min-h-screen lg:min-h-0 flex-col p-3 content-center md:w-1/2 rounded-xl">
         <div className="flex flex-grow flex-wrap justify-between content-center">
           <div className="text-md text-gray-800  mt-1.5 font-semibold">
@@ -269,13 +271,13 @@ export default function Hud() {
             <img
               onClick={clickExpand}
               src={expandIcon}
-              className="inline p-1 w-7 h-7 cursor-pointer mr-1 md:transform md:rotate-180 lg:hidden"
+              className="inline p-1 w-7 h-7 cursor-pointer mr-1 md:transform md:rotate-180 xl:hidden"
               alt="expand"
             />
           </div>
         </div>
       </div>
-      <ParticipantsList />
+      <ParticipantsList faces={propFaces} />
     </div>
   );
 }

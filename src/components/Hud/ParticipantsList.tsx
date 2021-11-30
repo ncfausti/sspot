@@ -8,22 +8,36 @@ interface Participant {
   img: string;
   talkRatio: number;
 }
+interface Face {
+  id: string;
+  x: number;
+  y: number;
+  label: string;
+  sentiment: number;
+  image_path: string;
+  status: number;
+  directory: string;
+}
 
-export default function ParticipantsList() {
+export default function ParticipantsList(props: { faces: Face[] }) {
   const [participants, setParticipants] = useState<Participant[]>([
     { id: '1', displayName: 'John Doe', img: defaultImg, talkRatio: 99.0 },
   ]);
+  log.info(props.faces);
   return (
     <div className="flex flex-grow flex-col bg-gray-100 p-6 content-center rounded-xl hidden md:inline-flex md:w-1/2 rounded-l-none">
       <div className="font-semibold">Participants</div>
-      {participants.map((participant: Participant) => (
+      {props.faces.map((participant: Participant) => (
         <div key={participant.id} className="mt-3 w-24 text-center">
           <img
-            src={participant.img}
-            className="w-24 h-24"
-            alt={participant.displayName}
+            src={participant.image_path}
+            className={`w-24 h-24 rounded-full border-4 ${
+              participant.sentiment < 0 ? 'border-red-400' : 'border-green-600'
+            }`}
+            alt={participant.id}
           />
-          <div>{participant.talkRatio}%</div>
+          <div>{participant.label}</div>
+          <div>{participant.sentiment}%</div>
         </div>
       ))}
     </div>
