@@ -68,11 +68,11 @@ export default function Meetings() {
     //   log.info('Full output of script: ', scriptOutput);
     // });
 
-    const midPointLessHalfHudWidth = window.screen.width / 2 - 100;
+    const midPointLessHalfHudWidth = window.screen.width / 2 - 150;
     const child = window.open(
       `file://${__dirname}/index.html#/live`,
       '_blank',
-      `top=40,left=${midPointLessHalfHudWidth},frame=false,transparent=true,alwaysOnTop=true,nodeIntegration=yes,backgroundColor=#00000000`
+      `top=40,left=${midPointLessHalfHudWidth},frame=false,transparent=true,alwaysOnTop=false,nodeIntegration=yes,backgroundColor=#00000000`
     );
     ipcRenderer.send('hideTrayWindow');
   }

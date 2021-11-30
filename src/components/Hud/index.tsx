@@ -153,17 +153,17 @@ export default function Hud() {
   function clickSpotting() {
     setIsSpotting((prev) => !prev);
     if (isSpotting) {
-      window.moveTo(0, 0);
       window.resizeTo(window.screen.width, window.screen.height);
+      window.moveTo(0, 0);
     } else {
       window.resizeTo(300, 120);
-      window.moveTo(window.screen.width / 2, 20);
+      window.moveTo(window.screen.width / 2 - 150, 40);
     }
   }
 
   return (
-    <div className="flex w- bg-purple-500 ">
-      <div className="flex flex-grow flex-col p-3 min-h-screen content-center md:w-1/2 rounded-xl">
+    <div className="flex items-start bg-purple-500 lg:w-1/2 lg:m-auto lg:items-stretch">
+      <div className="flex bg-green-500 min-h-screen lg:min-h-0 flex-col p-3 content-center md:w-1/2 rounded-xl">
         <div className="flex flex-grow flex-wrap justify-between content-center">
           <div className="text-md text-gray-800  mt-1.5 font-semibold">
             {timeStyle.format(time)}
@@ -242,7 +242,7 @@ export default function Hud() {
             <img
               onClick={clickExpand}
               src={expandIcon}
-              className="inline p-1 w-7 h-7 cursor-pointer mr-1 md:transform md:rotate-180"
+              className="inline p-1 w-7 h-7 cursor-pointer mr-1 md:transform md:rotate-180 lg:hidden"
               alt="expand"
             />
           </div>

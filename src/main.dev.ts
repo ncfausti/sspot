@@ -79,7 +79,7 @@ const createWindow = async () => {
       acceptFirstMouse: true,
       frame: false,
       backgroundColor: '#00000000',
-      alwaysOnTop: true,
+      alwaysOnTop: false,
       transparent: true,
       webPreferences: {
         nodeIntegration: true,

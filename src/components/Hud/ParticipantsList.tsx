@@ -14,7 +14,7 @@ export default function ParticipantsList() {
     { id: '1', displayName: 'John Doe', img: defaultImg, talkRatio: 99.0 },
   ]);
   return (
-    <div className="flex flex-grow flex-col bg-gray-100 p-6 min-h-screen content-center rounded-xl hidden md:inline-flex md:w-1/2 rounded-l-none">
+    <div className="flex flex-grow flex-col bg-gray-100 p-6 content-center rounded-xl hidden md:inline-flex md:w-1/2 rounded-l-none">
       <div className="font-semibold">Participants</div>
       {participants.map((participant: Participant) => (
         <div key={participant.id} className="mt-3 w-24 text-center">
