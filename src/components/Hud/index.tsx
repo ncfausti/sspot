@@ -161,9 +161,20 @@ export default function Hud() {
     }
   }
 
+  window.document.onclick = (e) => {
+    log.info('clicked');
+    // Renderer process
+    ipcRenderer
+      .invoke('get-cursor-pos')
+      .then((result) => {
+        log.info(result);
+      })
+      .catch((e) => log.error(e));
+  };
+
   return (
-    <div className="flex items-start bg-purple-500 lg:w-1/2 lg:m-auto lg:items-stretch">
-      <div className="flex bg-green-500 min-h-screen lg:min-h-0 flex-col p-3 content-center md:w-1/2 rounded-xl">
+    <div className="flex items-start bg-gray-100 lg:w-1/2 lg:m-auto lg:items-stretch">
+      <div className="flex min-h-screen lg:min-h-0 flex-col p-3 content-center md:w-1/2 rounded-xl">
         <div className="flex flex-grow flex-wrap justify-between content-center">
           <div className="text-md text-gray-800  mt-1.5 font-semibold">
             {timeStyle.format(time)}

@@ -93,26 +93,6 @@ const createWindow = async () => {
   ipcMain.on('hideTrayWindow', () => {
     mb.hideWindow();
   });
-  // mb.window?.webContents.setWindowOpenHandler(({ url }) => {
-  //   if (url.startsWith('https://github.com/')) {
-  //     return { action: 'allow' };
-  //   }
-  //   return { action: 'deny' };
-  // });
-
-  // mb.window?.webContents.on('did-create-window', (childWindow) => {
-  //   // For example...
-  //   childWindow.webContents.on('will-navigate', (e) => {
-  //     e.preventDefault();
-  //   });
-  // });
-
-  // mb.on('focus-lost', (e) => {
-  //   log.info('focus lost');
-  //   setTimeout(() => {
-  //     mb.window?.focus();
-  //   }, 200);
-  // });
 
   new AppUpdater();
 };
@@ -159,6 +139,12 @@ app.on('ready', () => {
 ipcMain.on('cursorpos', () => {
   const mousePos = screen.getCursorScreenPoint();
   log.info(mousePos);
+});
+
+// Main process
+ipcMain.handle('get-cursor-pos', (event, someArgument) => {
+  const result = screen.getCursorScreenPoint();
+  return result;
 });
 
 app.whenReady().then(createWindow).catch(console.log);

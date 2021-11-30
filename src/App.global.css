@@ -8,7 +8,7 @@
 
 @tailwind utilities;
 
-body { background: blue;}
+body { background: rgba(0,0,255, .2); }
 /* body {
   position: relative;
   color: white;
