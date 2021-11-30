@@ -75,7 +75,7 @@ export default function Meetings() {
   }
 
   return (
-    <div className="flex flex-grow flex-col p-3 min-h-screen content-center">
+    <div className="flex bg-gray-100 flex-grow flex-col p-3 min-h-screen content-center">
       <div className="flex flex-grow flex-wrap justify-between">
         <div className="text-xs text-gray-800 font-semibold">
           {dateStyle.format(time)}

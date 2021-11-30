@@ -10,6 +10,7 @@ import blindIcon from '../../../assets/blind.png';
 import resetIcon from '../../../assets/reset.png';
 import expandIcon from '../../../assets/expand.png';
 import defaultImg from '../../../assets/no-user.png';
+import { userDataDir } from '../../utils';
 
 interface RequestMessage {
   // Where the zip should get created
@@ -43,7 +44,8 @@ const voiceMetricsDefault = {
 };
 
 const exampleFace = {
-  directory: '/Users/nick/Desktop/',
+  // directory: '/Users/nick/Desktop/',
+  directory: userDataDir(),
   id: uuid(),
   x: 1225,
   y: 245,
@@ -53,7 +55,8 @@ const exampleFace = {
 
 const newFace = (x, y) => {
   return {
-    directory: '/Users/nick/Desktop/',
+    // directory: '/Users/nick/Desktop/',
+    directory: userDataDir(),
     id: uuid(),
     x,
     y,
@@ -80,7 +83,7 @@ export default function Hud() {
       onOpen: () => {
         // log.info('ws opened');
         const initMessage = JSON.stringify({
-          destination_directory: '/Users/nick/Desktop/',
+          destination_directory: userDataDir(),
           status_code: 1,
           faces,
         });
