@@ -90,6 +90,9 @@ const createWindow = async () => {
     },
   });
 
+  ipcMain.on('hideTrayWindow', () => {
+    mb.hideWindow();
+  });
   // mb.window?.webContents.setWindowOpenHandler(({ url }) => {
   //   if (url.startsWith('https://github.com/')) {
   //     return { action: 'allow' };
