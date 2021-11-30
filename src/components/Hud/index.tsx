@@ -43,12 +43,14 @@ const voiceMetricsDefault = {
 
 const exampleFace = {
   directory: '/Users/nick/Desktop/',
-  id: 'xyz128228xzfa',
+  id: uuid(),
   x: 1225,
   y: 245,
   image_path: '/Users/nick/smile-ml/salespot-desktop/assets/no-user.png',
   status: 2,
 };
+
+// set spotting mode bool
 
 const SOCKET_URL = 'ws://localhost:8765';
 
@@ -59,10 +61,11 @@ export default function Hud() {
   const [faces, setFaces] = useState([]);
   const [voiceMetrics, setVoiceMetrics] = useState(voiceMetricsDefault);
   const [messageHistory, setMessageHistory] = useState([]);
+  const [isSpotting, setIsSpotting] = useState(false);
   const { sendMessage, sendJsonMessage, lastMessage, readyState } =
     useWebSocket(SOCKET_URL, {
       onOpen: () => {
-        log.info('ws opened');
+        // log.info('ws opened');
         const initMessage = JSON.stringify({
           destination_directory: '/Users/nick/Desktop/',
           status_code: 1,
@@ -72,27 +75,27 @@ export default function Hud() {
       },
       onClose: () => log.info('ws closed'),
       onMessage: (e) => {
-        log.info('onmessage msg, faces');
+        // log.info('onmessage msg, faces');
         const msg = JSON.parse(e.data);
-        log.info(msg);
-        log.info(msg.faces);
+        // log.info(msg);
+        // log.info(msg.faces);
 
-        log.info(`Server says`);
-        if (msg.faces.length > 0) {
-          log.info(msg.faces[0].status);
-          log.info(msg.faces[0].x, ',', msg.faces[0].y);
-          log.info(msg.faces[0].label);
-          log.info(msg.faces[0].sentiment);
-        }
+        // log.info(`Server says`);
+        // if (msg.faces.length > 0) {
+        //   log.info(msg.faces[0].status);
+        //   log.info(msg.faces[0].x, ',', msg.faces[0].y);
+        //   log.info(msg.faces[0].label);
+        //   log.info(msg.faces[0].sentiment);
+        // }
         // log.info(msg.voice_metrics);
 
         setVoiceMetrics(msg.voice_metrics);
 
         setTimeout(() => {
-          log.info('inside readRespons...');
+          // log.info('inside readRespons...');
           msg.faces.push(...faces);
-          log.info(`Client sending:`);
-          log.info(msg.faces);
+          // log.info(`Client sending:`);
+          // log.info(msg.faces);
           // socket.send(JSON.stringify(msg));
 
           // WHY DOES THIS STOP SENDING AFTER A FEW SECONDS???
@@ -109,44 +112,6 @@ export default function Hud() {
       // Will attempt to reconnect on all close events, such as server shutting down
       shouldReconnect: (closeEvent) => true,
     });
-
-  function readResponseAndSendAnotherRequestAfterNMs(
-    e,
-    facelist,
-    msWait: number
-  ) {
-    const msg = JSON.parse(e.data);
-
-    log.info(`Server says`);
-    if (msg.faces.length > 0) {
-      log.info(msg.faces[0].status);
-      log.info(msg.faces[0].x, ',', msg.faces[0].y);
-      log.info(msg.faces[0].label);
-      log.info(msg.faces[0].sentiment);
-    }
-
-    setTimeout(() => {
-      log.info('inside readRespons...');
-      log.info(facelist);
-      msg.faces.push(...facelist);
-      log.info(`Client sending:`);
-      log.info(msg.faces);
-      // socket.send(JSON.stringify(msg));
-      sendJsonMessage(msg);
-
-      // Clear faces and let the server control facelist on
-      // next message recv
-      setFaces([]);
-    }, msWait);
-  }
-
-  // useEffect(() => {
-  //   if (lastMessage !== null) {
-  //     setMessageHistory((prev) => prev.concat(lastMessage));
-  //   }
-  // }, [lastMessage, setMessageHistory]);
-
-  const handleClickSendMessage = useCallback(() => sendJsonMessage(), []);
 
   const connectionStatus = {
     [ReadyState.CONNECTING]: 'Connecting',
@@ -171,7 +136,7 @@ export default function Hud() {
   }, []);
 
   function clickExpand() {
-    log.info('expand clicked');
+    // log.info('expand clicked');
     setExpanded((prev) => !prev);
     return expanded ? window.resizeTo(600, 120) : window.resizeTo(300, 120);
   }
@@ -179,15 +144,26 @@ export default function Hud() {
   function clickEnd() {
     // Read MyGlobalVariable.
     const pid = remote.getGlobal('serverPID');
-    log.info('killlinggggg');
-    log.info(pid);
+    // log.info('killlinggggg');
+    // log.info(pid);
     process.kill(pid);
     window.close();
   }
 
+  function clickSpotting() {
+    setIsSpotting((prev) => !prev);
+    if (isSpotting) {
+      window.moveTo(0, 0);
+      window.resizeTo(window.screen.width, window.screen.height);
+    } else {
+      window.resizeTo(300, 120);
+      window.moveTo(window.screen.width / 2, 20);
+    }
+  }
+
   return (
-    <div className="flex">
-      <div className="flex flex-grow flex-col bg-white p-3 min-h-screen content-center md:w-1/2 rounded-xl">
+    <div className="flex w- bg-purple-500 ">
+      <div className="flex flex-grow flex-col p-3 min-h-screen content-center md:w-1/2 rounded-xl">
         <div className="flex flex-grow flex-wrap justify-between content-center">
           <div className="text-md text-gray-800  mt-1.5 font-semibold">
             {timeStyle.format(time)}
@@ -196,12 +172,12 @@ export default function Hud() {
           <button
             type="button"
             onClick={() => {
-              log.info();
+              // log.info();
               // debugger;
               // on the very next call to sendJsonMessage
               // add in the face
               setFaces((prev) => [...prev, exampleFace]);
-              log.info(faces);
+              // log.info(faces);
             }}
           >
             Send Face
@@ -241,6 +217,7 @@ export default function Hud() {
             <span className="text-2xl">
               {voiceMetrics.is_talking ? '🗣' : '😶'}
             </span>
+            {isSpotting && 'spotting mode'}
           </div>
           <div className="text-gray-700 space-x-4">
             {/* <SpottingIcon className="h-4 w-4 cursor-pointer" /> */}
@@ -257,7 +234,7 @@ export default function Hud() {
               alt="blind"
             />
             <img
-              // onClick={clickSpotting}
+              onClick={clickSpotting}
               src={spottingIcon}
               className="inline w-7 h-7 cursor-pointer mr-1"
               alt="spotting"

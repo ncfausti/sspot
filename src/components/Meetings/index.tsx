@@ -33,46 +33,48 @@ export default function Meetings() {
   });
 
   function handleLaunchClick() {
-    log.info('running launch click');
-    const child = startServer();
-    ipcRenderer.send('setGlobalServerPID', child.pid);
+    // log.info('running launch click');
+    // const child = startServer();
+    // ipcRenderer.send('setGlobalServerPID', child.pid);
 
-    // for when the script closes later
-    const scriptOutput = '';
+    // // for when the script closes later
+    // let scriptOutput = '';
 
-    child.stdout.setEncoding('utf8');
-    child.stdout.on('data', function (data) {
-      // Here is where the output goes
+    // child.stdout.setEncoding('utf8');
+    // child.stdout.on('data', function (data) {
+    //   // Here is where the output goes
 
-      log.info(`stdout: ${data}`);
+    //   log.info(`stdout: ${data}`);
 
-      data = data.toString();
-      scriptOutput += data;
-    });
+    //   data = data.toString();
+    //   scriptOutput += data;
+    // });
 
-    child.stderr.setEncoding('utf8');
-    child.stderr.on('data', function (data) {
-      // Here is where the error output goes
+    // child.stderr.setEncoding('utf8');
+    // child.stderr.on('data', function (data) {
+    //   // Here is where the error output goes
 
-      log.info(`stderr: ${data}`);
+    //   log.info(`stderr: ${data}`);
 
-      data = data.toString();
-      scriptOutput += data;
-    });
+    //   data = data.toString();
+    //   scriptOutput += data;
+    // });
 
-    child.on('close', function (code) {
-      // Here you can get the exit code of the script
+    // child.on('close', function (code) {
+    //   // Here you can get the exit code of the script
 
-      log.info(`closing code: ${code}`);
+    //   log.info(`closing code: ${code}`);
 
-      log.info('Full output of script: ', scriptOutput);
-    });
+    //   log.info('Full output of script: ', scriptOutput);
+    // });
 
-    window.open(
+    const midPointLessHalfHudWidth = window.screen.width / 2;
+    const browserWindowProxy = window.open(
       `file://${__dirname}/index.html#/live`,
       '_blank',
-      `top=40,left=600,frame=false,transparent=false,alwaysOnTop=true,backgroundColor=#00000000`
+      `top=40,left=${midPointLessHalfHudWidth},frame=false,transparent=true,alwaysOnTop=true,nodeIntegration=yes,backgroundColor=#00000000`
     );
+    log.info(browserWindowProxy);
   }
 
   return (

@@ -68,7 +68,7 @@ const createWindow = async () => {
   };
 
   // Tray popout
-  menubar({
+  const mb = menubar({
     icon: getAssetPath('icon.png'),
     tooltip: 'SaleSpot',
     browserWindow: {
@@ -77,6 +77,10 @@ const createWindow = async () => {
       height: 120,
       icon: getAssetPath('icon.png'),
       acceptFirstMouse: true,
+      frame: false,
+      backgroundColor: '#00000000',
+      alwaysOnTop: true,
+      transparent: true,
       webPreferences: {
         nodeIntegration: true,
         additionalArguments: [`--USER-DATA-DIR=${app.getPath('userData')}`],
@@ -86,8 +90,27 @@ const createWindow = async () => {
     },
   });
 
-  // Remove this if your app does not use auto updates
-  // eslint-disable-next-line
+  // mb.window?.webContents.setWindowOpenHandler(({ url }) => {
+  //   if (url.startsWith('https://github.com/')) {
+  //     return { action: 'allow' };
+  //   }
+  //   return { action: 'deny' };
+  // });
+
+  // mb.window?.webContents.on('did-create-window', (childWindow) => {
+  //   // For example...
+  //   childWindow.webContents.on('will-navigate', (e) => {
+  //     e.preventDefault();
+  //   });
+  // });
+
+  // mb.on('focus-lost', (e) => {
+  //   log.info('focus lost');
+  //   setTimeout(() => {
+  //     mb.window?.focus();
+  //   }, 200);
+  // });
+
   new AppUpdater();
 };
 
@@ -98,6 +121,10 @@ ipcMain.on('setGlobalServerPID', (event, serverPID) => {
   log.info('setting global.serverPID');
   log.info(serverPID);
   global.serverPID = serverPID;
+});
+
+ipcMain.on('maximizeHud', (event, serverPID) => {
+  log.info('maximizing Hud window');
 });
 
 app.on('window-all-closed', () => {
