@@ -11,9 +11,6 @@ export default function Meetings() {
 
   // on initial load only
   useEffect(() => {
-    // const child = startServer();
-    // ipcRenderer.send('setGlobalServerPID', child.pid);
-
     const interval = setInterval(() => setTime(new Date()), 1000);
     return () => {
       clearInterval(interval);
@@ -33,43 +30,43 @@ export default function Meetings() {
   });
 
   function handleLaunchClick() {
-    // log.info('running launch click');
-    // const child = startServer();
-    // ipcRenderer.send('setGlobalServerPID', child.pid);
+    log.info('running launch click');
+    const child = startServer();
+    ipcRenderer.send('setGlobalServerPID', child.pid);
 
-    // // for when the script closes later
-    // let scriptOutput = '';
+    // for when the script closes later
+    let scriptOutput = '';
 
-    // child.stdout.setEncoding('utf8');
-    // child.stdout.on('data', function (data) {
-    //   // Here is where the output goes
+    child.stdout.setEncoding('utf8');
+    child.stdout.on('data', function (data) {
+      // Here is where the output goes
 
-    //   log.info(`stdout: ${data}`);
+      log.info(`stdout: ${data}`);
 
-    //   data = data.toString();
-    //   scriptOutput += data;
-    // });
+      data = data.toString();
+      scriptOutput += data;
+    });
 
-    // child.stderr.setEncoding('utf8');
-    // child.stderr.on('data', function (data) {
-    //   // Here is where the error output goes
+    child.stderr.setEncoding('utf8');
+    child.stderr.on('data', function (data) {
+      // Here is where the error output goes
 
-    //   log.info(`stderr: ${data}`);
+      log.info(`stderr: ${data}`);
 
-    //   data = data.toString();
-    //   scriptOutput += data;
-    // });
+      data = data.toString();
+      scriptOutput += data;
+    });
 
-    // child.on('close', function (code) {
-    //   // Here you can get the exit code of the script
+    child.on('close', function (code) {
+      // Here you can get the exit code of the script
 
-    //   log.info(`closing code: ${code}`);
+      log.info(`closing code: ${code}`);
 
-    //   log.info('Full output of script: ', scriptOutput);
-    // });
+      log.info('Full output of script: ', scriptOutput);
+    });
 
     const midPointLessHalfHudWidth = window.screen.width / 2 - 150;
-    const child = window.open(
+    window.open(
       `file://${__dirname}/index.html#/live`,
       '_blank',
       `top=40,left=${midPointLessHalfHudWidth},frame=false,transparent=true,alwaysOnTop=false,nodeIntegration=yes,backgroundColor=#00000000`

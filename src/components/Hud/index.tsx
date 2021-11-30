@@ -50,6 +50,17 @@ const exampleFace = {
   status: 2,
 };
 
+const newFace = (x, y) => {
+  return {
+    directory: '/Users/nick/Desktop/',
+    id: uuid(),
+    x,
+    y,
+    image_path: '/Users/nick/smile-ml/salespot-desktop/assets/no-user.png',
+    status: 2,
+  };
+};
+
 // set spotting mode bool
 
 const SOCKET_URL = 'ws://localhost:8765';
@@ -77,16 +88,16 @@ export default function Hud() {
       onMessage: (e) => {
         // log.info('onmessage msg, faces');
         const msg = JSON.parse(e.data);
-        // log.info(msg);
-        // log.info(msg.faces);
+        log.info(msg);
+        log.info(msg.faces);
 
         // log.info(`Server says`);
-        // if (msg.faces.length > 0) {
-        //   log.info(msg.faces[0].status);
-        //   log.info(msg.faces[0].x, ',', msg.faces[0].y);
-        //   log.info(msg.faces[0].label);
-        //   log.info(msg.faces[0].sentiment);
-        // }
+        if (msg.faces.length > 0) {
+          log.info(msg.faces[0].status);
+          log.info(msg.faces[0].x, ',', msg.faces[0].y);
+          log.info(msg.faces[0].label);
+          log.info(msg.faces[0].sentiment);
+        }
         // log.info(msg.voice_metrics);
 
         setVoiceMetrics(msg.voice_metrics);
@@ -150,9 +161,10 @@ export default function Hud() {
     window.close();
   }
 
-  function clickSpotting() {
+  function clickSpotting(e: Event) {
+    e.stopPropagation();
     setIsSpotting((prev) => !prev);
-    if (isSpotting) {
+    if (window.outerHeight < 600) {
       window.resizeTo(window.screen.width, window.screen.height);
       window.moveTo(0, 0);
     } else {
@@ -162,12 +174,16 @@ export default function Hud() {
   }
 
   window.document.onclick = (e) => {
-    log.info('clicked');
+    if (window.outerHeight < 600) return;
+    if (!isSpotting) return;
     // Renderer process
     ipcRenderer
       .invoke('get-cursor-pos')
       .then((result) => {
-        log.info(result);
+        // log.info(result);
+        // log.info(newFace(result.x, result.y));
+        setFaces((prev) => [...prev, newFace(result.x, result.y)]);
+        return true;
       })
       .catch((e) => log.error(e));
   };
@@ -245,7 +261,7 @@ export default function Hud() {
               alt="blind"
             />
             <img
-              onClick={clickSpotting}
+              onClick={(e) => clickSpotting(e)}
               src={spottingIcon}
               className="inline w-7 h-7 cursor-pointer mr-1"
               alt="spotting"
