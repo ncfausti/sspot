@@ -1,6 +1,7 @@
 import log from 'electron-log';
 import path from 'path';
 import { spawn } from 'child_process';
+import { app } from 'electron';
 
 export const displayThis = (condition, display = 'block') =>
   condition ? display : 'none';
@@ -81,7 +82,7 @@ export const startServer = () => {
   const binDir = path.join(assets, 'ws_server');
   process.chdir(binDir);
   const child = spawn(`./${pythonServerBin}`);
-  log.info(`STARTING SERVER FROM: ${assets}`);
+  log.info(`STARTING SERVER FROM: ${binDir}`);
   process.chdir(curDir);
   return child;
 };

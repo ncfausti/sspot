@@ -194,7 +194,7 @@ export default function Hud() {
   };
 
   return (
-    <div className="flex items-start bg-gray-100 md:w-full xl:w-1/2 lg:m-auto lg:items-stretch">
+    <div className="flex items-start md:min-h-screen xl:min-h-full rounded-xl bg-gray-100 md:w-full xl:w-1/2 lg:m-auto lg:items-stretch">
       <div className="flex min-h-screen lg:min-h-0 flex-col p-3 content-center md:w-1/2 rounded-xl">
         <div className="flex flex-grow flex-wrap justify-between content-center">
           <div className="text-md text-gray-800  mt-1.5 font-semibold">
