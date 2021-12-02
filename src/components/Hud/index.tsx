@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import log from 'electron-log';
-import { remote, screen, ipcRenderer } from 'electron';
+import { remote, ipcRenderer } from 'electron';
 import { uuid } from 'uuidv4';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 import ParticipantsList from './ParticipantsList';
@@ -10,7 +10,9 @@ import blindIcon from '../../../assets/blind.png';
 import resetIcon from '../../../assets/reset.png';
 import expandIcon from '../../../assets/expand.png';
 import defaultImg from '../../../assets/no-user.png';
+import salespotLogo from '../../../assets/salespot-logo-red.png';
 import { userDataDir } from '../../utils';
+import Loading from '../Loading';
 
 interface RequestMessage {
   // Where the zip should get created
@@ -193,94 +195,100 @@ export default function Hud() {
       .catch((e) => log.error(e));
   };
 
+  // text appears to big when packaged...why?
+  // popup window is too small when packaged...why?
   return (
-    <div className="flex items-start md:min-h-screen xl:min-h-full rounded-xl bg-gray-100 md:w-full xl:w-1/2 lg:m-auto lg:items-stretch">
-      <div className="flex min-h-screen lg:min-h-0 flex-col p-3 content-center md:w-1/2 rounded-xl">
-        <div className="flex flex-grow flex-wrap justify-between content-center">
-          <div className="text-md text-gray-800  mt-1.5 font-semibold">
-            {timeStyle.format(time)}
-          </div>
-          <span>The WebSocket is currently {connectionStatus}</span>
-          <button
-            type="button"
-            onClick={() => {
-              // log.info();
-              // debugger;
-              // on the very next call to sendJsonMessage
-              // add in the face
-              setFaces((prev) => [...prev, exampleFace]);
-              // log.info(faces);
-            }}
-          >
-            Send Face
-          </button>
-          <div className="text-md font-light">
-            <button
-              onClick={() => clickEnd()}
-              className="cursor-pointer bg-white border-2 rounded-lg border-gray-500 font-light px-6 py-1"
-              type="button"
-            >
-              End
-            </button>
-          </div>
-        </div>
-        <div className="flex flex-grow space-x-2 justify-between">
-          <div className="flex flex-col justify-end bg-gray-100 flex-1 p-3">
-            <div>{Math.floor(elapsed / 60)}m</div>
-            <div>Time Elapsed</div>
-          </div>
-          <div className="flex flex-col justify-end bg-gray-100 flex-1 p-3">
-            <div>{Math.floor(voiceMetrics.current_monologue / 60)}m</div>
-            <div>Monologue</div>
-          </div>
-          <div className="flex flex-col justify-end bg-gray-100 flex-1 p-3">
-            <div>{voiceMetrics.talk_ratio}%</div>
-            <div>Talk Ratio</div>
-          </div>
-        </div>
-        <div className="flex flex-grow flex-wrap justify-between items-center">
+    <>
+      {connectionStatus !== 'Open' && (
+        <div className="text-center pt-12 bg-gray-100 min-h-screen">
+          <img src={salespotLogo} className="inline w-1/2" alt="expand" />
           <div className="">
-            <img
-              // onClick={clickPlay}
-              src={playIcon}
-              className="hidden inline w-7 h-7 cursor-pointer mr-1"
-              alt="SaleSpot"
-            />
-            <span className="text-2xl">
-              {voiceMetrics.is_talking ? '🗣' : '😶'}
-            </span>
-            {isSpotting && 'spotting mode'}
-          </div>
-          <div className="text-gray-700 space-x-4">
-            {/* <SpottingIcon className="h-4 w-4 cursor-pointer" /> */}
-            <img
-              // onClick={clickReset}
-              src={resetIcon}
-              className="inline w-7 h-7 cursor-pointer mr-1"
-              alt="reset"
-            />
-            <img
-              // onClick={clickBlind}
-              src={blindIcon}
-              className="inline w-7 h-7 cursor-pointer mr-1"
-              alt="blind"
-            />
-            <img
-              onClick={(e) => clickSpotting(e)}
-              src={spottingIcon}
-              className="inline w-7 h-7 cursor-pointer mr-1"
-              alt="spotting"
-            />
-            <img
-              onClick={clickExpand}
-              src={expandIcon}
-              className="inline p-1 w-7 h-7 cursor-pointer mr-1 md:transform md:rotate-180 xl:hidden"
-              alt="expand"
-            />
+            <Loading />
           </div>
         </div>
-      </div>
-      <ParticipantsList faces={propFaces} />
-    </div>
+      )}
+      {connectionStatus === 'Open' && (
+        <div className="flex xl:mt-8 items-start md:min-h-screen xl:min-h-full rounded-3xl bg-gray-100 md:w-full xl:w-1/2 lg:m-auto lg:items-stretch">
+          <div className="flex flex-grow min-h-screen lg:min-h-0 flex-col p-3 content-center bg-white md:w-1/2 rounded-3xl">
+            <div className="flex flex-grow flex-wrap justify-between content-center">
+              <div className="text-md text-gray-800  mt-1.5 font-semibold">
+                {timeStyle.format(time)}
+              </div>
+              {/*
+          <span>scale: {remote.screen.getPrimaryDisplay().scaleFactor}</span> */}
+              <div className="text-md font-light">
+                <button
+                  onClick={() => clickEnd()}
+                  className="cursor-pointer bg-white border-2 rounded-lg border-gray-500 font-light px-6 py-1"
+                  type="button"
+                >
+                  End
+                </button>
+              </div>
+            </div>
+            <div className="flex flex-grow space-x-2 justify-between">
+              <div className="flex flex-col justify-end bg-gray-100 flex-1 p-3">
+                <div>{Math.floor(elapsed / 60)}m</div>
+                <div>Time Elapsed</div>
+              </div>
+              <div className="flex flex-col justify-end bg-gray-100 flex-1 p-3">
+                <div>{Math.floor(voiceMetrics.current_monologue / 60)}m</div>
+                <div>Monologue</div>
+              </div>
+              <div className="flex flex-col justify-end bg-gray-100 flex-1 p-3">
+                <div>{voiceMetrics.talk_ratio}%</div>
+                <div>Talk Ratio</div>
+              </div>
+            </div>
+            <div className="flex flex-grow flex-wrap justify-between items-center">
+              <div className="">
+                <img
+                  // onClick={clickPlay}
+                  src={playIcon}
+                  className="hidden inline w-7 h-7 cursor-pointer mr-1"
+                  alt="SaleSpot"
+                />
+                <span className="text-2xl">
+                  {voiceMetrics.is_talking ? '🗣' : '😶'}
+                </span>
+                <span>
+                  {/* {connectionStatus === 'Open' ? ' Active' : ' Initializing'} */}
+                </span>
+
+                {isSpotting && 'spotting mode'}
+              </div>
+              <div className="text-gray-700 space-x-4">
+                {/* <SpottingIcon className="h-4 w-4 cursor-pointer" /> */}
+                <img
+                  // onClick={clickReset}
+                  src={resetIcon}
+                  className="inline w-7 h-7 cursor-pointer mr-1"
+                  alt="reset"
+                />
+                <img
+                  // onClick={clickBlind}
+                  src={blindIcon}
+                  className="inline w-7 h-7 cursor-pointer mr-1"
+                  alt="blind"
+                />
+                <img
+                  onClick={(e) => clickSpotting(e)}
+                  src={spottingIcon}
+                  className="inline w-7 h-7 cursor-pointer mr-1"
+                  alt="spotting"
+                />
+                <img
+                  onClick={clickExpand}
+                  src={expandIcon}
+                  className="inline p-1 w-7 h-7 cursor-pointer mr-1 md:transform md:rotate-180 xl:hidden"
+                  alt="expand"
+                />
+              </div>
+            </div>
+          </div>
+          <ParticipantsList faces={propFaces} />
+        </div>
+      )}
+    </>
   );
 }

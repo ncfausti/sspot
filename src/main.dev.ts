@@ -67,8 +67,6 @@ const createWindow = async () => {
     return path.join(RESOURCES_PATH, ...paths);
   };
 
-  const factor = screen.getPrimaryDisplay().scaleFactor;
-
   // Tray popout
   const mb = menubar({
     icon: getAssetPath('tray.png'),
@@ -88,7 +86,6 @@ const createWindow = async () => {
         additionalArguments: [`--USER-DATA-DIR=${app.getPath('userData')}`],
         nativeWindowOpen: false,
         enableRemoteModule: true,
-        zoomFactor: 1.0,
       },
     },
   });
