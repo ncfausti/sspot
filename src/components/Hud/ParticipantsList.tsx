@@ -27,7 +27,7 @@ export default function ParticipantsList(props: { faces: Face[] }) {
   return (
     <div className="flex flex-grow flex-col bg-gray-100 content-center rounded-xl hidden md:inline-flex md:w-1/2 rounded-l-none">
       <div className="font-semibold ml-3">Participants</div>
-      <div className="flex flex-grow bg-gray-100 p-6 content-center rounded-xl hidden md:inline-flex md:w-1/2 rounded-l-none">
+      <div className="flex w-full flex-grow bg-gray-100 p-6 content-center rounded-xl hidden md:inline-flex rounded-l-none">
         {props.faces.map((participant: Participant) => (
           <div key={participant.id} className="mt-3 ml-3 w-24 text-center">
             <img
