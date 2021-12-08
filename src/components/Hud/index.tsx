@@ -5,6 +5,7 @@ import { uuid } from 'uuidv4';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 import ParticipantsList from './ParticipantsList';
 import spottingIcon from '../../../assets/spotting-icon.png';
+import spottingIconGray from '../../../assets/spotting-icon-gray.png';
 import playIcon from '../../../assets/play.png';
 import blindIcon from '../../../assets/blind.png';
 import resetIcon from '../../../assets/reset.png';
@@ -245,7 +246,7 @@ export default function Hud() {
                 <img
                   // onClick={clickPlay}
                   src={playIcon}
-                  className="hidden inline w-7 h-7 cursor-pointer mr-1"
+                  className="inline w-7 h-7 cursor-pointer mr-1"
                   alt="SaleSpot"
                 />
                 <span className="text-2xl">
@@ -273,7 +274,7 @@ export default function Hud() {
                 />
                 <img
                   onClick={(e) => clickSpotting(e)}
-                  src={spottingIcon}
+                  src={spottingIconGray}
                   className="inline w-7 h-7 cursor-pointer mr-1"
                   alt="spotting"
                 />

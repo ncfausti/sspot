@@ -2,6 +2,15 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "mouseListener",
+      "program": "/Users/nick/smile-ml/salespot-desktop/mouseListener.js",
+      "request": "launch",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "type": "pwa-node"
+    },
+    {
       "name": "Electron: Main",
       "type": "node",
       "request": "launch",
