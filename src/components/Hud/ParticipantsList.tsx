@@ -23,7 +23,6 @@ export default function ParticipantsList(props: { faces: Face[] }) {
   const [participants, setParticipants] = useState<Participant[]>([
     { id: '1', displayName: 'John Doe', img: defaultImg, talkRatio: 99.0 },
   ]);
-  log.info(props.faces);
   return (
     <div className="flex flex-grow flex-col bg-gray-100 content-center rounded-xl hidden md:inline-flex md:w-1/2 rounded-l-none">
       <div className="font-semibold ml-3">Participants</div>
