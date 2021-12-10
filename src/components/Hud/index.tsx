@@ -8,6 +8,7 @@ import ParticipantsList from './ParticipantsList';
 import spottingIcon from '../../../assets/spotting-icon-gray.png';
 import spottingIconOn from '../../../assets/spotting-icon.png';
 import playIcon from '../../../assets/play.png';
+import pauseIcon from '../../../assets/pause.png';
 import blindIcon from '../../../assets/blind.png';
 import resetIcon from '../../../assets/reset.png';
 import expandIcon from '../../../assets/expand.png';
@@ -38,7 +39,7 @@ interface Face {
 const timeStyle = new Intl.DateTimeFormat('en', {
   hour: 'numeric',
   minute: 'numeric',
-  timeZoneName: 'short',
+  // timeZoneName: 'short',
 });
 
 const voiceMetricsDefault = {
@@ -51,7 +52,7 @@ const voiceMetricsDefault = {
 const newFace = (x: number, y: number) => {
   return {
     // directory: '/Users/nick/Desktop/',
-    directory: `${userDataDir()}\\`,
+    directory: userDataDir(),
     id: uuid(),
     x,
     y,
@@ -72,13 +73,13 @@ export default function Hud() {
   const [isSpotting, setIsSpotting] = useState(false);
   const spottingBtn = useRef(null);
   const [clickCoords, setClickCoords] = useState({ x: -1, y: -1 });
-  const [inSpottingToggleIcon, setInSpottingToggleIcon] = useState(false);
+  const [inAppUI, setInAppUI] = useState(false);
   const { sendMessage, sendJsonMessage, lastMessage, readyState } =
     useWebSocket(SOCKET_URL, {
       onOpen: () => {
         log.info('ws opened');
         const initMessage = JSON.stringify({
-          destination_directory: `${userDataDir()}\\`,
+          destination_directory: userDataDir(),
           status_code: 1,
           faces,
         });
@@ -139,7 +140,7 @@ export default function Hud() {
 
   function clickExpand() {
     setExpanded((prev) => !prev);
-    return expanded ? window.resizeTo(700, 180) : window.resizeTo(320, 180);
+    return expanded ? window.resizeTo(330, 100) : window.resizeTo(165, 100);
   }
 
   function clickEnd() {
@@ -148,8 +149,9 @@ export default function Hud() {
     window.close();
   }
 
+  // When in spotting mode and a
   useEffect(() => {
-    if (!isSpotting || clickCoords.x === -1 || inSpottingToggleIcon) return;
+    if (!isSpotting || clickCoords.x === -1 || inAppUI) return;
     log.info(`you spotted someone at ${clickCoords.x},${clickCoords.y}`);
     setFaces((prev) => [...prev, newFace(clickCoords.x, clickCoords.y)]);
   }, [clickCoords]);
@@ -168,86 +170,98 @@ export default function Hud() {
         <div
           onMouseEnter={() => {
             log.info('mouse entered, set no spotting flag');
-            setInSpottingToggleIcon(true);
+            setInAppUI(true);
           }}
           onMouseLeave={() => {
             log.info('mouse exit, remove no spotting flag');
-            setInSpottingToggleIcon(false);
+            setInAppUI(false);
           }}
-          className="absolute flex xl:mt-8 items-start md:min-h-screen xl:min-h-full rounded-3xl bg-gray-100 md:w-full xl:w-1/2 lg:m-auto lg:items-stretch"
+          className="flex items-start rounded-lg bg-gray-100"
         >
-          <div className="flex z-50 flex-grow min-h-screen lg:min-h-0 flex-col p-3 content-center bg-white md:w-1/2 rounded-3xl">
-            <div className="flex flex-grow flex-wrap justify-between content-center">
-              <div className="text-sm text-gray-800 mt-1.5 font-semibold">
-                {timeStyle.format(time)}
-              </div>
-              {/*
-              <span>scale: {remote.screen.getPrimaryDisplay().scaleFactor}</span> */}
-              {clickCoords.x},{clickCoords.y}
-              {/* {window.devicePixelRatio} */}
-              <div className="text-xs font-light">
-                <button
-                  onClick={clickEnd}
-                  className="cursor-pointer bg-white border-2 rounded-lg border-gray-500 font-light px-6 py-1"
-                  type="button"
-                >
-                  End
-                </button>
-              </div>
-            </div>
-            <div className="flex text-xs flex-grow space-x-2 justify-between">
-              <div className="flex flex-col justify-end bg-gray-100 flex-1 p-3">
-                <div>{Math.floor(elapsed / 60)}m</div>
-                <div>Elapsed</div>
-              </div>
-              <div className="flex flex-col justify-end bg-gray-100 flex-1 p-3">
-                <div>{Math.floor(voiceMetrics.current_monologue / 60)}m</div>
-                <div>Monologue</div>
-              </div>
-              <div className="flex flex-col justify-end bg-gray-100 flex-1 p-3">
-                <div>{voiceMetrics.talk_ratio}%</div>
-                <div>Talk Ratio</div>
-              </div>
-            </div>
-            <div className="flex flex-grow flex-wrap justify-between items-center">
-              <div className="flex">
-                <img
-                  // onClick={clickPlay}
-                  src={playIcon}
-                  className="w-4 h-4 cursor-pointer mr-1"
-                  alt="SaleSpot"
-                />
-                <span className="text-sm">
-                  {voiceMetrics.is_talking ? '🗣' : '😶'}
-                </span>
-                <span>
-                  {/* {connectionStatus === 'Open' ? ' Active' : ' Initializing'} */}
-                </span>
-              </div>
-              <div className="flex text-gray-700 space-x-4">
-                <img
-                  // onClick={clickReset}
-                  src={resetIcon}
-                  className="w-4 h-4 cursor-pointer mr-1"
-                  alt="reset"
-                />
+          <div className="flex w-full z-50 min-h-screen flex-col px-2 py-1 content-center bg-white rounded-2xl">
+            <div className="flex flex-grow flex-wrap justify-between content-center pb-1">
+              <div>
                 <img
                   // onClick={clickBlind}
                   src={blindIcon}
                   className="w-4 h-4 cursor-pointer mr-1"
                   alt="blind"
                 />
+              </div>
+              {/*
+              <span>scale: {remote.screen.getPrimaryDisplay().scaleFactor}</span> */}
+              {/* {clickCoords.x},{clickCoords.y} */}
+              <span className="text-xs text-gray-900 font-semibold">
+                {timeStyle.format(new Date())}
+              </span>
+              {/* {window.devicePixelRatio} */}
+              <div className="text-xs font-light">
+                <button
+                  onClick={clickEnd}
+                  className="bg-white border border-gray-900
+                  rounded-md text-gray-900 bg-white hover:bg-gray-900
+                  hover:text-white text-xxs font-semibold px-1 cursor-pointer"
+                  type="button"
+                >
+                  End
+                </button>
+              </div>
+            </div>
+            <div className="flex text-xs font-medium flex-grow space-x-2.5 justify-between">
+              <div className="flex flex-col justify-end border border-spotblue bg-spotblue text-white flex-1 px-1 leading-tight">
+                <div className="text-sm font-semibold ">{65}%</div>
+                <div>My Score</div>
+              </div>
+              <div className="hidden flex flex-col justify-end bg-spotblue text-white flex-1 px-1">
+                <div>{Math.floor(voiceMetrics.current_monologue / 60)}m</div>
+                <div>Monologue</div>
+              </div>
+              <div className="flex flex-col justify-end border border-gray-900 text-gray-900 font-medium flex-1 px-1 leading-tight">
+                <div className="text-sm text-spotblue font-semibold">
+                  {voiceMetrics.talk_ratio}%
+                </div>
+                <div>Talk Ratio</div>
+              </div>
+            </div>
+            <div className="flex flex-grow flex-wrap justify-between items-center pt-1">
+              <div className="flex ">
                 <img
-                  ref={spottingBtn}
-                  onClick={() => setIsSpotting((prev) => !prev)}
-                  src={isSpotting ? spottingIconOn : spottingIcon}
-                  className="w-4 h-4 cursor-pointer mr-1"
-                  alt="spotting"
+                  // onClick={clickPlay}
+                  src={pauseIcon}
+                  className="w-3 h-3 cursor-pointer mt-1 mr-1"
+                  alt="SaleSpot"
                 />
+                <span className="text-sm">
+                  {/* {voiceMetrics.is_talking ? '🗣' : '😶'} */}
+                  {Math.floor(elapsed / 60) < 10 ? '0' : ''}
+                  {Math.floor(elapsed / 60)}:
+                  {Math.floor(elapsed % 60) < 10 ? '0' : ''}
+                  {Math.floor(elapsed % 60)}
+                </span>
+                <span>
+                  {/* {connectionStatus === 'Open' ? ' Active' : ' Initializing'} */}
+                </span>
+              </div>
+              <div className="flex text-gray-700 space-x-8">
+                <span className="flex space-x-1">
+                  <img
+                    // onClick={clickReset}
+                    src={resetIcon}
+                    className="w-3 h-3 cursor-pointer"
+                    alt="reset"
+                  />
+                  <img
+                    ref={spottingBtn}
+                    onClick={() => setIsSpotting((prev) => !prev)}
+                    src={isSpotting ? spottingIconOn : spottingIcon}
+                    className="w-3 h-3 cursor-pointer mr-1"
+                    alt="spotting"
+                  />
+                </span>
                 <img
                   onClick={clickExpand}
                   src={expandIcon}
-                  className="w-4 h-4 cursor-pointer mr-1 sm:transform sm:rotate-180"
+                  className="w-2 h-3 cursor-pointer mr-1"
                   alt="expand"
                 />
               </div>

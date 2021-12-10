@@ -69,7 +69,7 @@ export default function Meetings() {
     window.open(
       `file://${__dirname}/index.html#/live`,
       '_blank',
-      `width=300,height=120,top=40,left=${midPointLessHalfHudWidth},frame=false,transparent=true,alwaysOnTop=true,nodeIntegration=yes,backgroundColor=#00000000`
+      `width=165,height=100,top=40,left=${midPointLessHalfHudWidth},frame=false,transparent=true,alwaysOnTop=true,nodeIntegration=yes,backgroundColor=#00000000`
     );
     ipcRenderer.send('hideTrayWindow');
   }
