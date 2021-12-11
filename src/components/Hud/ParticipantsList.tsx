@@ -1,13 +1,5 @@
-import React, { useRef, useState, useEffect } from 'react';
-import log from 'electron-log';
-import defaultImg from '../../../assets/no-user.png';
+import React from 'react';
 
-interface Participant {
-  id: string;
-  displayName: string;
-  img: string;
-  talkRatio: number;
-}
 interface Face {
   id: string;
   x: number;
@@ -20,27 +12,27 @@ interface Face {
 }
 
 export default function ParticipantsList(props: { faces: Face[] }) {
-  const [participants, setParticipants] = useState<Participant[]>([
-    { id: '1', displayName: 'John Doe', img: defaultImg, talkRatio: 99.0 },
-  ]);
-
+  const { faces } = props;
+  const break = {
+    /* Inserting this collapsed row between two flex items will make
+    * the flex item that comes after it break to a new row */
+     flexBasis: '100%',
+     height: 0,
+   }
   return (
-    <div className="z-0 w-full ml-8 pl-8 min-h-screen fixed flex flex-grow flex-col bg-red-900 content-center rounded-l-none rounded-3xl">
-      <div className="font-semibold ml-3">Participants</div>
-      <div className="bg-red-500 flex w-full space-x-4 flex-grow bg-gray-100 p-6 content-center rounded-3xl  rounded-l-none">
-        {props.faces.map((participant: Participant) => (
-          <div key={participant.id} className="text-xs text-center">
+    <div className="z-0 w-1/2 min-h-screen fixed right-0 flex flex-grow flex-col bg-red-900 content-center rounded-l-none rounded-2xl">
+      <div className="bg-gray-200 flex flex-wrap w-full min-h-screen space-x-1 bg-gray-100 p-1 rounded-2xl rounded-l-none">
+        {faces.map((face: Face, index: number) => (
+          <div key={face.id} className="flex-auto text-xxs text-center">
             <img
-              src={participant.image_path}
-              className={`h-16 rounded-full border-4 ${
-                participant.sentiment < 0
-                  ? 'border-red-400'
-                  : 'border-green-600'
+              src={face.image_path}
+              className={`w-8 rounded-full border-4 ${
+                face.sentiment < 0 ? 'border-red-400' : 'border-green-600'
               }`}
-              alt={participant.id}
+              alt={face.id}
             />
-            <div>{participant.label}</div>
-            <div>{participant.sentiment}%</div>
+            {/* <div>{face.label}</div> */}
+            <div>{face.sentiment}%</div>
           </div>
         ))}
       </div>

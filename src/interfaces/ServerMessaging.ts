@@ -28,6 +28,6 @@ export interface IFace {
 export interface IServerResponse {
   audio_location: string;
   faces: IFace[];
-  status_code: number;
+  command: number;
   voice_metrics: IVoiceMetrics;
 }

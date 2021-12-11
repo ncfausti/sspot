@@ -87,6 +87,7 @@ const createWindow = async () => {
         nativeWindowOpen: false,
         enableRemoteModule: true,
       },
+      resizable: false,
     },
   });
 

@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 import React, { useCallback, useRef, useState, useEffect } from 'react';
 import log from 'electron-log';
 import { remote, ipcRenderer } from 'electron';
@@ -23,7 +25,7 @@ interface RequestMessage {
   // Where the zip should get created
   destination_directory: string;
   // 1 == run, 0 == stop server
-  status_code: number;
+  command: number;
   // List of faces
   faces: Face[];
 }
@@ -52,7 +54,6 @@ const voiceMetricsDefault = {
 
 const newFace = (x: number, y: number) => {
   return {
-    // directory: '/Users/nick/Desktop/',
     directory: userDataDir(),
     id: uuid(),
     x,
@@ -64,12 +65,15 @@ const newFace = (x: number, y: number) => {
 
 const SOCKET_URL = 'ws://localhost:8765';
 const HUD_STARTING_WIDTH = 165;
+const HUD_EXPANDED_WIDTH = 330;
+const HUD_STARTING_HEIGHT = 110;
 
 export default function Hud() {
   const [elapsed, setElapsed] = useState(0);
   const [expanded, setExpanded] = useState(window.innerWidth > 165);
   const [time, setTime] = useState(new Date());
   const [faces, setFaces] = useState([]);
+  const [command, setCommand] = useState(1);
   const [propFaces, setPropFaces] = useState([]);
   const [voiceMetrics, setVoiceMetrics] = useState(voiceMetricsDefault);
   const [isSpotting, setIsSpotting] = useState(false);
@@ -82,7 +86,7 @@ export default function Hud() {
         log.info('ws opened');
         const initMessage = JSON.stringify({
           destination_directory: userDataDir(),
-          status_code: 1,
+          command: 1,
           faces,
         });
         sendMessage(initMessage);
@@ -105,7 +109,7 @@ export default function Hud() {
           sendJsonMessage(msg);
 
           // clear out faces to send queue here ONLY IF
-          // the lenght is greater than 0, since it will have
+          // the length is greater than 0, since it will have
           // sent the face above
           if (faces.length > 0) {
             setFaces([]);
@@ -168,8 +172,19 @@ export default function Hud() {
   function clickExpand() {
     setExpanded((prev) => !prev);
     return window.outerWidth > HUD_STARTING_WIDTH
-      ? animatedResizeTo(165, 110)
-      : animatedResizeTo(330, 110);
+      ? animatedResizeTo(HUD_STARTING_WIDTH, 110)
+      : animatedResizeTo(HUD_EXPANDED_WIDTH, 110);
+  }
+
+  function clickPlayPause() {
+    setCommand((prev) => {
+      if (prev === 1) {
+        log.info('previously in play mode, now in pause mode');
+        return 3;
+      }
+      log.info('previously in pause mode, now in play mode');
+      return 1;
+    });
   }
 
   function clickEnd() {
@@ -178,7 +193,6 @@ export default function Hud() {
     window.close();
   }
 
-  // When in spotting mode and a
   useEffect(() => {
     if (!isSpotting || clickCoords.x === -1 || inAppUI) return;
     log.info(`you spotted someone at ${clickCoords.x},${clickCoords.y}`);
@@ -257,8 +271,8 @@ export default function Hud() {
             <div className="flex flex-grow flex-wrap justify-between items-center pt-1">
               <div className="flex ">
                 <img
-                  // onClick={clickPlay}
-                  src={pauseIcon}
+                  onClick={clickPlayPause}
+                  src={command === 1 ? pauseIcon : playIcon}
                   className="w-3 h-3 cursor-pointer mt-1 mr-1"
                   alt="SaleSpot"
                 />
@@ -280,7 +294,17 @@ export default function Hud() {
                   />
                   <img
                     ref={spottingBtn}
-                    onClick={() => setIsSpotting((prev) => !prev)}
+                    onClick={() =>
+                      setIsSpotting((prev) => {
+                        if (prev === false) {
+                          animatedResizeTo(
+                            HUD_EXPANDED_WIDTH,
+                            HUD_STARTING_HEIGHT
+                          );
+                        }
+                        return !prev;
+                      })
+                    }
                     src={isSpotting ? spottingIconOn : spottingIcon}
                     className="w-3 h-3 cursor-pointer mr-1"
                     alt="spotting"
@@ -290,7 +314,8 @@ export default function Hud() {
                   onClick={clickExpand}
                   src={expandIcon}
                   className={`w-2 h-3 cursor-pointer mr-1 ${
-                    expanded && 'transform rotate-180'
+                    window.outerWidth > HUD_STARTING_WIDTH &&
+                    'transform rotate-180'
                   }`}
                   alt="expand"
                 />
