@@ -86,7 +86,7 @@ export default function Hud() {
         log.info('ws opened');
         const initMessage = JSON.stringify({
           destination_directory: userDataDir(),
-          command: 1,
+          command,
           faces,
         });
         sendMessage(initMessage);
@@ -101,8 +101,10 @@ export default function Hud() {
         //   log.info(face.label);
         //   log.info(face.sentiment);
         // });
+        // debugger;
         setPropFaces(() => msg.faces);
         setVoiceMetrics(msg.voice_metrics);
+        msg.command = command;
 
         setTimeout(() => {
           msg.faces.push(...faces);
@@ -185,6 +187,11 @@ export default function Hud() {
       log.info('previously in pause mode, now in play mode');
       return 1;
     });
+  }
+
+  // function that sends reset command to server
+  function clickReset() {
+    setCommand(2);
   }
 
   function clickEnd() {
@@ -287,7 +294,7 @@ export default function Hud() {
               <div className="flex text-gray-700 space-x-8">
                 <span className="flex space-x-1">
                   <img
-                    // onClick={clickReset}
+                    onClick={clickReset}
                     src={resetIcon}
                     className="w-3 h-3 cursor-pointer"
                     alt="reset"
