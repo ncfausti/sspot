@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { CogIcon } from '@heroicons/react/solid';
 import log from 'electron-log';
-import { ipcRenderer } from 'electron';
+import { ipcRenderer, remote } from 'electron';
 import logo from '../../../assets/salespot-logo-red.png';
 import { startServer } from '../../utils';
 
@@ -65,11 +65,11 @@ export default function Meetings() {
       log.info('Full output of script: ', scriptOutput);
     });
 
-    const midPointLessHalfHudWidth = window.screen.width / 2 - 150;
+    const midPointLessHalfHudWidth = window.screen.width / 2 - 80;
     window.open(
       `file://${__dirname}/index.html#/live`,
       '_blank',
-      `width=165,height=100,top=40,left=${midPointLessHalfHudWidth},frame=false,transparent=true,alwaysOnTop=true,nodeIntegration=yes,backgroundColor=#00000000`
+      `width=165,height=110,top=40,left=${midPointLessHalfHudWidth},frame=false,transparent=true,alwaysOnTop=true,nodeIntegration=yes,backgroundColor=#00000000`
     );
     ipcRenderer.send('hideTrayWindow');
   }
@@ -94,6 +94,7 @@ export default function Meetings() {
         >
           Launch SaleSpot
         </button>
+        <span>{remote.screen.getPrimaryDisplay().scaleFactor}</span>
       </div>
       <div className="flex flex-grow flex-wrap justify-between items-center">
         <div className="">

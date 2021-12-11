@@ -21,6 +21,10 @@ module.exports = {
       colors: {
         spotblue: '#3190FF',
       },
+      width: {
+        165: '165px',
+        300: '300px',
+      },
     },
   },
   variants: {

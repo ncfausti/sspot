@@ -140,7 +140,7 @@ export default function Hud() {
 
   function clickExpand() {
     setExpanded((prev) => !prev);
-    return expanded ? window.resizeTo(330, 100) : window.resizeTo(165, 100);
+    return expanded ? window.resizeTo(330, 110) : window.resizeTo(165, 110);
   }
 
   function clickEnd() {
@@ -178,7 +178,7 @@ export default function Hud() {
           }}
           className="flex items-start rounded-lg bg-gray-100"
         >
-          <div className="flex w-full z-50 min-h-screen flex-col px-2 py-1 content-center bg-white rounded-2xl">
+          <div className="flex w-165 z-50 min-h-screen flex-col px-2 py-1 content-center bg-white rounded-2xl">
             <div className="flex flex-grow flex-wrap justify-between content-center pb-1">
               <div>
                 <img
