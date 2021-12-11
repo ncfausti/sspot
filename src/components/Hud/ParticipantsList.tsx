@@ -25,9 +25,9 @@ export default function ParticipantsList(props: { faces: Face[] }) {
   ]);
 
   return (
-    <div className="hidden sm:block z-0 w-2/3 ml-8 pl-8 min-h-screen fixed right-0 flex flex-grow flex-col bg-gray-100 content-center rounded-l-none rounded-3xl">
+    <div className="z-0 w-full ml-8 pl-8 min-h-screen fixed flex flex-grow flex-col bg-red-900 content-center rounded-l-none rounded-3xl">
       <div className="font-semibold ml-3">Participants</div>
-      <div className="flex w-full space-x-4 flex-grow bg-gray-100 p-6 content-center rounded-3xl  rounded-l-none">
+      <div className="bg-red-500 flex w-full space-x-4 flex-grow bg-gray-100 p-6 content-center rounded-3xl  rounded-l-none">
         {props.faces.map((participant: Participant) => (
           <div key={participant.id} className="text-xs text-center">
             <img

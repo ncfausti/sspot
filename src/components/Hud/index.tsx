@@ -17,6 +17,7 @@ import salespotLogo from '../../../assets/salespot-logo-red.png';
 import { userDataDir } from '../../utils';
 import Loading from '../Loading';
 import MouseListener from '../../utils/MouseListener';
+import CountUp from '../Clocks/CountUp';
 
 interface RequestMessage {
   // Where the zip should get created
@@ -62,10 +63,11 @@ const newFace = (x: number, y: number) => {
 };
 
 const SOCKET_URL = 'ws://localhost:8765';
+const HUD_STARTING_WIDTH = 165;
 
 export default function Hud() {
   const [elapsed, setElapsed] = useState(0);
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(window.innerWidth > 165);
   const [time, setTime] = useState(new Date());
   const [faces, setFaces] = useState([]);
   const [propFaces, setPropFaces] = useState([]);
@@ -138,9 +140,36 @@ export default function Hud() {
     return () => service.stdout.on('data', () => null);
   }, []);
 
+  // function that slowly resizes the window
+  // x,y must be multiples of 5
+  function animatedResizeTo(x: number, y: number) {
+    if (x % 5 !== 0 || y % 5 !== 0) {
+      return;
+    }
+    if (x === 0 || y === 0) {
+      return;
+    }
+    const timer = setInterval(() => {
+      if (window.outerWidth === x && window.outerHeight === y) {
+        clearInterval(timer);
+      } else {
+        // if window is less than desired size, increase it
+        if (window.innerWidth < x) {
+          window.resizeBy(5, 0);
+        }
+        // if window is more than desired size, decrease it
+        if (window.innerWidth > x) {
+          window.resizeBy(-5, 0);
+        }
+      }
+    }, 0);
+  }
+
   function clickExpand() {
     setExpanded((prev) => !prev);
-    return expanded ? window.resizeTo(330, 110) : window.resizeTo(165, 110);
+    return window.outerWidth > HUD_STARTING_WIDTH
+      ? animatedResizeTo(165, 110)
+      : animatedResizeTo(330, 110);
   }
 
   function clickEnd() {
@@ -176,9 +205,9 @@ export default function Hud() {
             log.info('mouse exit, remove no spotting flag');
             setInAppUI(false);
           }}
-          className="flex items-start rounded-lg bg-gray-100"
+          className="flex items-start rounded-3xl bg-gray-100"
         >
-          <div className="flex w-165 z-50 min-h-screen flex-col px-2 py-1 content-center bg-white rounded-2xl">
+          <div className="flex w-165 z-50 min-h-screen flex-col px-2 py-1 content-center bg-white rounded-xl">
             <div className="flex flex-grow flex-wrap justify-between content-center pb-1">
               <div>
                 <img
@@ -209,8 +238,10 @@ export default function Hud() {
             </div>
             <div className="flex text-xs font-medium flex-grow space-x-2.5 justify-between">
               <div className="flex flex-col justify-end border border-spotblue bg-spotblue text-white flex-1 px-1 leading-tight">
-                <div className="text-sm font-semibold ">{65}%</div>
-                <div>My Score</div>
+                <div className="text-sm font-semibold ">
+                  <CountUp elapsed={elapsed} />
+                </div>
+                <div>Time</div>
               </div>
               <div className="hidden flex flex-col justify-end bg-spotblue text-white flex-1 px-1">
                 <div>{Math.floor(voiceMetrics.current_monologue / 60)}m</div>
@@ -233,10 +264,7 @@ export default function Hud() {
                 />
                 <span className="text-sm">
                   {/* {voiceMetrics.is_talking ? '🗣' : '😶'} */}
-                  {Math.floor(elapsed / 60) < 10 ? '0' : ''}
-                  {Math.floor(elapsed / 60)}:
-                  {Math.floor(elapsed % 60) < 10 ? '0' : ''}
-                  {Math.floor(elapsed % 60)}
+                  {/* <CountUp elapsed={elapsed} /> */}
                 </span>
                 <span>
                   {/* {connectionStatus === 'Open' ? ' Active' : ' Initializing'} */}
@@ -261,7 +289,9 @@ export default function Hud() {
                 <img
                   onClick={clickExpand}
                   src={expandIcon}
-                  className="w-2 h-3 cursor-pointer mr-1"
+                  className={`w-2 h-3 cursor-pointer mr-1 ${
+                    expanded && 'transform rotate-180'
+                  }`}
                   alt="expand"
                 />
               </div>
