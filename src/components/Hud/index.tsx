@@ -80,6 +80,7 @@ export default function Hud() {
   const spottingBtn = useRef(null);
   const [clickCoords, setClickCoords] = useState({ x: -1, y: -1 });
   const [inAppUI, setInAppUI] = useState(false);
+  const [effect, setEffect] = useState(false);
   const { sendMessage, sendJsonMessage, lastMessage, readyState } =
     useWebSocket(SOCKET_URL, {
       onOpen: () => {
@@ -192,6 +193,7 @@ export default function Hud() {
   // function that sends reset command to server
   function clickReset() {
     setCommand(2);
+    setEffect(true);
   }
 
   function clickEnd() {
@@ -297,7 +299,9 @@ export default function Hud() {
                   <img
                     onClick={clickReset}
                     src={resetIcon}
-                    className="w-3 h-3 cursor-pointer"
+                    className={`${effect && 'animate-reverse-spin'}
+                    w-3 h-3 cursor-pointer`}
+                    onAnimationEnd={() => setEffect(false)}
                     alt="reset"
                   />
                   <img
@@ -314,7 +318,9 @@ export default function Hud() {
                       })
                     }
                     src={isSpotting ? spottingIconOn : spottingIcon}
-                    className="w-3 h-3 cursor-pointer mr-1"
+                    className={`${
+                      isSpotting && 'animate-ping'
+                    } w-3 h-3 cursor-pointer mr-1`}
                     alt="spotting"
                   />
                 </span>

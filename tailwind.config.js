@@ -25,6 +25,17 @@ module.exports = {
         165: '165px',
         300: '300px',
       },
+      animation: {
+        'spin-slow': 'spin 3s linear infinite',
+        'reverse-spin': 'reverse-spin .25s linear',
+      },
+      keyframes: {
+        'reverse-spin': {
+          from: {
+            transform: 'rotate(360deg)',
+          },
+        },
+      },
     },
   },
   variants: {
