@@ -304,25 +304,45 @@ export default function Hud() {
                     onAnimationEnd={() => setEffect(false)}
                     alt="reset"
                   />
-                  <img
-                    ref={spottingBtn}
-                    onClick={() =>
-                      setIsSpotting((prev) => {
-                        if (prev === false) {
-                          animatedResizeTo(
-                            HUD_EXPANDED_WIDTH,
-                            HUD_STARTING_HEIGHT
-                          );
+                  <span className="relative w-3 h-3">
+                    <img
+                      ref={spottingBtn}
+                      onClick={() =>
+                        setIsSpotting((prev) => {
+                          if (prev === false) {
+                            animatedResizeTo(
+                              HUD_EXPANDED_WIDTH,
+                              HUD_STARTING_HEIGHT
+                            );
+                          }
+                          return !prev;
+                        })
+                      }
+                      src={isSpotting ? spottingIconOn : spottingIcon}
+                      className={`${
+                        isSpotting && 'animate-ping'
+                      } w-3 h-3 cursor-pointer mr-1 absolute`}
+                      alt="spotting"
+                    />
+                    {isSpotting && (
+                      <img
+                        className="absolute cursor-pointer w-3 h-3"
+                        src={spottingIconOn}
+                        alt="spotting on"
+                        onClick={() =>
+                          setIsSpotting((prev) => {
+                            if (prev === false) {
+                              animatedResizeTo(
+                                HUD_EXPANDED_WIDTH,
+                                HUD_STARTING_HEIGHT
+                              );
+                            }
+                            return !prev;
+                          })
                         }
-                        return !prev;
-                      })
-                    }
-                    src={isSpotting ? spottingIconOn : spottingIcon}
-                    className={`${
-                      isSpotting && 'animate-ping'
-                    } w-3 h-3 cursor-pointer mr-1`}
-                    alt="spotting"
-                  />
+                      />
+                    )}
+                  </span>
                 </span>
                 <img
                   onClick={clickExpand}
