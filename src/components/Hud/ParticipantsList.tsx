@@ -20,19 +20,21 @@ export default function ParticipantsList(props: { faces: Face[] }) {
      height: 0,
    }
   return (
-    <div className="z-0 w-1/2 min-h-screen fixed right-0 flex flex-grow flex-col bg-red-900 content-center rounded-l-none rounded-2xl">
-      <div className="bg-gray-200 flex flex-wrap w-full min-h-screen space-x-1 bg-gray-100 p-1 rounded-2xl rounded-l-none">
+    <div className="z-0 w-1/2 min-h-screen fixed right-0 flex flex-grow flex-col bg-gray-100 content-center rounded-l-none rounded-2xl">
+      <div className="bg-gray-200 flex justify-evenly flex-wrap w-full min-h-screen bg-gray-100 p-1 rounded-2xl rounded-l-none">
         {faces.map((face: Face, index: number) => (
-          <div key={face.id} className="flex-auto text-xxs text-center">
+          <div key={face.id} className="text-xxs text-center">
             <img
               src={face.image_path}
-              className={`w-8 rounded-full border-4 ${
-                face.sentiment < 0 ? 'border-red-400' : 'border-green-600'
+              className={`w-10 rounded-full border-4 ${
+                face.sentiment >= 20 ? 'border-green-600' : 'border-gray-300'
               }`}
               alt={face.id}
             />
             {/* <div>{face.label}</div> */}
-            <div>{face.sentiment}%</div>
+            <div className={`pl-1 w-10 rounded-full font-semibold ${
+                face.sentiment > 20 ? 'text-green-600' : 'text-gray-900'
+              }`}>{face.sentiment <= 0 || !face.sentiment ? '0%' : face.sentiment + '%'}</div>
           </div>
         ))}
       </div>

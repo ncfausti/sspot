@@ -203,6 +203,7 @@ export default function Hud() {
   useEffect(() => {
     if (!isSpotting || clickCoords.x === -1 || inAppUI) return;
     log.info(`you spotted someone at ${clickCoords.x},${clickCoords.y}`);
+    setCommand(1);
     setFaces((prev) => [...prev, newFace(clickCoords.x, clickCoords.y)]);
   }, [clickCoords]);
 
