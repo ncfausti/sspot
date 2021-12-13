@@ -75,7 +75,7 @@ export function removeItemById(
   return array.filter((face) => face.id !== id);
 }
 
-export default function Hud(testing = false) {
+export default function Hud() {
   const [elapsed, setElapsed] = useState(0);
   const [expanded, setExpanded] = useState(window.innerWidth > 165);
   const [time, setTime] = useState(new Date());
@@ -97,6 +97,7 @@ export default function Hud(testing = false) {
           destination_directory: userDataDir(),
           command,
           faces,
+          settings: { auto_detect: 0 },
         });
         sendMessage(initMessage);
       },
@@ -117,6 +118,7 @@ export default function Hud(testing = false) {
 
         setVoiceMetrics(msg.voice_metrics);
         msg.command = command;
+        msg.settings = { auto_detect: 0 };
 
         setTimeout(() => {
           // add newly created faces
@@ -235,7 +237,7 @@ export default function Hud(testing = false) {
   return (
     <>
       {connectionStatus !== 'Open' && (
-        <div className="text-center bg-gray-100 min-h-screen">
+        <div className="text-center pt-5 bg-gray-100 min-h-screen">
           <img src={salespotLogo} className="inline w-1/2" alt="expand" />
           <div className="">
             <Loading x={60} y={60} />
