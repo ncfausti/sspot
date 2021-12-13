@@ -21,7 +21,7 @@ export default function ParticipantsList(props: {
   const faceClicked = (e: SyntheticEvent) => {
     // use the id value stored in the alt attribute
     // to get the face id
-    faceClickHandler(e.target.alt);
+    faceClickHandler(e.target.id);
   };
 
   return (
@@ -30,9 +30,15 @@ export default function ParticipantsList(props: {
         {faces.map((face: Face, index: number) => (
           <div
             key={face.id}
-            className="text-xxs text-center"
+            className="text-xxs text-center relative hover-trigger"
             onClick={faceClicked}
           >
+            <span
+              id={face.id}
+              className="absolute text-tiny text-gray-900 w-4 h-4 font-semibold transparent -right-2 -top-1.5 rounded-full hover-target cursor-pointer"
+            >
+              x
+            </span>
             <img
               src={face.image_path}
               className={`w-10 rounded-full border-4 ${
