@@ -1,5 +1,5 @@
 /* eslint-disable react/forbid-prop-types */
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { CogIcon } from '@heroicons/react/solid';
 import log from 'electron-log';
 import { ipcRenderer } from 'electron';
@@ -76,6 +76,10 @@ export default function Meetings() {
     ipcRenderer.send('hideTrayWindow');
   }
 
+  const memoizedBackClick = useCallback(() => {
+    setShowSettingsView(false);
+  }, []);
+
   return (
     <div className="flex bg-gray-100 flex-grow flex-col p-3 min-h-screen content-center">
       <>
@@ -119,7 +123,7 @@ export default function Meetings() {
             </div>
           </>
         )}
-        {showSettingsView && <Settings />}
+        {showSettingsView && <Settings backClick={memoizedBackClick} />}
       </>
     </div>
   );

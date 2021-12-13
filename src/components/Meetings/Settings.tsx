@@ -1,9 +1,8 @@
 import React from 'react';
 
-export default function Settings() {
+export default function Settings(props) {
   return (
-    <fieldset className="space-y-1">
-      <legend className="sr-only">Notifications</legend>
+    <fieldset className="space-y-0">
       <div className="relative flex items-start">
         <div className="flex items-center h-5">
           <input
@@ -11,16 +10,16 @@ export default function Settings() {
             aria-describedby="comments-description"
             name="comments"
             type="checkbox"
-            className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+            className="focus:ring-spotblue h-4 w-4 text-spotblue border-gray-300 rounded"
           />
         </div>
-        <div className="ml-3 text-sm">
+        <div className="ml-3 text-xs">
           <label htmlFor="comments" className="font-medium text-gray-700">
-            New comments
+            Auto-detect{' '}
           </label>
           <span id="comments-description" className="text-gray-500">
-            <span className="sr-only">New comments </span>so you always know
-            what's happening.
+            <span className="sr-only">Auto-detect </span>faces when{' '}
+            <span className="font-semibold">Launch SaleSpot</span> is clicked.
           </span>
         </div>
       </div>
@@ -31,19 +30,24 @@ export default function Settings() {
             aria-describedby="candidates-description"
             name="candidates"
             type="checkbox"
-            className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+            className="focus:ring-spotblue h-4 w-4 text-spotblue border-gray-300 rounded"
           />
         </div>
-        <div className="ml-3 text-sm">
+        <div className="ml-3 text-xs">
           <label htmlFor="candidates" className="font-medium text-gray-700">
-            New candidates
+            Debug
           </label>
           <span id="candidates-description" className="text-gray-500">
-            <span className="sr-only">New candidates </span>who apply for any
-            open postings.
+            <span className="sr-only">Debug </span>
           </span>
         </div>
       </div>
+      <button
+        onClick={() => props.backClick()}
+        className="cursor-pointer float-right text-right bg-spotblue hover:bg-blue-700 text-white font-bold text-xxs px-2 rounded"
+      >
+        Back
+      </button>
     </fieldset>
   );
 }
