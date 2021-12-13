@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { CogIcon } from '@heroicons/react/solid';
 import log from 'electron-log';
-import { ipcRenderer, remote } from 'electron';
+import { ipcRenderer } from 'electron';
 import logo from '../../../assets/salespot-logo-red.png';
 import { startServer } from '../../utils';
 
@@ -34,7 +34,7 @@ export default function Meetings() {
     const child = startServer();
     ipcRenderer.send('setGlobalServerPID', child.pid);
 
-    // for when the script closes later
+    // // for when the script closes later
     let scriptOutput = '';
 
     child.stdout.setEncoding('utf8');
@@ -94,7 +94,6 @@ export default function Meetings() {
         >
           Launch SaleSpot
         </button>
-        <span>{remote.screen.getPrimaryDisplay().scaleFactor}</span>
       </div>
       <div className="flex flex-grow flex-wrap justify-between items-center">
         <div className="">

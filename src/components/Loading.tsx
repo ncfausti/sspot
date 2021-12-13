@@ -1,13 +1,14 @@
 import React from 'react';
 
-export default function Loading() {
+export default function Loading(props) {
+  const { x, y } = props;
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       // xmlns:xlink="http://www.w3.org/1999/xlink"
       // style="margin:auto;background:#fff;display:block;"
-      width="90px"
-      height="90px"
+      width={`${x}px`}
+      height={`${y}px`}
       viewBox="0 0 100 100"
       preserveAspectRatio="xMidYMid"
       style={{ display: 'inline' }}

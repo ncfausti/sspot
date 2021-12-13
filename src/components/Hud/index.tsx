@@ -14,7 +14,7 @@ import pauseIcon from '../../../assets/pause.png';
 import blindIcon from '../../../assets/blind.png';
 import resetIcon from '../../../assets/reset.png';
 import expandIcon from '../../../assets/expand.png';
-import defaultImg from '../../../assets/no-user.png';
+import defaultImg from '../../../assets/loading.gif';
 import salespotLogo from '../../../assets/salespot-logo-red.png';
 import { userDataDir } from '../../utils';
 import Loading from '../Loading';
@@ -238,7 +238,7 @@ export default function Hud(testing = false) {
         <div className="text-center bg-gray-100 min-h-screen">
           <img src={salespotLogo} className="inline w-1/2" alt="expand" />
           <div className="">
-            <Loading />
+            <Loading x={60} y={60} />
           </div>
         </div>
       )}
