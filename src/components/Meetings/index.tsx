@@ -10,6 +10,7 @@ import Settings from './Settings';
 export default function Meetings() {
   const [time, setTime] = useState(new Date());
   const [showSettingsView, setShowSettingsView] = useState(false);
+  const [autoDetect, setAutoDetect] = useState(false);
 
   // on initial load only
   useEffect(() => {
@@ -76,8 +77,14 @@ export default function Meetings() {
     ipcRenderer.send('hideTrayWindow');
   }
 
-  const memoizedBackClick = useCallback(() => {
-    setShowSettingsView(false);
+  const memoizedBackClick = useCallback((e) => {
+    log.info(e);
+    setShowSettingsView();
+  }, []);
+
+  const memoizedAutoDetectChanged = useCallback((e) => {
+    log.info('auto detect changed', e.target.checked);
+    setAutoDetect((prev) => !prev);
   }, []);
 
   return (
@@ -101,7 +108,7 @@ export default function Meetings() {
           bg-blue-500 hover:bg-blue-600 focus:outline-none
           focus:ring-2 focus:ring-offset-2 focus:ring-blue-400"
               >
-                Launch SaleSpot
+                Launch SaleSpot {autoDetect ? '(auto-detect)' : ''}
               </button>
             </div>
             <div className="flex flex-grow flex-wrap justify-between items-center">
@@ -123,7 +130,13 @@ export default function Meetings() {
             </div>
           </>
         )}
-        {showSettingsView && <Settings backClick={memoizedBackClick} />}
+        {showSettingsView && (
+          <Settings
+            backClick={memoizedBackClick}
+            isAutoDetectOn={autoDetect}
+            autoDetectChanged={memoizedAutoDetectChanged}
+          />
+        )}
       </>
     </div>
   );

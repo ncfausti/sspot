@@ -95,7 +95,9 @@ const createWindow = async () => {
         nativeWindowOpen: false,
         enableRemoteModule: true,
       },
-      resizable: false,
+      resizable:
+        process.env.NODE_ENV === 'development' ||
+        process.env.DEBUG_PROD === 'true',
     },
   });
 
