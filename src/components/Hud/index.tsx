@@ -68,13 +68,21 @@ const HUD_STARTING_WIDTH = 165;
 const HUD_EXPANDED_WIDTH = 330;
 const HUD_STARTING_HEIGHT = 110;
 
-export default function Hud() {
+export function removeItemById(
+  id: string | number,
+  array: { id: string | number }[]
+) {
+  return array.filter((face) => face.id !== id);
+}
+
+export default function Hud(testing = false) {
   const [elapsed, setElapsed] = useState(0);
   const [expanded, setExpanded] = useState(window.innerWidth > 165);
   const [time, setTime] = useState(new Date());
-  const [faces, setFaces] = useState([]);
+  const [faces, setFaces] = useState<Face[]>([]);
   const [command, setCommand] = useState(1);
   const [propFaces, setPropFaces] = useState([]);
+  const [faceIdsToRemove, setFaceIdsToRemove] = useState<string[]>([]);
   const [voiceMetrics, setVoiceMetrics] = useState(voiceMetricsDefault);
   const [isSpotting, setIsSpotting] = useState(false);
   const spottingBtn = useRef(null);
@@ -103,12 +111,22 @@ export default function Hud() {
         //   log.info(face.sentiment);
         // });
         // debugger;
-        setPropFaces(() => msg.faces);
+        setPropFaces(() =>
+          msg.faces.filter((face) => !faceIdsToRemove.includes(face.id))
+        );
+
         setVoiceMetrics(msg.voice_metrics);
         msg.command = command;
 
         setTimeout(() => {
+          // add newly created faces
           msg.faces.push(...faces);
+
+          // remove faces that were flagged for removal
+          faceIdsToRemove.forEach((faceId: string) => {
+            msg.faces = removeItemById(faceId, msg.faces);
+          });
+
           sendJsonMessage(msg);
 
           // clear out faces to send queue here ONLY IF
@@ -208,6 +226,11 @@ export default function Hud() {
     setCommand(1);
     setFaces((prev) => [...prev, newFace(clickCoords.x, clickCoords.y)]);
   }, [clickCoords]);
+
+  const memoizedRemoveFace = useCallback((faceId: string) => {
+    log.info('removing face', faceId);
+    setFaceIdsToRemove((prev) => [...prev, faceId]);
+  }, []);
 
   return (
     <>
@@ -356,7 +379,10 @@ export default function Hud() {
               </div>
             </div>
           </div>
-          <ParticipantsList faces={propFaces} />
+          <ParticipantsList
+            faces={propFaces}
+            faceClickHandler={memoizedRemoveFace}
+          />
         </div>
       )}
     </>

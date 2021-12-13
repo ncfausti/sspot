@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { SyntheticEvent } from 'react';
+import log from 'electron-log';
 
 interface Face {
   id: string;
@@ -11,19 +12,27 @@ interface Face {
   directory: string;
 }
 
-export default function ParticipantsList(props: { faces: Face[] }) {
-  const { faces } = props;
-  const break = {
-    /* Inserting this collapsed row between two flex items will make
-    * the flex item that comes after it break to a new row */
-     flexBasis: '100%',
-     height: 0,
-   }
+export default function ParticipantsList(props: {
+  faces: Face[];
+  faceClickHandler: (string) => void;
+}) {
+  const { faces, faceClickHandler } = props;
+
+  const faceClicked = (e: SyntheticEvent) => {
+    // use the id value stored in the alt attribute
+    // to get the face id
+    faceClickHandler(e.target.alt);
+  };
+
   return (
     <div className="z-0 w-1/2 min-h-screen fixed right-0 flex flex-grow flex-col bg-gray-100 content-center rounded-l-none rounded-2xl">
       <div className="bg-gray-200 flex justify-evenly flex-wrap w-full min-h-screen bg-gray-100 p-1 rounded-2xl rounded-l-none">
         {faces.map((face: Face, index: number) => (
-          <div key={face.id} className="text-xxs text-center">
+          <div
+            key={face.id}
+            className="text-xxs text-center"
+            onClick={faceClicked}
+          >
             <img
               src={face.image_path}
               className={`w-10 rounded-full border-4 ${
@@ -32,9 +41,15 @@ export default function ParticipantsList(props: { faces: Face[] }) {
               alt={face.id}
             />
             {/* <div>{face.label}</div> */}
-            <div className={`pl-1 w-10 rounded-full font-semibold ${
+            <div
+              className={`pl-1 w-10 rounded-full font-semibold ${
                 face.sentiment > 20 ? 'text-green-600' : 'text-gray-900'
-              }`}>{face.sentiment <= 0 || !face.sentiment ? '0%' : face.sentiment + '%'}</div>
+              }`}
+            >
+              {face.sentiment <= 0 || !face.sentiment
+                ? '0%'
+                : `${face.sentiment}%`}
+            </div>
           </div>
         ))}
       </div>
