@@ -89,6 +89,7 @@ const createWindow = async () => {
       backgroundColor: '#00000000',
       alwaysOnTop: true,
       transparent: true,
+      paintWhenInitiallyHidden: false,
       webPreferences: {
         nodeIntegration: true,
         additionalArguments: [`--USER-DATA-DIR=${app.getPath('userData')}`],

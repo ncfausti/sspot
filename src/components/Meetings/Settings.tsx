@@ -2,6 +2,12 @@ import React, { SyntheticEvent, useEffect, useRef } from 'react';
 import { ipcRenderer } from 'electron';
 import log from 'electron-log';
 
+const showDebugMode = () => {
+  return (
+    process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
+  );
+};
+
 export default function Settings(props) {
   const { isAutoDetectOn, backClick, autoDetectChanged } = props;
 
@@ -54,7 +60,7 @@ export default function Settings(props) {
           </span>
         </div>
       </div>
-      <div className="relative flex items-start">
+      <div className={`${true && 'hidden'} relative flex items-start`}>
         <div className="flex items-center h-5">
           <input
             id="check-debug"
