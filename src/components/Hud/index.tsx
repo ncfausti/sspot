@@ -67,7 +67,9 @@ const SOCKET_URL = 'ws://localhost:8765';
 const HUD_STARTING_WIDTH = 165;
 const HUD_EXPANDED_WIDTH = 330;
 const HUD_STARTING_HEIGHT = 110;
-
+// adjust for different screens with different DPIs
+const PIXEL_RATIO = window.innerWidth / window.outerWidth;
+const mainHudWidth = Math.floor(HUD_STARTING_WIDTH * PIXEL_RATIO);
 export function removeItemById(
   id: string | number,
   array: { id: string | number }[]
@@ -190,12 +192,12 @@ export default function Hud() {
         clearInterval(timer);
       } else {
         // if window is less than desired size, increase it
-        if (window.innerWidth < x) {
-          window.resizeBy(5, 0);
+        if (window.outerWidth < x) {
+          window.resizeBy(15, 0);
         }
         // if window is more than desired size, decrease it
-        if (window.innerWidth > x) {
-          window.resizeBy(-5, 0);
+        if (window.outerWidth > x) {
+          window.resizeBy(-15, 0);
         }
       }
     }, 0);
@@ -273,7 +275,12 @@ export default function Hud() {
           }}
           className="flex items-start rounded-3xl bg-gray-100"
         >
-          <div className="flex w-165 z-50 min-h-screen flex-col px-2 py-1 content-center bg-white rounded-xl">
+          <div
+            style={{
+              width: `${mainHudWidth}px`,
+            }}
+            className="flex z-50 min-h-screen flex-col px-2 py-1 content-center bg-white rounded-xl"
+          >
             <div className="flex flex-grow flex-wrap justify-between content-center pb-1">
               <div>
                 <img

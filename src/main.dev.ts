@@ -94,6 +94,8 @@ const createWindow = async () => {
         nodeIntegration: true,
         additionalArguments: [`--USER-DATA-DIR=${app.getPath('userData')}`],
         nativeWindowOpen: false,
+        // nativeWindowOpen: true,
+        // nodeIntegrationInSubFrames: true,
         enableRemoteModule: true,
       },
       resizable:
