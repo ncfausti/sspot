@@ -76,14 +76,14 @@ export default function Settings(props) {
       <div className="pt-5">
         <button
           onClick={backClick}
-          className="cursor-pointer float-right text-right bg-spotblue hover:bg-blue-700 text-white font-bold text-xxs px-2 rounded"
+          className="cursor-pointer float-right text-right bg-spotblue hover:bg-blue-700 text-white font-bold text-xxs py-1 px-2 rounded"
         >
           Back
         </button>
 
         <button
           onClick={exitApp}
-          className="cursor-pointer float-right text-right mr-3 bg-spotred hover:bg-red-800 text-white font-bold text-xxs px-2 rounded"
+          className="cursor-pointer float-right text-right mr-3 bg-spotred hover:bg-red-800 text-white font-bold text-xxs py-1 px-2 rounded"
         >
           Quit
         </button>

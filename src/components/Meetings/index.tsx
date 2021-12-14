@@ -111,7 +111,8 @@ export default function Meetings() {
           bg-blue-500 hover:bg-blue-600 focus:outline-none
           focus:ring-2 focus:ring-offset-2 focus:ring-blue-400"
               >
-                Launch SaleSpot {autoDetect ? '(auto-detect)' : ''}
+                Launch SaleSpot
+                {/* {autoDetect ? '(auto-detect)' : ''} */}
               </button>
             </div>
             <div className="flex flex-grow flex-wrap justify-between items-center">

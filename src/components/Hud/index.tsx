@@ -108,14 +108,14 @@ export default function Hud() {
       onClose: () => log.info('ws closed'),
       onMessage: (e) => {
         const msg = JSON.parse(e.data);
-        log.info(msg);
-        msg.faces.forEach((face) => {
-          log.info(face.status);
-          log.info(face.x, ',', face.y);
-          log.info(face.label);
-          log.info(face.sentiment);
-        });
-        // debugger;
+        // log.info(msg);
+        // msg.faces.forEach((face) => {
+        //   log.info(face.status);
+        //   log.info(face.x, ',', face.y);
+        //   log.info(face.label);
+        //   log.info(face.sentiment);
+        // });
+
         setPropFaces(() =>
           msg.faces.filter((face) => !faceIdsToRemove.includes(face.id))
         );
@@ -290,9 +290,9 @@ export default function Hud() {
                 {timeStyle.format(new Date())}
               </span>
               {/* {window.devicePixelRatio} */}
-              {remote.getGlobal('autoDetectOn') === true && (
+              {/* {remote.getGlobal('autoDetectOn') === true && (
                 <span className="text-xxs text-green-400">Auto Detect</span>
-              )}
+              )} */}
               <div className="text-xs font-light">
                 <button
                   onClick={clickEnd}
@@ -307,20 +307,25 @@ export default function Hud() {
             </div>
             <div className="flex text-xs font-medium flex-grow space-x-2.5 justify-between">
               <div className="flex flex-col justify-end border border-spotblue bg-spotblue text-white flex-1 px-1 leading-tight">
-                <div className="text-sm font-semibold ">
-                  <CountUp elapsed={elapsed} />
+                <div className="text-sm">
+                  {/* <CountUp elapsed={elapsed} /> */}
+                  <div className="text-base font-bold">
+                    {propFaces[0] ? propFaces[0].sentiment : '0'}
+                    <span className="font-medium">%</span>
+                  </div>
                 </div>
-                <div>Time</div>
+                <div className="pb-1">My Score</div>
               </div>
               <div className="hidden flex flex-col justify-end bg-spotblue text-white flex-1 px-1">
                 <div>{Math.floor(voiceMetrics.current_monologue / 60)}m</div>
                 <div>Monologue</div>
               </div>
               <div className="flex flex-col justify-end border border-gray-900 text-gray-900 font-medium flex-1 px-1 leading-tight">
-                <div className="text-sm text-spotblue font-semibold">
-                  {voiceMetrics.talk_ratio}%
+                <div className="text-base text-spotblue font-bold">
+                  {voiceMetrics.talk_ratio}
+                  <span className="font-medium">%</span>
                 </div>
-                <div>Talk Ratio</div>
+                <div className="pb-1">Talk Ratio</div>
               </div>
             </div>
             <div className="flex flex-grow flex-wrap justify-between items-center pt-1">
@@ -333,7 +338,7 @@ export default function Hud() {
                 />
                 <span className="text-sm">
                   {/* {voiceMetrics.is_talking ? '🗣' : '😶'} */}
-                  {/* <CountUp elapsed={elapsed} /> */}
+                  <CountUp elapsed={elapsed} />
                 </span>
                 <span>
                   {/* {connectionStatus === 'Open' ? ' Active' : ' Initializing'} */}
