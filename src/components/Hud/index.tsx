@@ -89,6 +89,10 @@ export default function Hud() {
   const [clickCoords, setClickCoords] = useState({ x: -1, y: -1 });
   const [inAppUI, setInAppUI] = useState(false);
   const [effect, setEffect] = useState(false);
+
+  // get window aspect ratio
+  // get click x, y  as percentage of window
+
   const { sendMessage, sendJsonMessage, lastMessage, readyState } =
     useWebSocket(SOCKET_URL, {
       onOpen: () => {
@@ -97,20 +101,20 @@ export default function Hud() {
           destination_directory: userDataDir(),
           command,
           faces,
-          settings: { auto_detect: 0 },
+          settings: { auto_detect: remote.getGlobal('autoDetectOn') },
         });
         sendMessage(initMessage);
       },
       onClose: () => log.info('ws closed'),
       onMessage: (e) => {
         const msg = JSON.parse(e.data);
-        // log.info(msg);
-        // msg.faces.forEach((face) => {
-        //   log.info(face.status);
-        //   log.info(face.x, ',', face.y);
-        //   log.info(face.label);
-        //   log.info(face.sentiment);
-        // });
+        log.info(msg);
+        msg.faces.forEach((face) => {
+          log.info(face.status);
+          log.info(face.x, ',', face.y);
+          log.info(face.label);
+          log.info(face.sentiment);
+        });
         // debugger;
         setPropFaces(() =>
           msg.faces.filter((face) => !faceIdsToRemove.includes(face.id))
@@ -118,7 +122,7 @@ export default function Hud() {
 
         setVoiceMetrics(msg.voice_metrics);
         msg.command = command;
-        msg.settings = { auto_detect: 0 };
+        msg.settings = { auto_detect: remote.getGlobal('autoDetectOn') };
 
         setTimeout(() => {
           // add newly created faces
@@ -128,6 +132,11 @@ export default function Hud() {
           faceIdsToRemove.forEach((faceId: string) => {
             msg.faces = removeItemById(faceId, msg.faces);
           });
+
+          // // if auto-detect is on, don't send any faces
+          // if (remote.getGlobal('autoDetectOn')) {
+          //   msg.faces = [];
+          // }
 
           sendJsonMessage(msg);
 
@@ -226,7 +235,11 @@ export default function Hud() {
     if (!isSpotting || clickCoords.x === -1 || inAppUI) return;
     log.info(`you spotted someone at ${clickCoords.x},${clickCoords.y}`);
     setCommand(1);
-    setFaces((prev) => [...prev, newFace(clickCoords.x, clickCoords.y)]);
+    const { screen } = window;
+    const pctX = clickCoords.x / screen.width;
+    const pctY = clickCoords.y / screen.height;
+
+    setFaces((prev) => [...prev, newFace(pctX, pctY)]);
   }, [clickCoords]);
 
   const memoizedRemoveFace = useCallback((faceId: string) => {
@@ -234,6 +247,10 @@ export default function Hud() {
     setFaceIdsToRemove((prev) => [...prev, faceId]);
   }, []);
 
+  {
+    /* x: {clickCoords.x}, y: {clickCoords.y}
+      w: {window.screen.width}, y: {window.screen.height} */
+  }
   return (
     <>
       {connectionStatus !== 'Open' && (
@@ -273,6 +290,9 @@ export default function Hud() {
                 {timeStyle.format(new Date())}
               </span>
               {/* {window.devicePixelRatio} */}
+              {remote.getGlobal('autoDetectOn') === true && (
+                <span className="text-xxs text-green-400">Auto Detect</span>
+              )}
               <div className="text-xs font-light">
                 <button
                   onClick={clickEnd}

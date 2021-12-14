@@ -15,8 +15,6 @@ export default function MouseListener() {
       service = spawn(`./${mouseListenerBin}`);
       process.chdir(curDir);
       service.stdout.setEncoding('utf8');
-      // service.stderr.pipe(process.stderr);
-      // service.stdout.pipe(process.stdout);
       return service;
     },
     kill: () => {

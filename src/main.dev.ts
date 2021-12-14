@@ -117,6 +117,11 @@ ipcMain.on('setGlobalServerPID', (event, serverPID) => {
   global.serverPID = serverPID;
 });
 
+ipcMain.on('setAutoDetectBoolean', (event, autoDetectBoolean) => {
+  log.info(autoDetectBoolean);
+  global.autoDetectOn = autoDetectBoolean;
+});
+
 ipcMain.on('maximizeHud', (event, serverPID) => {
   log.info('maximizing Hud window');
 });
@@ -141,6 +146,12 @@ app.on('will-quit', () => {
 
 app.on('ready', () => {
   console.log('app is ready');
+  global.autoDetectOn = true;
+
+  const primaryDisplay = screen.getPrimaryDisplay();
+  console.log('primary display', primaryDisplay);
+  console.log(primaryDisplay.size);
+
   // const interval = setInterval(() => {
   //   const mousePos = screen.getCursorScreenPoint();
   //   // console.log(mousePos);
@@ -156,6 +167,11 @@ ipcMain.on('cursorpos', () => {
 ipcMain.handle('get-cursor-pos', (event, someArgument) => {
   const result = screen.getCursorScreenPoint();
   return result;
+});
+
+// Close the main process and exit the app
+ipcMain.on('close-me', (evt, arg) => {
+  app.quit();
 });
 
 app.whenReady().then(createWindow).catch(console.log);

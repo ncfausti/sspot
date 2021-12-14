@@ -1,8 +1,13 @@
 import React, { SyntheticEvent, useEffect, useRef } from 'react';
+import { ipcRenderer } from 'electron';
 import log from 'electron-log';
 
 export default function Settings(props) {
   const { isAutoDetectOn, backClick, autoDetectChanged } = props;
+
+  const exitApp = () => {
+    ipcRenderer.send('close-me');
+  };
 
   useEffect(() => {
     log.info('autodetect is: ', isAutoDetectOn);
@@ -61,19 +66,28 @@ export default function Settings(props) {
         </div>
         <div className="ml-3 text-xs">
           <label htmlFor="check-debug" className="font-medium text-gray-700">
-            Debug
+            Debug mode
           </label>
           <span id="debug-description" className="text-gray-500">
             <span className="sr-only">Debug </span>
           </span>
         </div>
       </div>
-      <button
-        onClick={backClick}
-        className="cursor-pointer float-right text-right bg-spotblue hover:bg-blue-700 text-white font-bold text-xxs px-2 rounded"
-      >
-        Back
-      </button>
+      <div className="pt-5">
+        <button
+          onClick={backClick}
+          className="cursor-pointer float-right text-right bg-spotblue hover:bg-blue-700 text-white font-bold text-xxs px-2 rounded"
+        >
+          Back
+        </button>
+
+        <button
+          onClick={exitApp}
+          className="cursor-pointer float-right text-right mr-3 bg-spotred hover:bg-red-800 text-white font-bold text-xxs px-2 rounded"
+        >
+          Quit
+        </button>
+      </div>
     </fieldset>
   );
 }

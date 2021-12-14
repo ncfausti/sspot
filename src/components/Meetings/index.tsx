@@ -33,40 +33,43 @@ export default function Meetings() {
   });
 
   function handleLaunchClick() {
-    log.info('running launch click');
-    // const child = startServer();
-    // ipcRenderer.send('setGlobalServerPID', child.pid);
+    ipcRenderer.send('setAutoDetectBoolean', autoDetect);
+    log.info('running launch click with autoDetect set to: ', autoDetect);
 
-    // // // for when the script closes later
-    // let scriptOutput = '';
+    const child = startServer();
+    ipcRenderer.send('setGlobalServerPID', child.pid);
+    ipcRenderer.send('setAutoDetectBoolean', autoDetect);
 
-    // child.stdout.setEncoding('utf8');
-    // child.stdout.on('data', function (data) {
-    //   // Here is where the output goes
+    // // for when the script closes later
+    let scriptOutput = '';
 
-    //   log.info(`stdout: ${data}`);
+    child.stdout.setEncoding('utf8');
+    child.stdout.on('data', function (data) {
+      // Here is where the output goes
 
-    //   data = data.toString();
-    //   scriptOutput += data;
-    // });
+      log.info(`stdout: ${data}`);
 
-    // child.stderr.setEncoding('utf8');
-    // child.stderr.on('data', function (data) {
-    //   // Here is where the error output goes
+      data = data.toString();
+      scriptOutput += data;
+    });
 
-    //   log.info(`stderr: ${data}`);
+    child.stderr.setEncoding('utf8');
+    child.stderr.on('data', function (data) {
+      // Here is where the error output goes
 
-    //   data = data.toString();
-    //   scriptOutput += data;
-    // });
+      log.info(`stderr: ${data}`);
 
-    // child.on('close', function (code) {
-    //   // Here you can get the exit code of the script
+      data = data.toString();
+      scriptOutput += data;
+    });
 
-    //   log.info(`closing code: ${code}`);
+    child.on('close', function (code) {
+      // Here you can get the exit code of the script
 
-    //   log.info('Full output of script: ', scriptOutput);
-    // });
+      log.info(`closing code: ${code}`);
+
+      log.info('Full output of script: ', scriptOutput);
+    });
 
     const midPointLessHalfHudWidth = window.screen.width / 2 - 80;
     window.open(
@@ -79,7 +82,7 @@ export default function Meetings() {
 
   const memoizedBackClick = useCallback((e) => {
     log.info(e);
-    setShowSettingsView();
+    setShowSettingsView(false);
   }, []);
 
   const memoizedAutoDetectChanged = useCallback((e) => {

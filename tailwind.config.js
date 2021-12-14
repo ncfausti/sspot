@@ -20,6 +20,7 @@ module.exports = {
     extend: {
       colors: {
         spotblue: '#3190FF',
+        spotred: 'rgba(219, 61, 72, 1)',
       },
       width: {
         165: '165px',
