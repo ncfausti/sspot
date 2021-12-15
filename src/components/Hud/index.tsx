@@ -69,7 +69,8 @@ const HUD_EXPANDED_WIDTH = 330;
 const HUD_STARTING_HEIGHT = 110;
 // adjust for different screens with different DPIs
 const PIXEL_RATIO = window.innerWidth / window.outerWidth;
-const mainHudWidth = Math.floor(HUD_STARTING_WIDTH * PIXEL_RATIO);
+const mainHudWidth = 165; // Math.floor(HUD_STARTING_WIDTH * PIXEL_RATIO);
+
 export function removeItemById(
   id: string | number,
   array: { id: string | number }[]
@@ -178,7 +179,7 @@ export default function Hud() {
     });
     service.stdout.on('data', (e) => {
       const event = JSON.parse(e);
-      log.info(event.x, ',', event.y);
+      // log.info(event.x, ',', event.y);
       setClickCoords({ x: Math.round(event.x), y: Math.round(event.y) });
     });
     return () => service.kill();
