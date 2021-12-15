@@ -1,13 +1,13 @@
 {
   "name": "salespot-desktop",
   "productName": "Salespot Desktop",
-  "version": "0.0.1",
+  "version": "0.7.0",
   "description": "",
   "main": "./main.prod.js",
   "author": {
-    "name": "nick",
-    "email": "nick@smile-ml.com",
-    "url": "https://github.com/vizaiapp/salespot-desktop"
+    "name": "smileML",
+    "email": "info@smile-ml.com",
+    "url": "https://www.salespot.io/"
   },
   "scripts": {
     "electron-rebuild": "node -r ../.erb/scripts/BabelRegister.js ../.erb/scripts/ElectronRebuild.js",

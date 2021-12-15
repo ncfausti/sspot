@@ -103,8 +103,8 @@
   },
   "author": {
     "name": "smileML",
-    "email": "nick@smile-ml.com",
-    "url": "https://smile-ml.com"
+    "email": "info@smile-ml.com",
+    "url": "https://www.salespot.io/"
   },
   "contributors": [],
   "license": "UNLICENSED",
@@ -304,5 +304,5 @@
       "pre-commit": "lint-staged"
     }
   },
-  "version": "0.0.1"
+  "version": "0.7.0"
 }
