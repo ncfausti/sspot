@@ -9,11 +9,14 @@ export default function MouseListener() {
       const curDir = process.cwd();
       const mouseListenerBin =
         process.platform === 'darwin' ? 'pymouse' : 'pymouse.exe';
-      const binDir = path.join(__dirname, '..', 'assets');
+      const assets = path.join(__dirname, '..', 'assets');
+      const binDir = path.join(assets, 'pymouse');
       process.chdir(binDir);
       service = spawn(`./${mouseListenerBin}`);
       process.chdir(curDir);
       service.stdout.setEncoding('utf8');
+      service.stderr.setEncoding('utf8');
+
       return service;
     },
     kill: () => {

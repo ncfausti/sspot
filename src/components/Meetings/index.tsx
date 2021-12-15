@@ -10,7 +10,7 @@ import Settings from './Settings';
 export default function Meetings() {
   const [time, setTime] = useState(new Date());
   const [showSettingsView, setShowSettingsView] = useState(false);
-  const [autoDetect, setAutoDetect] = useState(false);
+  const [autoDetect, setAutoDetect] = useState(true);
 
   // on initial load only
   useEffect(() => {

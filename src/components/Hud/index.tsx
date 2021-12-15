@@ -170,12 +170,18 @@ export default function Hud() {
   }, [elapsed]);
 
   useEffect(() => {
+    log.info('starting mouse listener');
     const service: ChildProcessWithoutNullStreams = MouseListener().start();
+    service.stderr.on('data', (e) => {
+      log.info('error in mouse listener:');
+      log.info(e);
+    });
     service.stdout.on('data', (e) => {
       const event = JSON.parse(e);
+      log.info(event.x, ',', event.y);
       setClickCoords({ x: Math.round(event.x), y: Math.round(event.y) });
     });
-    return () => service.stdout.on('data', () => null);
+    return () => service.kill();
   }, []);
 
   // function that slowly resizes the window
