@@ -91,7 +91,6 @@ const createWindow = async () => {
       alwaysOnTop: true,
       transparent: true,
       paintWhenInitiallyHidden: false,
-      // visibleOnAllWorkspaces: true,
       webPreferences: {
         nodeIntegration: true,
         additionalArguments: [`--USER-DATA-DIR=${app.getPath('userData')}`],

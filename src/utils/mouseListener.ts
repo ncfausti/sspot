@@ -1,6 +1,7 @@
 import { spawn } from 'child_process';
 import path from 'path';
 
+// Fix for Ubuntu on CI
 export default function MouseListener() {
   let service;
 
