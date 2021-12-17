@@ -87,6 +87,7 @@ export default function Hud() {
   const [clickCoords, setClickCoords] = useState({ x: -1, y: -1 });
   const [inAppUI, setInAppUI] = useState(false);
   const [effect, setEffect] = useState(false);
+  const [paused, setPaused] = useState(false);
 
   const { sendMessage, sendJsonMessage, readyState } = useWebSocket(
     SOCKET_URL,
@@ -160,11 +161,20 @@ export default function Hud() {
   }[readyState];
 
   useEffect(() => {
-    const timer = setTimeout(() => setElapsed((prev) => prev + 1), 1000);
+    const timer = setTimeout(
+      () =>
+        setElapsed((prev) => {
+          if (!paused) {
+            return prev + 1;
+          }
+          return prev;
+        }),
+      1000
+    );
     return () => {
       clearTimeout(timer);
     };
-  }, [elapsed]);
+  }, [elapsed, paused]);
 
   useEffect(() => {
     log.info('starting mouse listener');
@@ -219,9 +229,11 @@ export default function Hud() {
     setCommand((prev) => {
       if (prev === 1) {
         log.info('previously in play mode, now in pause mode');
+        setPaused(true);
         return 3;
       }
       log.info('previously in pause mode, now in play mode');
+      setPaused(false);
       return 1;
     });
   }
@@ -230,6 +242,8 @@ export default function Hud() {
   function clickReset() {
     setCommand(2);
     setEffect(true);
+    setElapsed(0);
+    setPaused(true);
   }
 
   function clickEnd() {
@@ -241,6 +255,7 @@ export default function Hud() {
   useEffect(() => {
     if (!isSpotting || clickCoords.x === -1 || inAppUI) return;
     log.info(`you spotted someone at ${clickCoords.x},${clickCoords.y}`);
+    setPaused(false);
     setCommand(1);
     const { screen } = window;
     const pctX = clickCoords.x / screen.width;
