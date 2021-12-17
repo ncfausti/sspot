@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint global-require: off, no-console: off */
 
 /**
@@ -90,10 +91,11 @@ const createWindow = async () => {
       alwaysOnTop: true,
       transparent: true,
       paintWhenInitiallyHidden: false,
+      // visibleOnAllWorkspaces: true,
       webPreferences: {
         nodeIntegration: true,
         additionalArguments: [`--USER-DATA-DIR=${app.getPath('userData')}`],
-        nativeWindowOpen: false,
+        nativeWindowOpen: true,
         // nativeWindowOpen: true,
         // nodeIntegrationInSubFrames: true,
         enableRemoteModule: true,
@@ -104,29 +106,30 @@ const createWindow = async () => {
     },
   });
 
+  // store the user app data directory in a global variable
+  (global as any).userDataDir = app.getPath('userData');
+  log.info('SETTING GLOBAL USER DATA DIR', (global as any).userDataDir);
+
   ipcMain.on('hideTrayWindow', () => {
     mb.hideWindow();
   });
 
+  // eslint-disable-next-line no-new
   new AppUpdater();
 };
 
 /**
  * Add event listeners...
  */
-ipcMain.on('setGlobalServerPID', (event, serverPID) => {
+ipcMain.on('setGlobalServerPID', (_event, serverPID) => {
   log.info('setting global.serverPID');
   log.info(serverPID);
-  global.serverPID = serverPID;
+  (global as any).serverPID = serverPID;
 });
 
-ipcMain.on('setAutoDetectBoolean', (event, autoDetectBoolean) => {
+ipcMain.on('setAutoDetectBoolean', (_event, autoDetectBoolean) => {
   log.info(autoDetectBoolean);
-  global.autoDetectOn = autoDetectBoolean;
-});
-
-ipcMain.on('maximizeHud', (event, serverPID) => {
-  log.info('maximizing Hud window');
+  (global as any).autoDetectOn = autoDetectBoolean;
 });
 
 app.on('window-all-closed', () => {
@@ -141,7 +144,7 @@ app.on('will-quit', () => {
   // kill the processing server
   log.info('killing server before quit');
   try {
-    process.kill(global.serverPID);
+    process.kill((global as any).serverPID);
   } catch (e) {
     log.error(e);
   }
@@ -149,7 +152,7 @@ app.on('will-quit', () => {
 
 app.on('ready', () => {
   console.log('app is ready');
-  global.autoDetectOn = true;
+  (global as any).autoDetectOn = true;
 
   const primaryDisplay = screen.getPrimaryDisplay();
   console.log('primary display', primaryDisplay);
@@ -167,13 +170,13 @@ ipcMain.on('cursorpos', () => {
 });
 
 // Main process
-ipcMain.handle('get-cursor-pos', (event, someArgument) => {
+ipcMain.handle('get-cursor-pos', () => {
   const result = screen.getCursorScreenPoint();
   return result;
 });
 
 // Close the main process and exit the app
-ipcMain.on('close-me', (evt, arg) => {
+ipcMain.on('close-me', () => {
   app.quit();
 });
 

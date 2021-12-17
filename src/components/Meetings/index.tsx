@@ -1,8 +1,9 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable react/forbid-prop-types */
 import React, { useCallback, useEffect, useState } from 'react';
 import { CogIcon } from '@heroicons/react/solid';
 import log from 'electron-log';
-import { ipcRenderer } from 'electron';
+import { ipcRenderer, remote } from 'electron';
 import logo from '../../../assets/salespot-logo-red.png';
 import { startServer } from '../../utils';
 import Settings from './Settings';
@@ -12,6 +13,7 @@ export default function Meetings() {
   const [showSettingsView, setShowSettingsView] = useState(false);
   const [autoDetect, setAutoDetect] = useState(false);
 
+  log.info('USER DATA-DIR: ', remote.getGlobal('userDataDir'));
   // on initial load only
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000);
@@ -44,39 +46,59 @@ export default function Meetings() {
     let scriptOutput = '';
 
     child.stdout.setEncoding('utf8');
-    child.stdout.on('data', function (data) {
+    child.stdout.on('data', (data) => {
       // Here is where the output goes
-
       log.info(`stdout: ${data}`);
-
-      data = data.toString();
-      scriptOutput += data;
+      scriptOutput += data.toString();
     });
 
     child.stderr.setEncoding('utf8');
-    child.stderr.on('data', function (data) {
-      // Here is where the error output goes
-
+    child.stderr.on('data', (data) => {
       log.info(`stderr: ${data}`);
-
-      data = data.toString();
-      scriptOutput += data;
+      scriptOutput += data.toString();
     });
 
-    child.on('close', function (code) {
-      // Here you can get the exit code of the script
-
+    child.on('close', (code) => {
       log.info(`closing code: ${code}`);
-
       log.info('Full output of script: ', scriptOutput);
     });
 
     const midPointLessHalfHudWidth = window.screen.width / 2 - 80;
-    window.open(
-      `file://${__dirname}/index.html#/live`,
-      '_blank',
-      `width=165,height=110,top=40,left=${midPointLessHalfHudWidth},frame=false,transparent=true,alwaysOnTop=true,nodeIntegration=yes,backgroundColor=#00000000`
+    // window.open(
+    //   `file://${__dirname}/index.html#/live`,
+    //   '_blank',
+    //   `width=165,height=110,top=40,left=${midPointLessHalfHudWidth},frame=false,transparent=true,alwaysOnTop=true,nodeIntegration=yes,backgroundColor=#00000000`
+    // );
+
+    log.info(
+      'creating new window with userDataDir: ',
+      remote.getGlobal('userDataDir')
     );
+
+    const hudWindow = new remote.BrowserWindow({
+      x: midPointLessHalfHudWidth,
+      y: 40,
+      width: 165,
+      height: 110,
+      frame: false,
+      transparent: true,
+      alwaysOnTop: true,
+      webPreferences: {
+        nodeIntegration: true,
+        additionalArguments: [
+          `--USER-DATA-DIR=${remote.getGlobal('userDataDir')}`,
+        ],
+        nativeWindowOpen: false,
+        // nativeWindowOpen: true,
+        enableRemoteModule: true,
+      },
+      hasShadow: false,
+    });
+
+    hudWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+
+    hudWindow.loadURL(`file://${__dirname}/index.html#/live`);
+
     ipcRenderer.send('hideTrayWindow');
   }
 
@@ -125,11 +147,11 @@ export default function Meetings() {
                   ⌘ + Y to toggle
                 </span>
               </div>
-              <div
-                className="text-gray-700"
-                onClick={() => setShowSettingsView(true)}
-              >
-                <CogIcon className="h-4 w-4 cursor-pointer" />
+              <div className="text-gray-700">
+                <CogIcon
+                  onClick={() => setShowSettingsView(true)}
+                  className="h-4 w-4 cursor-pointer"
+                />
               </div>
             </div>
           </>

@@ -2,7 +2,7 @@
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 import React, { useCallback, useRef, useState, useEffect } from 'react';
 import log from 'electron-log';
-import { remote, ipcRenderer } from 'electron';
+import { remote } from 'electron';
 import { uuid } from 'uuidv4';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 import { ChildProcessWithoutNullStreams } from 'child_process';
@@ -21,15 +21,6 @@ import Loading from '../Loading';
 import MouseListener from '../../utils/MouseListener';
 import CountUp from '../Clocks/CountUp';
 
-interface RequestMessage {
-  // Where the zip should get created
-  destination_directory: string;
-  // 1 == run, 0 == stop server
-  command: number;
-  // List of faces
-  faces: Face[];
-}
-
 interface Face {
   directory: string;
   id: string;
@@ -37,6 +28,12 @@ interface Face {
   y: number;
   image_path: string;
   status: number;
+}
+
+interface DetectedFace {
+  id: string;
+  sentiment: number;
+  label: string;
 }
 
 const timeStyle = new Intl.DateTimeFormat('en', {
@@ -52,9 +49,9 @@ const voiceMetricsDefault = {
   talk_ratio: 0,
 };
 
-const newFace = (x: number, y: number) => {
+const newFace = (x: number, y: number): Face => {
   return {
-    directory: userDataDir(),
+    directory: userDataDir() as string,
     id: uuid(),
     x,
     y,
@@ -67,8 +64,6 @@ const SOCKET_URL = 'ws://localhost:8765';
 const HUD_STARTING_WIDTH = 165;
 const HUD_EXPANDED_WIDTH = 330;
 const HUD_STARTING_HEIGHT = 110;
-// adjust for different screens with different DPIs
-const PIXEL_RATIO = window.innerWidth / window.outerWidth;
 const mainHudWidth = 165; // Math.floor(HUD_STARTING_WIDTH * PIXEL_RATIO);
 
 export function removeItemById(
@@ -80,8 +75,8 @@ export function removeItemById(
 
 export default function Hud() {
   const [elapsed, setElapsed] = useState(0);
-  const [expanded, setExpanded] = useState(window.innerWidth > 165);
-  const [time, setTime] = useState(new Date());
+  // const [expanded, setExpanded] = useState(window.innerWidth > 165);
+  // const [time, setTime] = useState(new Date());
   const [faces, setFaces] = useState<Face[]>([]);
   const [command, setCommand] = useState(1);
   const [propFaces, setPropFaces] = useState([]);
@@ -93,11 +88,9 @@ export default function Hud() {
   const [inAppUI, setInAppUI] = useState(false);
   const [effect, setEffect] = useState(false);
 
-  // get window aspect ratio
-  // get click x, y  as percentage of window
-
-  const { sendMessage, sendJsonMessage, lastMessage, readyState } =
-    useWebSocket(SOCKET_URL, {
+  const { sendMessage, sendJsonMessage, readyState } = useWebSocket(
+    SOCKET_URL,
+    {
       onOpen: () => {
         log.info('ws opened');
         const initMessage = JSON.stringify({
@@ -120,7 +113,9 @@ export default function Hud() {
         // });
 
         setPropFaces(() =>
-          msg.faces.filter((face) => !faceIdsToRemove.includes(face.id))
+          msg.faces.filter(
+            (face: DetectedFace) => !faceIdsToRemove.includes(face.id)
+          )
         );
 
         setVoiceMetrics(msg.voice_metrics);
@@ -152,8 +147,9 @@ export default function Hud() {
         }, 10);
       },
       // Will attempt to reconnect on all close events, such as server shutting down
-      shouldReconnect: (closeEvent) => true,
-    });
+      shouldReconnect: () => true,
+    }
+  );
 
   const connectionStatus = {
     [ReadyState.CONNECTING]: 'Connecting',
@@ -182,7 +178,9 @@ export default function Hud() {
       // log.info(event.x, ',', event.y);
       setClickCoords({ x: Math.round(event.x), y: Math.round(event.y) });
     });
-    return () => service.kill();
+    return () => {
+      service.kill();
+    };
   }, []);
 
   // function that slowly resizes the window
@@ -211,7 +209,7 @@ export default function Hud() {
   }
 
   function clickExpand() {
-    setExpanded((prev) => !prev);
+    // setExpanded((prev) => !prev);
     return window.outerWidth > HUD_STARTING_WIDTH
       ? animatedResizeTo(HUD_STARTING_WIDTH, 110)
       : animatedResizeTo(HUD_EXPANDED_WIDTH, 110);
@@ -249,6 +247,7 @@ export default function Hud() {
     const pctY = clickCoords.y / screen.height;
 
     setFaces((prev) => [...prev, newFace(pctX, pctY)]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clickCoords]);
 
   const memoizedRemoveFace = useCallback((faceId: string) => {
@@ -256,10 +255,6 @@ export default function Hud() {
     setFaceIdsToRemove((prev) => [...prev, faceId]);
   }, []);
 
-  {
-    /* x: {clickCoords.x}, y: {clickCoords.y}
-      w: {window.screen.width}, y: {window.screen.height} */
-  }
   return (
     <>
       {connectionStatus !== 'Open' && (
@@ -324,7 +319,9 @@ export default function Hud() {
                 <div className="text-sm">
                   {/* <CountUp elapsed={elapsed} /> */}
                   <div className="text-base font-bold">
-                    {propFaces[0] ? propFaces[0].sentiment : '0'}
+                    {propFaces[0]
+                      ? (propFaces[0] as DetectedFace).sentiment
+                      : '0'}
                     <span className="font-medium">%</span>
                   </div>
                 </div>
