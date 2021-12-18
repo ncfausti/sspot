@@ -1,5 +1,6 @@
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import path from 'path';
+import os from 'os';
 
 // Fix for Ubuntu on CI
 export default function MouseListener() {
@@ -8,14 +9,18 @@ export default function MouseListener() {
   return {
     start: () => {
       const curDir = process.cwd();
-      const mouseListenerBin =
-        process.platform === 'darwin' ? 'pymouse' : 'pymouse.exe';
+      const { platform } = process;
+      const binary = platform === 'darwin' ? 'pymouse' : 'pymouse.exe';
+      const arch = os.arch(); // 'x64' or 'arm64'
+      const subFolder = path.join(platform, arch);
       const assets = path.join(__dirname, '..', 'assets');
-      const binDir = path.join(assets, 'pymouse');
+
+      const binDir = path.join(assets, subFolder);
       process.chdir(binDir);
-      service = spawn(`./${mouseListenerBin}`);
+      service = spawn(`./${binary}`);
       process.chdir(curDir);
       service.stdout.setEncoding('utf8');
+
       service.stderr.setEncoding('utf8');
 
       return service;

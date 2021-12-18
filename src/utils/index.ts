@@ -1,6 +1,7 @@
 import log from 'electron-log';
 import path from 'path';
-import { spawn } from 'child_process';
+import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
+import { arch } from 'os';
 
 export const validEmail = (email: string) => {
   const re =
@@ -23,13 +24,23 @@ export function userDataDir() {
 
 export const startServer = () => {
   const curDir = process.cwd();
-  const pythonServerBin =
-    process.platform === 'darwin' ? 'ws_server' : 'ws_server.exe';
+  const { platform } = process;
+  const binary = platform === 'darwin' ? 'ws_server' : 'ws_server.exe';
+  const architecture = arch(); // 'x64' or 'arm64'
+  const subFolder = path.join(platform, architecture);
+
   const assets = path.join(__dirname, '..', 'assets');
-  const binDir = path.join(assets, 'ws_server');
+  const binDir = path.join(assets, subFolder, 'ws_server');
   process.chdir(binDir);
-  const child = spawn(`./${pythonServerBin}`);
-  log.info(`STARTING SERVER FROM: ${binDir}`);
-  process.chdir(curDir);
-  return child;
+  // log.info(`STARTING SERVER FROM: ${binDir}`);
+  let child: ChildProcessWithoutNullStreams;
+  try {
+    child = spawn(`./${binary}`);
+    process.chdir(curDir);
+    return child;
+  } catch (e) {
+    log.error('Error: failed to start server');
+    log.error(e);
+    return null;
+  }
 };

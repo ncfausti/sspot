@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { CogIcon } from '@heroicons/react/solid';
 import log from 'electron-log';
-import { ipcRenderer, remote } from 'electron';
+import { app, ipcRenderer, remote } from 'electron';
 import logo from '../../../assets/salespot-logo-red.png';
 import { startServer } from '../../utils';
 import Settings from './Settings';
@@ -39,36 +39,33 @@ export default function Meetings() {
     log.info('running launch click with autoDetect set to: ', autoDetect);
 
     const child = startServer();
-    ipcRenderer.send('setGlobalServerPID', child.pid);
-    ipcRenderer.send('setAutoDetectBoolean', autoDetect);
+    if (child === null) {
+      app.quit();
+    } else {
+      ipcRenderer.send('setGlobalServerPID', child.pid);
+      ipcRenderer.send('setAutoDetectBoolean', autoDetect);
 
-    // // for when the script closes later
-    let scriptOutput = '';
+      let scriptOutput = '';
 
-    child.stdout.setEncoding('utf8');
-    child.stdout.on('data', (data) => {
-      // Here is where the output goes
-      log.info(`stdout: ${data}`);
-      scriptOutput += data.toString();
-    });
+      child.stdout.setEncoding('utf8');
+      child.stdout.on('data', (data) => {
+        log.info(`stdout: ${data}`);
+        scriptOutput += data.toString();
+      });
 
-    child.stderr.setEncoding('utf8');
-    child.stderr.on('data', (data) => {
-      log.info(`stderr: ${data}`);
-      scriptOutput += data.toString();
-    });
+      child.stderr.setEncoding('utf8');
+      child.stderr.on('data', (data) => {
+        log.info(`stderr: ${data}`);
+        scriptOutput += data.toString();
+      });
 
-    child.on('close', (code) => {
-      log.info(`closing code: ${code}`);
-      log.info('Full output of script: ', scriptOutput);
-    });
+      child.on('close', (code) => {
+        log.info(`closing code: ${code}`);
+        log.info('Full output of script: ', scriptOutput);
+      });
+    }
 
     const midPointLessHalfHudWidth = window.screen.width / 2 - 80;
-    // window.open(
-    //   `file://${__dirname}/index.html#/live`,
-    //   '_blank',
-    //   `width=165,height=110,top=40,left=${midPointLessHalfHudWidth},frame=false,transparent=true,alwaysOnTop=true,nodeIntegration=yes,backgroundColor=#00000000`
-    // );
 
     log.info(
       'creating new window with userDataDir: ',
@@ -81,8 +78,9 @@ export default function Meetings() {
       width: 165,
       height: 110,
       frame: false,
-      transparent: true,
       alwaysOnTop: true,
+      transparent: true,
+      paintWhenInitiallyHidden: false,
       webPreferences: {
         nodeIntegration: true,
         additionalArguments: [
