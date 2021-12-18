@@ -247,8 +247,8 @@ export default function Hud() {
   }
 
   function clickEnd() {
-    const pid = remote.getGlobal('serverPID');
-    process.kill(pid);
+    const server = remote.getGlobal('serverProcess');
+    server.kill(); // we should really just send a reset command here. how?
     window.close();
   }
 

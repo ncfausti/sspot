@@ -16,6 +16,8 @@ import { app, screen, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import { menubar } from 'menubar';
+import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
+import { arch } from 'os';
 
 export default class AppUpdater {
   constructor() {
@@ -162,6 +164,28 @@ app.on('ready', () => {
   //   // console.log(mousePos);
   // }, 50);
 });
+
+// ipcMain.handle('start-server', async () => {
+log.info('trying to start server');
+const curDir = process.cwd();
+const { platform } = process;
+const binary = platform === 'darwin' ? 'ws_server' : 'ws_server.exe';
+const architecture = arch(); // 'x64' or 'arm64'
+const subFolder = path.join(platform, architecture);
+
+const assets = path.join(__dirname, '..', 'assets');
+const binDir = path.join(assets, subFolder, 'ws_server');
+process.chdir(binDir);
+log.info(`STARTING SERVER FROM: ${binDir}`);
+let child: ChildProcessWithoutNullStreams;
+try {
+  child = spawn(`./${binary}`);
+  process.chdir(curDir);
+  (global as any).serverProcess = child;
+} catch (e) {
+  log.error('Error: failed to start server');
+  log.error(e);
+}
 
 ipcMain.on('cursorpos', () => {
   const mousePos = screen.getCursorScreenPoint();

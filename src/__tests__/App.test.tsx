@@ -2,9 +2,16 @@ import React from 'react';
 import '@testing-library/jest-dom';
 import { render } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
+import { ipcRenderer } from 'electron';
 import App from '../App';
 
 describe('App', () => {
+  it(`should check to make sure that the location of
+  the assets folder is a sibling to main.dev.ts`, () => {
+    const assetsFolder = ipcRenderer.send('getAssetsFolder');
+    expect(assetsFolder).toEqual(path.join('..', mainFolder, 'assets'));
+  });
+
   it('should start the ws_server from main via ipc call', () => {
     expect(1).toEqual(2);
   });

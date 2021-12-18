@@ -5,7 +5,7 @@ import { CogIcon } from '@heroicons/react/solid';
 import log from 'electron-log';
 import { app, ipcRenderer, remote } from 'electron';
 import logo from '../../../assets/salespot-logo-red.png';
-import { startServer } from '../../utils';
+// import { startServer } from '../../utils';
 import Settings from './Settings';
 
 export default function Meetings() {
@@ -38,7 +38,7 @@ export default function Meetings() {
     ipcRenderer.send('setAutoDetectBoolean', autoDetect);
     log.info('running launch click with autoDetect set to: ', autoDetect);
 
-    const child = startServer();
+    const child = remote.getGlobal('serverProcess'); // startServer();
     if (child === null) {
       app.quit();
     } else {
