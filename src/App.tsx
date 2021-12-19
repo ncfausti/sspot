@@ -1,9 +1,9 @@
 import React from 'react';
 import { HashRouter as Router, Switch, Route } from 'react-router-dom';
 import './App.global.css';
-import log from 'electron-log';
-import { AuthProvider } from './contexts/AuthContext';
-import PrivateRoute from './components/PrivateRoute';
+// import log from 'electron-log';
+// import { AuthProvider } from './contexts/AuthContext';
+// import PrivateRoute from './components/PrivateRoute';
 import Meetings from './components/Meetings';
 import Hud from './components/Hud';
 // import SignIn from './components/SignIn';
