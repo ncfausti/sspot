@@ -145,7 +145,7 @@ app.on('will-quit', () => {
   // kill the processing server
   log.info('killing server before quit');
   try {
-    process.kill((global as any).serverPID);
+    (global as any).serverProcess.kill(9);
   } catch (e) {
     log.error(e);
   }
@@ -158,38 +158,55 @@ app.on('ready', () => {
   const primaryDisplay = screen.getPrimaryDisplay();
   console.log('primary display', primaryDisplay);
   console.log(primaryDisplay.size);
-
-  // const interval = setInterval(() => {
-  //   const mousePos = screen.getCursorScreenPoint();
-  //   // console.log(mousePos);
-  // }, 50);
 });
 
-// ipcMain.handle('start-server', async () => {
-log.info('trying to start server');
-const curDir = process.cwd();
-const { platform } = process;
-const binary = platform === 'darwin' ? 'ws_server' : 'ws_server.exe';
-const architecture = arch(); // 'x64' or 'arm64'
-const subFolder = path.join(platform, architecture);
+export const startServer = () => {
+  log.info('trying to start server');
+  const curDir = process.cwd();
+  const { platform } = process;
+  const binary = platform === 'darwin' ? 'ws_server' : 'ws_server.exe';
+  const architecture = arch(); // 'x64' or 'arm64'
+  const subFolder = path.join(platform, architecture);
 
-const assets = path.join(__dirname, '..', 'assets');
-const binDir = path.join(assets, subFolder, 'ws_server');
-process.chdir(binDir);
-log.info(`STARTING SERVER FROM: ${binDir}`);
-let child: ChildProcessWithoutNullStreams;
-try {
-  child = spawn(`./${binary}`);
-  process.chdir(curDir);
-  (global as any).serverProcess = child;
-} catch (e) {
-  log.error('Error: failed to start server');
-  log.error(e);
-}
+  const assets = path.join(__dirname, '..', 'assets');
+  const binDir = path.join(assets, subFolder, 'ws_server');
+  process.chdir(binDir);
+  log.info(`STARTING SERVER FROM: ${binDir}`);
+  let child: ChildProcessWithoutNullStreams;
+  try {
+    child = spawn(`./${binary}`);
+    process.chdir(curDir);
+    return child;
+  } catch (e) {
+    log.error('Error: failed to start server');
+    log.error(e);
+    return null;
+  }
+};
 
-ipcMain.on('cursorpos', () => {
-  const mousePos = screen.getCursorScreenPoint();
-  log.info(mousePos);
+// Initial start of server
+(global as any).serverProcess = startServer();
+
+ipcMain.handle('start-server', async () => {
+  // set the global variable
+  (global as any).serverProcess = startServer();
+  return (global as any).serverProcess !== null;
+});
+
+ipcMain.handle('kill-server', async () => {
+  // get the global server process variable,
+  // then kill it
+  return (global as any).serverProcess.kill(9);
+});
+
+ipcMain.handle('bounce-server', async () => {
+  // get the global server process variable,
+  // then kill it, then restart it
+  (global as any).serverProcess.kill(9);
+
+  // set the global variable
+  (global as any).serverProcess = startServer();
+  return (global as any).serverProcess !== null;
 });
 
 // Main process

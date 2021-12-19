@@ -4,17 +4,26 @@ import { render } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
 import { ipcRenderer } from 'electron';
 import App from '../App';
+import { startServer } from '../main';
 
 describe('App', () => {
-  it(`should check to make sure that the location of
-  the assets folder is a sibling to main.dev.ts`, () => {
-    const assetsFolder = ipcRenderer.send('getAssetsFolder');
-    expect(assetsFolder).toEqual(path.join('..', mainFolder, 'assets'));
+  it(`should start the ws_server from main via
+  ipc call and return success boolean`, () => {
+    const serverProcess = startServer();
+    expect(serverProcess.pid).toBeGreaterThan(0);
   });
 
-  it('should start the ws_server from main via ipc call', () => {
-    expect(1).toEqual(2);
+  it(`should kill the ws_server from main via
+  ipc call and return success boolean`, () => {
+    expect(ipcRenderer.invoke('kill-server')).toBe(true);
   });
+
+  it(`should bounce the ws_server from main via
+  ipc call and return success boolean`, () => {
+    expect(ipcRenderer.invoke('bounce-server')).toBe(true);
+  });
+
+  // bounce() should kill the server then immediately start it again
 
   // since we can now reset the state of the server easily,
   // we should create the server on app start, then reset it

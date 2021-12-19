@@ -2,7 +2,7 @@
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 import React, { useCallback, useRef, useState, useEffect } from 'react';
 import log from 'electron-log';
-import { remote } from 'electron';
+import { ipcRenderer, remote } from 'electron';
 import { uuid } from 'uuidv4';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 import { ChildProcessWithoutNullStreams } from 'child_process';
@@ -238,17 +238,16 @@ export default function Hud() {
     });
   }
 
-  // function that sends reset command to server
+  // send reset command to server and reset timer on client
   function clickReset() {
     setCommand(2);
-    setEffect(true);
-    setElapsed(0);
+    setEffect(true); // for animation of reset button
+    setElapsed(0); // reset timer back to 0
     setPaused(true);
   }
 
   function clickEnd() {
-    const server = remote.getGlobal('serverProcess');
-    server.kill(); // we should really just send a reset command here. how?
+    ipcRenderer.invoke('bounce-server');
     window.close();
   }
 
@@ -299,11 +298,11 @@ export default function Hud() {
             className="flex z-50 min-h-screen flex-col px-2 py-1 content-center bg-white rounded-xl"
           >
             <div className="flex flex-grow flex-wrap justify-between content-center pb-1">
-              <div>
+              <div className="w-8">
                 <img
                   // onClick={clickBlind}
                   src={blindIcon}
-                  className="w-4 h-4 cursor-pointer mr-1"
+                  className="hidden w-4 h-4 cursor-pointer mr-1"
                   alt="blind"
                 />
               </div>
