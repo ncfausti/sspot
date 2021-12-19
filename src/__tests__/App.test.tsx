@@ -38,8 +38,4 @@ describe('App', () => {
   it('should render', () => {
     expect(render(<App />)).toBeTruthy();
   });
-
-  it('should render with snapshot', () => {
-    expect(render(<App />)).toMatchSnapshot();
-  });
 });

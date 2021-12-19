@@ -4,8 +4,8 @@ import './App.global.css';
 // import log from 'electron-log';
 // import { AuthProvider } from './contexts/AuthContext';
 // import PrivateRoute from './components/PrivateRoute';
-import Meetings from './components/Meetings';
-import Hud from './components/Hud';
+import Meetings from './components/Meetings/Meetings';
+import Hud from './components/Hud/Hud';
 // import SignIn from './components/SignIn';
 
 export default function App() {
@@ -14,7 +14,6 @@ export default function App() {
       {/* <AuthProvider> */}
       <Switch>
         <Route exact path="/" component={Meetings} />
-
         {/* <Route path="/login" component={SignIn} /> */}
         <Route path="/live" component={Hud} />
       </Switch>

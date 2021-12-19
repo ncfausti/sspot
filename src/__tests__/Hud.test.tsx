@@ -1,11 +1,13 @@
 import React from 'react';
 import '@testing-library/jest-dom';
 import { render } from '@testing-library/react';
-import { act } from 'react-dom/test-utils';
 import Hud, { removeItemById } from '../components/Hud';
-import { startServer } from '../utils';
 
 describe('Hud', () => {
+  it('should render', () => {
+    expect(render(<Hud />)).toBeTruthy();
+  });
+
   it('should remove item by id', () => {
     const faces = [
       { id: 1, name: 'test', image: 'test' },
