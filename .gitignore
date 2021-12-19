@@ -43,9 +43,9 @@ dll
 main.js
 main.js.map
 
-assets/darwin/*
-assets/win32/*
-assets/ws_server/*
+assets/darwin/**
+assets/win32/**
+assets/ws_server/**
 !**/version.txt
 
 .idea
