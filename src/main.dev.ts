@@ -25,6 +25,19 @@ export default class AppUpdater {
     autoUpdater.logger = log;
     autoUpdater.checkForUpdatesAndNotify();
   }
+  // import { AppImageUpdater, MacUpdater, NsisUpdater } from "electron-updater"
+
+  // const options = { … }
+
+  // if (process.platform === "win32") {
+  //     autoUpdater = new NsisUpdater(options)
+  // }
+  // else if (process.platform === "darwin") {
+  //     autoUpdater = new MacUpdater(options)
+  // }
+  // else {
+  //     autoUpdater = new AppImageUpdater(options)
+  // }
 }
 
 if (process.env.NODE_ENV === 'production') {

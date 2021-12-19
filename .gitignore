@@ -43,10 +43,10 @@ dll
 main.js
 main.js.map
 
-assets/darwin/**
-assets/win32/**
+assets/darwin/*
+assets/win32/*
 assets/ws_server/**
-!**/version.txt
+!**/versions.txt
 
 .idea
 npm-debug.log.*
