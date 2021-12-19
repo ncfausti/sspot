@@ -39,7 +39,6 @@ interface DetectedFace {
 const timeStyle = new Intl.DateTimeFormat('en', {
   hour: 'numeric',
   minute: 'numeric',
-  // timeZoneName: 'short',
 });
 
 const voiceMetricsDefault = {
@@ -65,6 +64,7 @@ const HUD_STARTING_WIDTH = 165;
 const HUD_EXPANDED_WIDTH = 330;
 const HUD_STARTING_HEIGHT = 110;
 const mainHudWidth = 165; // Math.floor(HUD_STARTING_WIDTH * PIXEL_RATIO);
+const { platform } = process;
 
 export function removeItemById(
   id: string | number,
@@ -75,8 +75,6 @@ export function removeItemById(
 
 export default function Hud() {
   const [elapsed, setElapsed] = useState(0);
-  // const [expanded, setExpanded] = useState(window.innerWidth > 165);
-  // const [time, setTime] = useState(new Date());
   const [faces, setFaces] = useState<Face[]>([]);
   const [command, setCommand] = useState(1);
   const [propFaces, setPropFaces] = useState([]);
@@ -105,13 +103,6 @@ export default function Hud() {
       onClose: () => log.info('ws closed'),
       onMessage: (e) => {
         const msg = JSON.parse(e.data);
-        // log.info(msg);
-        // msg.faces.forEach((face) => {
-        //   log.info(face.status);
-        //   log.info(face.x, ',', face.y);
-        //   log.info(face.label);
-        //   log.info(face.sentiment);
-        // });
 
         setPropFaces(() =>
           msg.faces.filter(
@@ -132,11 +123,6 @@ export default function Hud() {
             msg.faces = removeItemById(faceId, msg.faces);
           });
 
-          // // if auto-detect is on, don't send any faces
-          // if (remote.getGlobal('autoDetectOn')) {
-          //   msg.faces = [];
-          // }
-
           sendJsonMessage(msg);
 
           // clear out faces to send queue here ONLY IF
@@ -147,7 +133,8 @@ export default function Hud() {
           }
         }, 10);
       },
-      // Will attempt to reconnect on all close events, such as server shutting down
+      // Will attempt to reconnect on all close events,
+      // such as server shutting down
       shouldReconnect: () => true,
     }
   );
@@ -176,6 +163,9 @@ export default function Hud() {
     };
   }, [elapsed, paused]);
 
+  // setup the mouse listener to detect clicks
+  // when the app is not focused, i.e. when in spotting
+  // mode and the user clicks out of the app (on a face)
   useEffect(() => {
     log.info('starting mouse listener');
     const service: ChildProcessWithoutNullStreams = MouseListener().start();
@@ -185,7 +175,6 @@ export default function Hud() {
     });
     service.stdout.on('data', (e) => {
       const event = JSON.parse(e);
-      // log.info(event.x, ',', event.y);
       setClickCoords({ x: Math.round(event.x), y: Math.round(event.y) });
     });
     return () => {
@@ -208,10 +197,19 @@ export default function Hud() {
       } else {
         // if window is less than desired size, increase it
         if (window.outerWidth < x) {
+          // if on windows, just set the width directly
+          if (platform !== 'darwin') {
+            window.resizeTo(HUD_EXPANDED_WIDTH, window.outerHeight);
+            return;
+          }
           window.resizeBy(15, 0);
         }
         // if window is more than desired size, decrease it
         if (window.outerWidth > x) {
+          if (platform !== 'darwin') {
+            window.resizeTo(HUD_STARTING_WIDTH, window.outerHeight);
+            return;
+          }
           window.resizeBy(-15, 0);
         }
       }
