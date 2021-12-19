@@ -43,9 +43,12 @@ dll
 main.js
 main.js.map
 
-assets/darwin/*
-assets/win32/*
-assets/ws_server/**
+assets/darwin/arm64/ws_server*
+assets/darwin/arm64/pymouse*
+assets/darwin/x64/ws_server*
+assets/darwin/x64/pymouse*
+assets/win32/x64/ws_server*
+assets/win32/x64/pymouse*
 !**/versions.txt
 
 .idea
