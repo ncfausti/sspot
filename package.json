@@ -12,7 +12,7 @@
     "package:win": "rm -rf src/dist && yarn build && electron-builder build --win --x64 --publish never",
     "package-gh": "rm -rf src/dist && yarn build && electron-builder build --publish always",
     "package-s3": "rm -rf src/dist && yarn build && electron-builder build --publish always",
-    "package-gh:win": "rm -rf src/dist && yarn build && electron-builder build --win --x64 --publish always",
+    "package-s3:win": "rm -rf src/dist && yarn build && electron-builder build --win --x64 --publish always",
     "postinstall": "node -r @babel/register .erb/scripts/CheckNativeDep.js && electron-builder install-app-deps && yarn cross-env NODE_ENV=development webpack --config ./.erb/configs/webpack.config.renderer.dev.dll.babel.js && opencollective-postinstall && yarn-deduplicate yarn.lock",
     "start": "node -r @babel/register ./.erb/scripts/CheckPortInUse.js && yarn start:renderer",
     "start:main": "cross-env NODE_ENV=development electron -r ./.erb/scripts/BabelRegister ./src/main.dev.ts",
@@ -307,5 +307,5 @@
       "pre-commit": "lint-staged"
     }
   },
-  "version": "0.7.2"
+  "version": "0.7.3"
 }

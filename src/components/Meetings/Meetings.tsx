@@ -90,10 +90,12 @@ export default function Meetings() {
         // nativeWindowOpen: true,
         enableRemoteModule: true,
       },
-      hasShadow: false,
+      hasShadow: true,
+      resizable: false,
     });
 
     hudWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+    hudWindow.setResizable(false);
 
     hudWindow.loadURL(`file://${__dirname}/index.html#/live`);
 

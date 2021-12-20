@@ -8,7 +8,7 @@
 
 @tailwind utilities;
 
-body { background: rgba(42, 42, 42, 0.2); }
+body { background: rgba(42, 42, 42, 0.01); overflow: hidden; }
 
 .hover-trigger .hover-target {
   display: none;
