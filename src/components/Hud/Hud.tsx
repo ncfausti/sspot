@@ -18,7 +18,6 @@ import defaultImg from '../../../assets/loading.gif';
 import salespotLogo from '../../../assets/salespot-logo-red.png';
 import { userDataDir } from '../../utils';
 import Loading from '../Loading';
-import MouseListener from '../../utils/MouseListener';
 import CountUp from '../Clocks/CountUp';
 
 interface Face {
@@ -167,18 +166,23 @@ export default function Hud() {
   // when the app is not focused, i.e. when in spotting
   // mode and the user clicks out of the app (on a face)
   useEffect(() => {
-    log.info('starting mouse listener');
-    const service: ChildProcessWithoutNullStreams = MouseListener().start();
+    const service: ChildProcessWithoutNullStreams =
+      remote.getGlobal('mouseListener');
     service.stderr.on('data', (e) => {
-      log.info('error in mouse listener:');
-      log.info(e);
+      log.error('error in mouse listener:');
+      log.error(e);
     });
     service.stdout.on('data', (e) => {
-      const event = JSON.parse(e);
-      setClickCoords({ x: Math.round(event.x), y: Math.round(event.y) });
+      try {
+        const event = JSON.parse(e);
+        setClickCoords({ x: Math.round(event.x), y: Math.round(event.y) });
+      } catch (err) {
+        log.info(e);
+        log.error(err);
+      }
     });
     return () => {
-      service.kill();
+      service.stdout.on('data', () => null);
     };
   }, []);
 

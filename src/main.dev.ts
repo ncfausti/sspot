@@ -100,8 +100,6 @@ const createWindow = async () => {
         nodeIntegration: true,
         additionalArguments: [`--USER-DATA-DIR=${app.getPath('userData')}`],
         nativeWindowOpen: true,
-        // nativeWindowOpen: true,
-        // nodeIntegrationInSubFrames: true,
         enableRemoteModule: true,
       },
       resizable: false,
@@ -150,6 +148,14 @@ app.on('will-quit', () => {
   } catch (e) {
     log.error(e);
   }
+
+  // kill the mouse listener service
+  log.info('killing mouse server before quit');
+  try {
+    (global as any).mouseListener.kill(9);
+  } catch (e) {
+    log.error(e);
+  }
 });
 
 app.on('ready', () => {
@@ -172,7 +178,7 @@ export const startServer = () => {
   const assets = path.join(__dirname, '..', 'assets');
   const binDir = path.join(assets, subFolder, 'ws_server');
   process.chdir(binDir);
-  log.info(`STARTING SERVER FROM: ${binDir}`);
+  log.info(`starting ws_server from: ${binDir}`);
   let child: ChildProcessWithoutNullStreams;
   try {
     child = spawn(`./${binary}`);
@@ -184,6 +190,37 @@ export const startServer = () => {
     return null;
   }
 };
+
+const MouseListener = () => {
+  let service: ChildProcessWithoutNullStreams;
+
+  return {
+    start: () => {
+      const curDir = process.cwd();
+      const { platform } = process;
+      const binary = platform === 'darwin' ? 'pymouse' : 'pymouse.exe';
+      const architecture = arch(); // 'x64' or 'arm64'
+      const subFolder = path.join(platform, architecture);
+      const assets = path.join(__dirname, '..', 'assets');
+
+      const binDir = path.join(assets, subFolder);
+      process.chdir(binDir);
+      service = spawn(`./${binary}`);
+      process.chdir(curDir);
+      service.stdout.setEncoding('utf8');
+      service.stderr.setEncoding('utf8');
+
+      return service;
+    },
+    kill: () => {
+      return service.kill(9);
+    },
+  };
+};
+
+log.info('Starting mouse server');
+// Initial start of the mouse listener
+(global as any).mouseListener = MouseListener().start();
 
 // Initial start of server
 (global as any).serverProcess = startServer();

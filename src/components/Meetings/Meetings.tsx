@@ -13,7 +13,6 @@ export default function Meetings() {
   const [showSettingsView, setShowSettingsView] = useState(false);
   const [autoDetect, setAutoDetect] = useState(false);
 
-  log.info('USER DATA-DIR: ', remote.getGlobal('userDataDir'));
   // on initial load only
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000);
@@ -78,6 +77,7 @@ export default function Meetings() {
       width: 165,
       height: 110,
       frame: false,
+      backgroundColor: '#00000000',
       alwaysOnTop: true,
       transparent: true,
       paintWhenInitiallyHidden: false,
@@ -87,7 +87,6 @@ export default function Meetings() {
           `--USER-DATA-DIR=${remote.getGlobal('userDataDir')}`,
         ],
         nativeWindowOpen: false,
-        // nativeWindowOpen: true,
         enableRemoteModule: true,
       },
       hasShadow: true,
