@@ -93,7 +93,7 @@ export default function Settings(props) {
         >
           Quit
         </button>
-        <div className="text-xxs float-left ml-8 text-gray-300">v0.7.5</div>
+        <div className="text-xxs float-left ml-8 text-gray-300">v0.7.6</div>
       </div>
     </fieldset>
   );
