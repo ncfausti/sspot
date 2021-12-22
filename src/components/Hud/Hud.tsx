@@ -307,14 +307,14 @@ export default function Hud() {
       )}
       {connectionStatus === 'Open' && (
         <div
-          // onMouseEnter={() => {
-          //   log.info('mouse entered, set no spotting flag');
-          //   setInAppUI(true);
-          // }}
-          // onMouseLeave={() => {
-          //   log.info('mouse exit, remove no spotting flag');
-          //   setInAppUI(false);
-          // }}
+          onMouseEnter={() => {
+            log.info('mouse entered, set no spotting flag');
+            setInAppUI(true);
+          }}
+          onMouseLeave={() => {
+            log.info('mouse exit, remove no spotting flag');
+            setInAppUI(false);
+          }}
           className="flex items-start rounded-3xl bg-gray-100"
         >
           <div
