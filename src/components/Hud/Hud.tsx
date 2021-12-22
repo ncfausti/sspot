@@ -175,7 +175,9 @@ export default function Hud() {
     service.stdout.on('data', (e) => {
       try {
         const event = JSON.parse(e);
+        log.info(event);
         setClickCoords({ x: Math.round(event.x), y: Math.round(event.y) });
+        setInAppUI(false);
       } catch (err) {
         log.info(e);
         log.error(err);
@@ -254,7 +256,16 @@ export default function Hud() {
   }
 
   useEffect(() => {
+    document.body.addEventListener('click', () => {
+      // e.stopPropagation();
+      log.info('document.body.click');
+      setInAppUI(true);
+    });
+  }, []);
+
+  useEffect(() => {
     if (!isSpotting || clickCoords.x === -1 || inAppUI) return;
+
     log.info(`you spotted someone at ${clickCoords.x},${clickCoords.y}`);
     setPaused(false);
     setCommand(1);
@@ -283,14 +294,14 @@ export default function Hud() {
       )}
       {connectionStatus === 'Open' && (
         <div
-          onMouseEnter={() => {
-            log.info('mouse entered, set no spotting flag');
-            setInAppUI(true);
-          }}
-          onMouseLeave={() => {
-            log.info('mouse exit, remove no spotting flag');
-            setInAppUI(false);
-          }}
+          // onMouseEnter={() => {
+          //   log.info('mouse entered, set no spotting flag');
+          //   setInAppUI(true);
+          // }}
+          // onMouseLeave={() => {
+          //   log.info('mouse exit, remove no spotting flag');
+          //   setInAppUI(false);
+          // }}
           className="flex items-start rounded-3xl bg-gray-100"
         >
           <div
@@ -301,6 +312,7 @@ export default function Hud() {
           >
             <div className="flex flex-grow flex-wrap justify-between content-center pb-1">
               <div className="w-8">
+                {/* {inAppUI && 'in'} */}
                 <img
                   // onClick={clickBlind}
                   src={blindIcon}
