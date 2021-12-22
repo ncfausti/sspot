@@ -59,10 +59,6 @@ const newFace = (x: number, y: number): Face => {
 };
 
 const SOCKET_URL = 'ws://localhost:8765';
-const HUD_STARTING_WIDTH = 165;
-const HUD_EXPANDED_WIDTH = 330;
-const HUD_STARTING_HEIGHT = 110;
-const mainHudWidth = 165; // Math.floor(HUD_STARTING_WIDTH * PIXEL_RATIO);
 const { platform } = process;
 
 export function removeItemById(
@@ -85,6 +81,16 @@ export default function Hud() {
   const [inAppUI, setInAppUI] = useState(false);
   const [effect, setEffect] = useState(false);
   const [paused, setPaused] = useState(false);
+
+  const HUD_STARTING_WIDTH = 165;
+  const HUD_EXPANDED_WIDTH = 330;
+  const HUD_STARTING_HEIGHT = 110;
+  const mainHudWidth = 165;
+
+  // Fix for Windows off by 1 pixel errors
+  useEffect(() => {
+    window.resizeTo(HUD_STARTING_WIDTH, HUD_STARTING_HEIGHT);
+  }, []);
 
   const { sendMessage, sendJsonMessage, readyState } = useWebSocket(
     SOCKET_URL,
@@ -203,19 +209,10 @@ export default function Hud() {
       } else {
         // if window is less than desired size, increase it
         if (window.outerWidth < x) {
-          // if on windows, just set the width directly
-          if (platform !== 'darwin') {
-            window.resizeTo(HUD_EXPANDED_WIDTH, window.outerHeight);
-            return;
-          }
           window.resizeBy(15, 0);
         }
         // if window is more than desired size, decrease it
         if (window.outerWidth > x) {
-          if (platform !== 'darwin') {
-            window.resizeTo(HUD_STARTING_WIDTH, window.outerHeight);
-            return;
-          }
           window.resizeBy(-15, 0);
         }
       }
@@ -223,10 +220,26 @@ export default function Hud() {
   }
 
   function clickExpand() {
-    // setExpanded((prev) => !prev);
+    // if on Windows, just set the width directly
+    log.info(platform);
+    if (platform !== 'darwin') {
+      const widthDiff = Math.abs(window.outerWidth - HUD_STARTING_WIDTH);
+      log.info(widthDiff);
+      // if the difference between the window.outerWidth and starting width
+      // is within an acceptable range (0 to 20px), then the HUD is NOT expanded
+      // else if window.outerWidth - starting width is g.t. ~20px, then the window is
+      // expanded
+      return widthDiff > 20
+        ? // window is contracted
+          window.resizeTo(HUD_STARTING_WIDTH, HUD_STARTING_HEIGHT)
+        : // if diff is g.t. 20, width is expanded
+          window.resizeTo(HUD_EXPANDED_WIDTH, HUD_STARTING_HEIGHT);
+    }
+
+    // else
     return window.outerWidth > HUD_STARTING_WIDTH
-      ? animatedResizeTo(HUD_STARTING_WIDTH, 110)
-      : animatedResizeTo(HUD_EXPANDED_WIDTH, 110);
+      ? animatedResizeTo(HUD_STARTING_WIDTH, HUD_STARTING_HEIGHT)
+      : animatedResizeTo(HUD_EXPANDED_WIDTH, HUD_STARTING_HEIGHT);
   }
 
   function clickPlayPause() {

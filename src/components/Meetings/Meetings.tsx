@@ -13,6 +13,10 @@ export default function Meetings() {
   const [showSettingsView, setShowSettingsView] = useState(false);
   const [autoDetect, setAutoDetect] = useState(false);
 
+  const SPACE_ABOVE_HUD = 40;
+  const HUD_STARTING_WIDTH = 165;
+  const HUD_STARTING_HEIGHT = 165;
+
   // on initial load only
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000);
@@ -73,9 +77,9 @@ export default function Meetings() {
 
     const hudWindow = new remote.BrowserWindow({
       x: midPointLessHalfHudWidth,
-      y: 40,
-      width: 165,
-      height: 110,
+      y: SPACE_ABOVE_HUD,
+      width: HUD_STARTING_WIDTH,
+      height: HUD_STARTING_HEIGHT,
       frame: false,
       backgroundColor: '#00000000',
       alwaysOnTop: true,
