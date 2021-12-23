@@ -17,6 +17,11 @@ export default function ParticipantsList(props: {
   faceClickHandler: (string) => void;
 }) {
   const { faces, faceClickHandler } = props;
+  const HUD_STARTING_WIDTH = 175;
+  const HUD_EXPANDED_WIDTH = 340;
+  const HUD_STARTING_HEIGHT = 120;
+  const mainHudWidth = 165;
+  const mainHudHeight = 110;
 
   const faceClicked = (e: SyntheticEvent) => {
     // use the id value stored in the alt attribute
@@ -24,8 +29,13 @@ export default function ParticipantsList(props: {
     faceClickHandler(e.target.id);
   };
 
+  const widthDiff = Math.abs(window.outerWidth - HUD_STARTING_WIDTH);
+  const width = widthDiff < 20 ? mainHudWidth : 330;
+
   return (
-    <div className="z-0 fixed fixed left-0 w-[330px] shadow-hud min-h-[110px] flex flex-grow flex-end bg-gray-100 content-center rounded-hud">
+    <div
+      className={`z-0 fixed fixed left-0 w-[${width}px] shadow-hud min-h-[110px] flex flex-grow flex-end bg-gray-100 content-center rounded-hud`}
+    >
       <div className="flex justify-evenly flex-wrap w-1/2 fixed right-0">
         {faces.map((face: Face, index: number) => (
           <div
