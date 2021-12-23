@@ -116,7 +116,7 @@ export default function Meetings() {
   }, []);
 
   return (
-    <div className="flex bg-gray-100 flex-grow flex-col p-3 min-h-screen content-center">
+    <div className="flex rounded-hud bg-gray-100 flex-grow flex-col p-3 min-h-screen content-center">
       <>
         {!showSettingsView && (
           <>

@@ -32,22 +32,48 @@ export default function ParticipantsList(props: {
   const widthDiff = Math.abs(window.outerWidth - HUD_STARTING_WIDTH);
   const width = widthDiff < 20 ? mainHudWidth : 330;
 
+  // function delayedDisplay(diff: number) {
+  //   const show = diff < 20;
+  //   return setTimeout(() => (show ? 'w-full' : 'w-1/2'), 2000);
+  // }
   return (
     <div
-      className={`z-0 fixed fixed left-0 w-[${width}px] shadow-hud min-h-[110px] flex flex-grow flex-end bg-gray-100 content-center rounded-hud`}
+      className="z-0 fixed fixed left-0 shadow-hud min-h-[110px] flex flex-grow flex-end bg-gray-100 content-center rounded-hud"
+      style={{ width: `${width}px` }}
     >
-      <div className="flex justify-evenly flex-wrap w-1/2 fixed right-0">
+      <div className="flex flex-wrap w-1/2 justify-evenly p-3 pl-1 mr-1 fixed right-0">
+        <div
+          className={`w-full font-semibold text-center ${
+            widthDiff > 20 ? '' : 'hidden'
+          }`}
+        >
+          Participants: <span className="text-spotred">({faces.length})</span>
+        </div>
         {faces.map((face: Face, index: number) => (
           <div
             key={face.id}
-            className="text-xxs text-center relative hover-trigger"
+            className="text-sm text-center relative hover-trigger"
             onClick={faceClicked}
           >
             <span
               id={face.id}
-              className="absolute text-tiny text-gray-900 w-4 h-4 font-semibold transparent -right-2 -top-1.5 rounded-full hover-target cursor-pointer"
+              style={{
+                position: 'absolute',
+                right: '-12px',
+                top: '-3px',
+              }}
+              className="absolute bg-gray-400 text-tiny text-gray-900 w-4 h-4 transparent -right-2 -top-1.5 rounded-full hover-target cursor-pointer"
             >
-              x
+              <div
+                className="text-white"
+                style={{
+                  position: 'absolute',
+                  left: '5px',
+                  bottom: '0px',
+                }}
+              >
+                x
+              </div>
             </span>
             <img
               src={face.image_path}

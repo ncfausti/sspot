@@ -326,120 +326,111 @@ export default function Hud() {
           className="flex items-start rounded-hud"
         >
           <div
+            id="contain-main-hud-shadow-bottom"
+            className="flex items-start rounded-hud"
             style={{
-              width: `${mainHudWidth}px`,
-              height: `${mainHudHeight}px`,
+              maxHeight: '110px',
+              overflow: 'hidden',
+              width: `${
+                Math.abs(window.outerWidth - HUD_STARTING_WIDTH) < 20 // participants hidden, hide shadow
+                  ? '165px'
+                  : '175px'
+              }`,
             }}
-            className="flex z-50 flex-col px-2 py-1 content-center bg-white rounded-hud"
           >
-            <div className="flex flex-grow flex-wrap justify-between content-center pb-1">
-              <div className="w-8">
-                {/* {inAppUI && 'in'} */}
-                <img
-                  // onClick={clickBlind}
-                  src={blindIcon}
-                  className="hidden w-4 h-4 cursor-pointer mr-1"
-                  alt="blind"
-                />
-              </div>
-              {/*
+            <div
+              style={{
+                width: `${mainHudWidth}px`,
+                height: `${mainHudHeight}px`,
+              }}
+              className="flex z-50 shadow-hud flex-col px-2 py-1 content-center bg-white rounded-hud"
+            >
+              <div className="flex flex-grow flex-wrap justify-between content-center pb-1">
+                <div className="w-8">
+                  {/* {inAppUI && 'in'} */}
+                  <img
+                    // onClick={clickBlind}
+                    src={blindIcon}
+                    className="hidden w-4 h-4 cursor-pointer mr-1"
+                    alt="blind"
+                  />
+                </div>
+                {/*
               <span>scale: {remote.screen.getPrimaryDisplay().scaleFactor}</span> */}
-              {/* {clickCoords.x},{clickCoords.y} */}
-              <span className="text-xs text-gray-900 font-semibold">
-                {timeStyle.format(new Date())}
-              </span>
-              {/* {window.devicePixelRatio} */}
-              {/* {remote.getGlobal('autoDetectOn') === true && (
+                {/* {clickCoords.x},{clickCoords.y} */}
+                <span className="text-sm text-gray-900 font-semibold">
+                  {timeStyle.format(new Date())}
+                </span>
+                {/* {window.devicePixelRatio} */}
+                {/* {remote.getGlobal('autoDetectOn') === true && (
                 <span className="text-xxs text-green-400">Auto Detect</span>
               )} */}
-              <div className="text-xs font-light">
-                <button
-                  onClick={clickEnd}
-                  className="bg-white border border-gray-900
-                  rounded-hud text-gray-900 bg-white hover:bg-gray-900
-                  hover:text-white text-xxs font-semibold px-1 cursor-pointer"
-                  type="button"
-                >
-                  End
-                </button>
+                <div className="text-xs font-light">
+                  <button
+                    onClick={clickEnd}
+                    className="bg-white border border-gray-900
+                  rounded-sm text-gray-900 bg-white hover:bg-gray-900
+                  hover:text-white text-xs font-bold px-1 cursor-pointer"
+                    type="button"
+                  >
+                    End
+                  </button>
+                </div>
               </div>
-            </div>
-            <div className="flex text-xs font-medium flex-grow space-x-2.5 justify-between">
-              <div className="flex flex-col justify-end border border-spotblue bg-spotblue text-white flex-1 px-1 leading-tight">
-                <div className="text-sm">
-                  {/* <CountUp elapsed={elapsed} /> */}
-                  <div className="text-base font-bold">
-                    {propFaces[0]
-                      ? (propFaces[0] as DetectedFace).sentiment
-                      : '0'}
+              <div className="flex text-xs font-medium flex-grow space-x-2.5 justify-between">
+                <div className="flex flex-col justify-end border border-spotblue bg-spotblue text-white flex-1 px-1 leading-tight">
+                  <div className="text-sm">
+                    {/* <CountUp elapsed={elapsed} /> */}
+                    <div className="text-base font-bold">
+                      {propFaces[0]
+                        ? (propFaces[0] as DetectedFace).sentiment
+                        : '0'}
+                      <span className="font-medium">%</span>
+                    </div>
+                  </div>
+                  <div className="pb-1">My Score</div>
+                </div>
+                <div className="hidden flex flex-col justify-end bg-spotblue text-white flex-1 px-1">
+                  <div>{Math.floor(voiceMetrics.current_monologue / 60)}m</div>
+                  <div>Monologue</div>
+                </div>
+                <div className="flex flex-col justify-end border border-gray-900 text-gray-900 font-medium flex-1 px-1 leading-tight">
+                  <div className="text-base text-spotblue font-bold">
+                    {voiceMetrics.talk_ratio}
                     <span className="font-medium">%</span>
                   </div>
+                  <div className="pb-1">Talk Ratio</div>
                 </div>
-                <div className="pb-1">My Score</div>
               </div>
-              <div className="hidden flex flex-col justify-end bg-spotblue text-white flex-1 px-1">
-                <div>{Math.floor(voiceMetrics.current_monologue / 60)}m</div>
-                <div>Monologue</div>
-              </div>
-              <div className="flex flex-col justify-end border border-gray-900 text-gray-900 font-medium flex-1 px-1 leading-tight">
-                <div className="text-base text-spotblue font-bold">
-                  {voiceMetrics.talk_ratio}
-                  <span className="font-medium">%</span>
-                </div>
-                <div className="pb-1">Talk Ratio</div>
-              </div>
-            </div>
-            <div className="flex flex-grow flex-wrap justify-between items-center pt-1">
-              <div className="flex ">
-                <img
-                  onClick={clickPlayPause}
-                  src={command === 1 ? pauseIcon : playIcon}
-                  className="w-3 h-3 cursor-pointer mt-1 mr-1"
-                  alt="SaleSpot"
-                />
-                <span className="text-sm">
-                  {/* {voiceMetrics.is_talking ? '🗣' : '😶'} */}
-                  <CountUp elapsed={elapsed} />
-                </span>
-                <span>
-                  {/* {connectionStatus === 'Open' ? ' Active' : ' Initializing'} */}
-                </span>
-              </div>
-              <div className="flex text-gray-700 space-x-8">
-                <span className="flex space-x-1">
+              <div className="flex flex-grow flex-wrap justify-between items-center pt-1">
+                <div className="flex ">
                   <img
-                    onClick={clickReset}
-                    src={resetIcon}
-                    className={`${effect && 'animate-reverse-spin'}
-                    w-3 h-3 cursor-pointer`}
-                    onAnimationEnd={() => setEffect(false)}
-                    alt="reset"
+                    onClick={clickPlayPause}
+                    src={command === 1 ? pauseIcon : playIcon}
+                    className="w-3 h-3 cursor-pointer mt-1 mr-1"
+                    alt="SaleSpot"
                   />
-                  <span className="relative w-3 h-3">
+                  <span className="text-sm">
+                    {/* {voiceMetrics.is_talking ? '🗣' : '😶'} */}
+                    <CountUp elapsed={elapsed} />
+                  </span>
+                  <span>
+                    {/* {connectionStatus === 'Open' ? ' Active' : ' Initializing'} */}
+                  </span>
+                </div>
+                <div className="flex text-gray-700 space-x-8">
+                  <span className="flex space-x-1">
                     <img
-                      ref={spottingBtn}
-                      onClick={() =>
-                        setIsSpotting((prev) => {
-                          if (prev === false) {
-                            animatedResizeTo(
-                              HUD_EXPANDED_WIDTH,
-                              HUD_STARTING_HEIGHT
-                            );
-                          }
-                          return !prev;
-                        })
-                      }
-                      src={isSpotting ? spottingIconOn : spottingIcon}
-                      className={`${
-                        isSpotting && 'animate-ping'
-                      } w-3 h-3 cursor-pointer mr-1 absolute`}
-                      alt="spotting"
+                      onClick={clickReset}
+                      src={resetIcon}
+                      className={`${effect && 'animate-reverse-spin'}
+                    w-3 h-3 cursor-pointer`}
+                      onAnimationEnd={() => setEffect(false)}
+                      alt="reset"
                     />
-                    {isSpotting && (
+                    <span className="relative w-3 h-3">
                       <img
-                        className="absolute cursor-pointer w-3 h-3"
-                        src={spottingIconOn}
-                        alt="spotting on"
+                        ref={spottingBtn}
                         onClick={() =>
                           setIsSpotting((prev) => {
                             if (prev === false) {
@@ -451,19 +442,42 @@ export default function Hud() {
                             return !prev;
                           })
                         }
+                        src={isSpotting ? spottingIconOn : spottingIcon}
+                        className={`${
+                          isSpotting && 'animate-ping'
+                        } w-3 h-3 cursor-pointer mr-1 absolute`}
+                        alt="spotting"
                       />
-                    )}
+                      {isSpotting && (
+                        <img
+                          className="absolute cursor-pointer w-3 h-3"
+                          src={spottingIconOn}
+                          alt="spotting on"
+                          onClick={() =>
+                            setIsSpotting((prev) => {
+                              if (prev === false) {
+                                animatedResizeTo(
+                                  HUD_EXPANDED_WIDTH,
+                                  HUD_STARTING_HEIGHT
+                                );
+                              }
+                              return !prev;
+                            })
+                          }
+                        />
+                      )}
+                    </span>
                   </span>
-                </span>
-                <img
-                  onClick={clickExpand}
-                  src={expandIcon}
-                  className={`w-2 h-3 cursor-pointer mr-1 ${
-                    Math.abs(window.outerWidth - HUD_STARTING_WIDTH) > 20 &&
-                    'transform rotate-180'
-                  }`}
-                  alt="expand"
-                />
+                  <img
+                    onClick={clickExpand}
+                    src={expandIcon}
+                    className={`w-2 h-3 cursor-pointer mr-1 ${
+                      Math.abs(window.outerWidth - HUD_STARTING_WIDTH) > 20 &&
+                      'transform rotate-180'
+                    }`}
+                    alt="expand"
+                  />
+                </div>
               </div>
             </div>
           </div>
