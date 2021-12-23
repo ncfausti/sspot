@@ -98,10 +98,9 @@ export default function Meetings() {
     });
 
     hudWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+    hudWindow.setAlwaysOnTop(true, 'screen-saver');
     hudWindow.setResizable(false);
-
     hudWindow.loadURL(`file://${__dirname}/index.html#/live`);
-
     ipcRenderer.send('hideTrayWindow');
   }
 

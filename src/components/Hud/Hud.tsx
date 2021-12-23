@@ -87,6 +87,8 @@ export default function Hud() {
   const HUD_STARTING_HEIGHT = 110;
   const mainHudWidth = 165;
 
+  const electronWindow = remote.getCurrentWindow();
+
   // Fix for Windows off by 1 pixel errors
   useEffect(() => {
     window.resizeTo(HUD_STARTING_WIDTH, HUD_STARTING_HEIGHT);
@@ -229,14 +231,19 @@ export default function Hud() {
       // is within an acceptable range (0 to 20px), then the HUD is NOT expanded
       // else if window.outerWidth - starting width is g.t. ~20px, then the window is
       // expanded
-      return widthDiff > 20
-        ? // window is contracted
-          window.resizeTo(HUD_STARTING_WIDTH, HUD_STARTING_HEIGHT)
-        : // if diff is g.t. 20, width is expanded
-          window.resizeTo(HUD_EXPANDED_WIDTH, HUD_STARTING_HEIGHT);
-    }
+      if (widthDiff > 20) {
+        log.info('hide participants');
 
-    // else
+        window.resizeTo(HUD_STARTING_WIDTH, HUD_STARTING_HEIGHT);
+        electronWindow.setAlwaysOnTop(true, 'screen-saver');
+      } else {
+        // if diff is g.t. 20, width is expanded
+        log.info('show participants');
+        window.resizeTo(HUD_EXPANDED_WIDTH, HUD_STARTING_HEIGHT);
+        electronWindow.setAlwaysOnTop(true, 'screen-saver');
+      }
+      return null;
+    }
     return window.outerWidth > HUD_STARTING_WIDTH
       ? animatedResizeTo(HUD_STARTING_WIDTH, HUD_STARTING_HEIGHT)
       : animatedResizeTo(HUD_EXPANDED_WIDTH, HUD_STARTING_HEIGHT);
@@ -450,7 +457,7 @@ export default function Hud() {
                   onClick={clickExpand}
                   src={expandIcon}
                   className={`w-2 h-3 cursor-pointer mr-1 ${
-                    window.outerWidth > HUD_STARTING_WIDTH &&
+                    Math.abs(window.outerWidth - HUD_STARTING_WIDTH) > 20 &&
                     'transform rotate-180'
                   }`}
                   alt="expand"
