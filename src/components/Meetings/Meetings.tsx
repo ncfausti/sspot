@@ -14,8 +14,8 @@ export default function Meetings() {
   const [autoDetect, setAutoDetect] = useState(false);
 
   const SPACE_ABOVE_HUD = 40;
-  const HUD_STARTING_WIDTH = 165;
-  const HUD_STARTING_HEIGHT = 165;
+  const HUD_STARTING_WIDTH = 175;
+  const HUD_STARTING_HEIGHT = 120;
 
   // on initial load only
   useEffect(() => {
@@ -100,6 +100,7 @@ export default function Meetings() {
     hudWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
     hudWindow.setAlwaysOnTop(true, 'screen-saver');
     hudWindow.setResizable(false);
+    hudWindow.setHasShadow(true);
     hudWindow.loadURL(`file://${__dirname}/index.html#/live`);
     ipcRenderer.send('hideTrayWindow');
   }

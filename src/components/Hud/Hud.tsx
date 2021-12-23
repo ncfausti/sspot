@@ -82,10 +82,11 @@ export default function Hud() {
   const [effect, setEffect] = useState(false);
   const [paused, setPaused] = useState(false);
 
-  const HUD_STARTING_WIDTH = 165;
-  const HUD_EXPANDED_WIDTH = 330;
-  const HUD_STARTING_HEIGHT = 110;
+  const HUD_STARTING_WIDTH = 175;
+  const HUD_EXPANDED_WIDTH = 340;
+  const HUD_STARTING_HEIGHT = 120;
   const mainHudWidth = 165;
+  const mainHudHeight = 110;
 
   const electronWindow = remote.getCurrentWindow();
 
@@ -305,7 +306,7 @@ export default function Hud() {
   return (
     <>
       {connectionStatus !== 'Open' && (
-        <div className="text-center pt-5 bg-gray-100 min-h-screen">
+        <div className="text-center pt-5 bg-gray-100">
           <img src={salespotLogo} className="inline w-1/2" alt="expand" />
           <div className="">
             <Loading x={60} y={60} />
@@ -322,13 +323,14 @@ export default function Hud() {
             log.info('mouse exit, remove no spotting flag');
             setInAppUI(false);
           }}
-          className="flex items-start rounded-3xl bg-gray-100"
+          className="flex items-start rounded-3xl"
         >
           <div
             style={{
               width: `${mainHudWidth}px`,
+              height: `${mainHudHeight}px`,
             }}
-            className="flex z-50 min-h-screen flex-col px-2 py-1 content-center bg-white rounded-xl"
+            className="flex z-50 flex-col px-2 py-1 content-center bg-white rounded-xl"
           >
             <div className="flex flex-grow flex-wrap justify-between content-center pb-1">
               <div className="w-8">
