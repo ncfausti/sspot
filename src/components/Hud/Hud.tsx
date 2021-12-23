@@ -323,14 +323,14 @@ export default function Hud() {
             log.info('mouse exit, remove no spotting flag');
             setInAppUI(false);
           }}
-          className="flex items-start rounded-3xl"
+          className="flex items-start rounded-hud"
         >
           <div
             style={{
               width: `${mainHudWidth}px`,
               height: `${mainHudHeight}px`,
             }}
-            className="flex z-50 flex-col px-2 py-1 content-center bg-white rounded-xl"
+            className="flex z-50 flex-col px-2 py-1 content-center bg-white rounded-hud"
           >
             <div className="flex flex-grow flex-wrap justify-between content-center pb-1">
               <div className="w-8">
@@ -356,7 +356,7 @@ export default function Hud() {
                 <button
                   onClick={clickEnd}
                   className="bg-white border border-gray-900
-                  rounded-md text-gray-900 bg-white hover:bg-gray-900
+                  rounded-hud text-gray-900 bg-white hover:bg-gray-900
                   hover:text-white text-xxs font-semibold px-1 cursor-pointer"
                   type="button"
                 >

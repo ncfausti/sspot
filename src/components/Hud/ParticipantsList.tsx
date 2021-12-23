@@ -25,8 +25,8 @@ export default function ParticipantsList(props: {
   };
 
   return (
-    <div className="z-0 w-1/2 min-h-[110px] fixed right-0 flex flex-grow flex-col bg-gray-100 content-center rounded-l-none rounded-2xl">
-      <div className="bg-gray-200 flex justify-evenly flex-wrap w-full bg-gray-100 p-1 rounded-2xl rounded-l-none">
+    <div className="z-0 fixed fixed left-0 w-[330px] shadow-hud min-h-[110px] flex flex-grow flex-end bg-gray-100 content-center rounded-hud">
+      <div className="flex justify-evenly flex-wrap w-1/2 fixed right-0">
         {faces.map((face: Face, index: number) => (
           <div
             key={face.id}
