@@ -1,7 +1,7 @@
 import React from 'react';
 import '@testing-library/jest-dom';
 import { render } from '@testing-library/react';
-import Hud, { removeItemById } from '../components/Hud';
+import Hud, { removeItemById } from '../components/Hud/Hud';
 
 describe('Hud', () => {
   it('should render', () => {
