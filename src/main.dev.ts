@@ -173,10 +173,10 @@ export const startServer = () => {
   const { platform } = process;
   const binary = platform === 'darwin' ? 'ws_server' : 'ws_server.exe';
   const architecture = arch(); // 'x64' or 'arm64'
-  const subFolder = path.join(platform, architecture);
+  const platformSpecificDir = path.join(`${platform}-${architecture}`);
 
   const assets = path.join(__dirname, '..', 'assets');
-  const binDir = path.join(assets, subFolder, 'ws_server');
+  const binDir = path.join(assets, platformSpecificDir, 'ws_server');
   process.chdir(binDir);
   log.info(`starting ws_server from: ${binDir}`);
   let child: ChildProcessWithoutNullStreams;
@@ -200,10 +200,10 @@ const MouseListener = () => {
       const { platform } = process;
       const binary = platform === 'darwin' ? 'pymouse' : 'pymouse.exe';
       const architecture = arch(); // 'x64' or 'arm64'
-      const subFolder = path.join(platform, architecture);
+      const platformSpecificDir = path.join(`${platform}-${architecture}`);
       const assets = path.join(__dirname, '..', 'assets');
 
-      const binDir = path.join(assets, subFolder);
+      const binDir = path.join(assets, platformSpecificDir);
       process.chdir(binDir);
       service = spawn(`./${binary}`);
       process.chdir(curDir);
