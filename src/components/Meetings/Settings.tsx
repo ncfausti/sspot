@@ -8,7 +8,11 @@ const showDebugMode = () => {
   );
 };
 
-export default function Settings(props) {
+export default function Settings(props: {
+  isAutoDetectOn: boolean;
+  backClick: () => void;
+  autoDetectChanged: (autoDetect: boolean) => void;
+}) {
   const { isAutoDetectOn, backClick, autoDetectChanged } = props;
 
   const exitApp = () => {
@@ -75,12 +79,15 @@ export default function Settings(props) {
             Debug mode
           </label>
           <span id="debug-description" className="text-gray-500">
-            <span className="sr-only">Debug </span>
+            <span id="check-debug" className="sr-only">
+              Debug{' '}
+            </span>
           </span>
         </div>
       </div>
       <div className="pt-5">
         <button
+          type="button"
           onClick={backClick}
           className="cursor-pointer float-right text-right bg-spotblue hover:bg-blue-700 text-white font-bold text-xxs py-1 px-2 rounded"
         >
@@ -88,12 +95,13 @@ export default function Settings(props) {
         </button>
 
         <button
+          type="button"
           onClick={exitApp}
           className="cursor-pointer float-right text-right mr-3 bg-spotred hover:bg-red-800 text-white font-bold text-xxs py-1 px-2 rounded"
         >
           Quit
         </button>
-        <div className="text-xxs float-left ml-8 text-gray-300">v0.7.7</div>
+        {/* v0.7.8 */}
       </div>
     </fieldset>
   );

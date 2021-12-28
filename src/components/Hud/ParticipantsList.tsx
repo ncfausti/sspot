@@ -1,5 +1,5 @@
 import React, { SyntheticEvent } from 'react';
-import log from 'electron-log';
+import xImg from '../../../assets/x-icon.png';
 
 interface Face {
   id: string;
@@ -53,28 +53,20 @@ export default function ParticipantsList(props: {
           <div
             key={face.id}
             className="text-sm text-center relative hover-trigger"
-            onClick={faceClicked}
           >
-            <span
+            <button
+              type="button"
               id={face.id}
+              onClick={faceClicked}
               style={{
                 position: 'absolute',
-                right: '-12px',
-                top: '-3px',
+                right: '-25px',
+                top: '1px',
+                background: `url(${xImg}) no-repeat`,
+                backgroundSize: '13px',
               }}
-              className="absolute bg-gray-400 text-tiny text-gray-900 w-4 h-4 transparent -right-2 -top-1.5 rounded-full hover-target cursor-pointer"
-            >
-              <div
-                className="text-white"
-                style={{
-                  position: 'absolute',
-                  left: '5px',
-                  bottom: '0px',
-                }}
-              >
-                x
-              </div>
-            </span>
+              className="absolute text-tiny w-6 h-6 transparent hover-target cursor-pointer focus:outline-none"
+            />
             <img
               src={face.image_path}
               className={`w-10 rounded-full border-4 ${

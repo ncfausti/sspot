@@ -361,16 +361,12 @@ export default function Hud() {
                 <span className="text-sm text-gray-900 font-semibold">
                   {timeStyle.format(new Date())}
                 </span>
-                {/* {window.devicePixelRatio} */}
-                {/* {remote.getGlobal('autoDetectOn') === true && (
-                <span className="text-xxs text-green-400">Auto Detect</span>
-              )} */}
                 <div className="text-xs font-light">
                   <button
                     onClick={clickEnd}
                     className="bg-white border border-gray-900
                   rounded-sm text-gray-900 bg-white hover:bg-gray-900
-                  hover:text-white text-xs font-bold px-1 cursor-pointer"
+                  hover:text-white text-xs font-bold px-1 cursor-pointer focus:outline-none"
                     type="button"
                   >
                     End

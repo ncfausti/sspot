@@ -11,8 +11,9 @@
     "package": "rm -rf src/dist && yarn build && electron-builder build --publish never",
     "package:win": "rm -rf src/dist && yarn build && electron-builder build --win --x64 --publish never",
     "package-gh": "rm -rf src/dist && yarn build && electron-builder build --publish always",
-    "package-s3": "rm -rf src/dist && yarn build && electron-builder build --publish always",
-    "package-s3:win": "rm -rf src/dist && yarn build && electron-builder build --win --x64 --publish always",
+    "publish:x64": "rm -rf src/dist && yarn build && electron-builder build --mac --x64 --publish always",
+    "publish:arm": "rm -rf src/dist && yarn build && electron-builder build --mac --arm64 --publish always",
+    "publish:win": "rm -rf src/dist && yarn build && electron-builder build --win --x64 --publish always",
     "postinstall": "node -r @babel/register .erb/scripts/CheckNativeDep.js && electron-builder install-app-deps && yarn cross-env NODE_ENV=development webpack --config ./.erb/configs/webpack.config.renderer.dev.dll.babel.js && opencollective-postinstall && yarn-deduplicate yarn.lock",
     "start": "node -r @babel/register ./.erb/scripts/CheckPortInUse.js && yarn start:renderer",
     "start:main": "cross-env NODE_ENV=development electron -r ./.erb/scripts/BabelRegister ./src/main.dev.ts",
@@ -47,13 +48,6 @@
     ],
     "afterSign": ".erb/scripts/Notarize.js",
     "mac": {
-      "target": {
-        "target": "default",
-        "arch": [
-          "arm64",
-          "x64"
-        ]
-      },
       "type": "distribution",
       "hardenedRuntime": true,
       "entitlements": "assets/entitlements.mac.plist",
@@ -307,5 +301,5 @@
       "pre-commit": "lint-staged"
     }
   },
-  "version": "0.7.7"
+  "version": "0.7.8"
 }

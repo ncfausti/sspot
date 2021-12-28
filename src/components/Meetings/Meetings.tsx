@@ -133,8 +133,7 @@ export default function Meetings() {
                 className="w-full
           border border-transparent text-xs font-semibold
           font-medium rounded-md shadow-sm text-white
-          bg-blue-500 hover:bg-blue-600 focus:outline-none
-          focus:ring-2 focus:ring-offset-2 focus:ring-blue-400"
+          bg-blue-500 hover:bg-blue-600 focus:outline-none"
               >
                 Launch SaleSpot
                 {/* {autoDetect ? '(auto-detect)' : ''} */}
