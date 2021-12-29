@@ -6,7 +6,7 @@ import path from 'path';
 describe('All platform-specific binaries should exist', () => {
   it('check that mouse event listener binary exists', () => {
     const pymouseBinary =
-      process.platform === 'darwin' ? 'python' : 'pymouse.exe';
+      process.platform === 'darwin' ? 'pymouse' : 'pymouse.exe';
     const pymouse = path.join(
       __dirname,
       '..',
