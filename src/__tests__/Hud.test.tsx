@@ -1,7 +1,30 @@
 import React from 'react';
 import '@testing-library/jest-dom';
 import { render } from '@testing-library/react';
+import EventEmitter from 'events';
 import Hud, { removeItemById } from '../components/Hud/Hud';
+
+jest.mock('electron', () => {
+  const mElectron = {
+    ipcRenderer: {
+      on: jest.fn(),
+      send: jest.fn(),
+      sendSync: jest.fn(),
+    },
+    remote: {
+      getGlobal: jest.fn(),
+      getCurrentWindow: jest.fn(),
+    },
+  };
+  return mElectron;
+});
+
+jest.mock('./components/Hud/Hud', () => {
+  const emitter = jest.fn();
+  emitter.send = jest.fn();
+  emitter.setConfig = jest.fn();
+  return emitter;
+});
 
 describe('Hud', () => {
   it('should render', () => {

@@ -3,7 +3,6 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import App from '../App';
 
-// Mock electron, electron-store, and DataStore
 jest.mock('electron', () => {
   const mElectron = {
     ipcRenderer: {
@@ -15,8 +14,6 @@ jest.mock('electron', () => {
   };
   return mElectron;
 });
-
-// jest.mock('remote');
 
 // Partial mock example
 // https://jestjs.io/docs/mock-functions#mocking-partials
