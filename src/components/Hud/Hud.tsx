@@ -68,12 +68,44 @@ export function removeItemById(
   return array.filter((face) => face.id !== id);
 }
 
+function handleNewParticipant(pid: string) {
+  const NOTES_WIDTH = 300;
+  const NOTES_HEIGHT = 150;
+
+  const hudWindow = new remote.BrowserWindow({
+    x: window.screen.width / 2 - NOTES_WIDTH / 2,
+    y: window.screen.height / 2 - NOTES_HEIGHT / 2,
+    width: NOTES_WIDTH,
+    height: NOTES_HEIGHT,
+    frame: false,
+    alwaysOnTop: true,
+    transparent: true,
+    paintWhenInitiallyHidden: false,
+    webPreferences: {
+      nodeIntegration: true,
+      additionalArguments: [
+        `--USER-DATA-DIR=${remote.getGlobal('userDataDir')}`,
+      ],
+      nativeWindowOpen: false,
+      enableRemoteModule: true,
+    },
+    hasShadow: true,
+    resizable: false,
+  });
+
+  hudWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+  hudWindow.setAlwaysOnTop(true, 'screen-saver');
+  hudWindow.setResizable(false);
+  hudWindow.setHasShadow(true);
+  hudWindow.loadURL(`file://${__dirname}/index.html#/participant/${pid}`);
+}
+
 export default function Hud() {
   const [elapsed, setElapsed] = useState(0);
   const [faces, setFaces] = useState<Face[]>([]);
   const [command, setCommand] = useState(1);
   const [propFaces, setPropFaces] = useState([]);
-  const [faceIdsToRemove, setFaceIdsToRemove] = useState<string[]>([]);
+  // const [faceIdsToRemove, setFaceIdsToRemove] = useState<string[]>([]);
   const [voiceMetrics, setVoiceMetrics] = useState(voiceMetricsDefault);
   const [isSpotting, setIsSpotting] = useState(false);
   const spottingBtn = useRef(null);
@@ -111,12 +143,11 @@ export default function Hud() {
       onClose: () => log.info('ws closed'),
       onMessage: (e) => {
         const msg = JSON.parse(e.data);
-
-        setPropFaces(() =>
-          msg.faces.filter(
-            (face: DetectedFace) => !faceIdsToRemove.includes(face.id)
-          )
+        const faceIdsToRemove = remote.getGlobal('faceIdsToRemove');
+        const filteredFaces = msg.faces.filter(
+          (face: DetectedFace) => !faceIdsToRemove.includes(face.id)
         );
+        setPropFaces(() => filteredFaces);
 
         setVoiceMetrics(msg.voice_metrics);
         msg.command = command;
@@ -284,23 +315,30 @@ export default function Hud() {
     });
   }, []);
 
+  // This is where we add a participant to call
   useEffect(() => {
     if (!isSpotting || clickCoords.x === -1 || inAppUI) return;
 
-    log.info(`you spotted someone at ${clickCoords.x},${clickCoords.y}`);
+    log.info(`You spotted someone at ${clickCoords.x},${clickCoords.y}`);
     setPaused(false);
     setCommand(1);
     const { screen } = window;
     const pctX = clickCoords.x / screen.width;
     const pctY = clickCoords.y / screen.height;
 
-    setFaces((prev) => [...prev, newFace(pctX, pctY)]);
+    const face = newFace(pctX, pctY);
+    setFaces((prev) => [...prev, face]);
+
+    // spawn a new BrowserWindow with ParticipantInfo component
+
+    handleNewParticipant(face.id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clickCoords]);
 
   const memoizedRemoveFace = useCallback((faceId: string) => {
-    log.info('removing face', faceId);
-    setFaceIdsToRemove((prev) => [...prev, faceId]);
+    log.info('sending removeParticipant from Hud', faceId);
+    // setFaceIdsToRemove((prev) => [...prev, faceId]);
+    ipcRenderer.send('removeParticipant', faceId);
   }, []);
 
   return (

@@ -132,6 +132,11 @@ ipcMain.on('setAutoDetectBoolean', (_event, autoDetectBoolean) => {
   (global as any).autoDetectOn = autoDetectBoolean;
 });
 
+ipcMain.on('removeParticipant', (_event, pid) => {
+  log.info(`removing participant: ${pid}`);
+  (global as any).faceIdsToRemove.push(pid);
+});
+
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
@@ -161,6 +166,8 @@ app.on('will-quit', () => {
 app.on('ready', () => {
   console.log('app is ready');
   (global as any).autoDetectOn = true;
+
+  (global as any).faceIdsToRemove = [];
 
   const primaryDisplay = screen.getPrimaryDisplay();
   console.log('primary display', primaryDisplay);
@@ -241,7 +248,7 @@ ipcMain.handle('bounce-server', async () => {
   // get the global server process variable,
   // then kill it, then restart it
   (global as any).serverProcess.kill(9);
-
+  (global as any).faceIdsToRemove = [];
   // set the global variable
   (global as any).serverProcess = startServer();
   return (global as any).serverProcess !== null;
