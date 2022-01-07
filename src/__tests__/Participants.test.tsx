@@ -1,34 +1,11 @@
 import React from 'react';
 import '@testing-library/jest-dom';
 import { render } from '@testing-library/react';
-import EventEmitter from 'events';
-import Hud, { removeItemById } from '../components/Hud/Hud';
+import ParticipantInfo, { removeItemById } from '../components/Hud/Hud';
 
-jest.mock('electron', () => {
-  const mElectron = {
-    ipcRenderer: {
-      on: jest.fn(),
-      send: jest.fn(),
-      sendSync: jest.fn(),
-    },
-    remote: {
-      getGlobal: jest.fn(),
-      getCurrentWindow: jest.fn(),
-    },
-  };
-  return mElectron;
-});
-
-jest.mock('events', () => {
-  const emitter = jest.fn();
-  emitter.send = jest.fn();
-  emitter.setConfig = jest.fn();
-  return emitter;
-});
-
-describe('Hud', () => {
+describe('ParticipantInfo', () => {
   it('should render', () => {
-    expect(render(<Hud />)).toBeTruthy();
+    expect(render(<ParticipantInfo />)).toBeTruthy();
   });
 
   it('should remove item by id', () => {

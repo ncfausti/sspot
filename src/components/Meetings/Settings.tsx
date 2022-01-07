@@ -1,5 +1,5 @@
 import React, { SyntheticEvent, useEffect, useRef } from 'react';
-import { ipcRenderer } from 'electron';
+import { ipcRenderer, remote } from 'electron';
 import log from 'electron-log';
 
 const showDebugMode = () => {
@@ -22,6 +22,38 @@ export default function Settings(props: {
   useEffect(() => {
     log.info('autodetect is: ', isAutoDetectOn);
   }, [isAutoDetectOn]);
+
+  function handleViewNotes() {
+    const NOTES_WIDTH = 400;
+    const NOTES_HEIGHT = 200;
+
+    const hudWindow = new remote.BrowserWindow({
+      x: window.screen.width / 2 - NOTES_WIDTH / 2,
+      y: window.screen.height / 2 - NOTES_HEIGHT / 2,
+      width: NOTES_WIDTH,
+      height: NOTES_HEIGHT,
+      frame: true,
+      alwaysOnTop: false,
+      transparent: false,
+      paintWhenInitiallyHidden: false,
+      webPreferences: {
+        nodeIntegration: true,
+        additionalArguments: [
+          `--USER-DATA-DIR=${remote.getGlobal('userDataDir')}`,
+        ],
+        nativeWindowOpen: false,
+        enableRemoteModule: true,
+      },
+      hasShadow: true,
+      resizable: false,
+    });
+
+    hudWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+    hudWindow.setAlwaysOnTop(true, 'screen-saver');
+    hudWindow.setResizable(false);
+    hudWindow.setHasShadow(true);
+    hudWindow.loadURL(`file://${__dirname}/index.html#/release`);
+  }
 
   return (
     <fieldset className="space-y-0">
@@ -64,6 +96,15 @@ export default function Settings(props: {
           </span>
         </div>
       </div>
+      <div className="flex flex-grow">
+        <button
+          type="button"
+          onClick={handleViewNotes}
+          className="cursor-pointer text-xs text-spotblue hover:text-blue-700 outline-none "
+        >
+          Release Notes
+        </button>
+      </div>
       <div className={`${true && 'hidden'} relative flex items-start`}>
         <div className="flex items-center h-5">
           <input
@@ -101,7 +142,6 @@ export default function Settings(props: {
         >
           Quit
         </button>
-        {/* v0.7.8 */}
       </div>
     </fieldset>
   );
