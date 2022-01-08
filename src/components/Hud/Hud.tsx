@@ -72,19 +72,19 @@ export function removeItemById(
 function handleNewParticipant(pid: string) {
   const numFaces = remote.getGlobal('propFaces').length;
 
-  const NOTES_WIDTH = 150;
-  const NOTES_HEIGHT = 150;
-  const spaceBetween = 40;
+  const POPUP_WIDTH = 120;
+  const POPUP_HEIGHT = 110;
+  const SPACE_BETWEEN = 40;
 
   const hudWindow = new remote.BrowserWindow({
     x:
       window.screen.width / 2 -
-      NOTES_WIDTH / 2 +
-      (numFaces + 1) * NOTES_WIDTH +
-      spaceBetween,
+      POPUP_WIDTH / 2 +
+      (numFaces + 1) * POPUP_WIDTH +
+      SPACE_BETWEEN,
     y: SPACE_ABOVE_HUD,
-    width: NOTES_WIDTH,
-    height: NOTES_HEIGHT,
+    width: POPUP_WIDTH,
+    height: POPUP_HEIGHT,
     frame: false,
     alwaysOnTop: true,
     transparent: true,

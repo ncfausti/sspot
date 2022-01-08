@@ -121,6 +121,7 @@ const createWindow = async () => {
 function resetGlobalParticipants() {
   (global as any).participantFaces = [];
   (global as any).faceIdsToRemove = [];
+  (global as any).propFaces = [];
 }
 
 /**
@@ -139,12 +140,16 @@ ipcMain.on('setAutoDetectBoolean', (_event, autoDetectBoolean) => {
 
 ipcMain.on('addParticipant', (_event, face) => {
   log.info(`adding face`);
+  log.info(
+    `participantFaces count: ${(global as any).participantFaces.length}`
+  );
   (global as any).participantFaces.push(face);
 });
 
 ipcMain.on('setPropFaces', (_event, filteredFaces) => {
   // this will run every time a new msg is recieved from
   // the face server
+  // log.info(`filteredFaces count: ${filteredFaces.length}`);
   (global as any).propFaces = filteredFaces;
 });
 
@@ -256,6 +261,7 @@ ipcMain.handle('start-server', async () => {
 ipcMain.handle('kill-server', async () => {
   // get the global server process variable,
   // then kill it
+  resetGlobalParticipants();
   return (global as any).serverProcess.kill(9);
 });
 
@@ -280,6 +286,7 @@ ipcMain.handle('get-cursor-pos', () => {
 
 // Close the main process and exit the app
 ipcMain.on('close-me', () => {
+  resetGlobalParticipants();
   app.quit();
 });
 
