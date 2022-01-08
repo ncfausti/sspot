@@ -148,6 +148,7 @@ export default function Hud() {
           (face: DetectedFace) => !faceIdsToRemove.includes(face.id)
         );
         setPropFaces(() => filteredFaces);
+        ipcRenderer.send('setPropFaces', filteredFaces);
 
         setVoiceMetrics(msg.voice_metrics);
         msg.command = command;
@@ -328,6 +329,7 @@ export default function Hud() {
 
     const face = newFace(pctX, pctY);
     setFaces((prev) => [...prev, face]);
+    ipcRenderer.send('addParticipant', face);
 
     // spawn a new BrowserWindow with ParticipantInfo component
 

@@ -1,4 +1,4 @@
-import React, { SyntheticEvent, useEffect } from 'react';
+import React, { SyntheticEvent, useEffect, useState } from 'react';
 import { ipcRenderer, remote } from 'electron';
 import { useParams } from 'react-router-dom';
 import log from 'electron-log';
@@ -22,11 +22,18 @@ export default function ParticipantInfo() {
   const HUD_STARTING_HEIGHT = 120;
   const mainHudWidth = 165;
   const mainHudHeight = 110;
-
   const params: { pid: string } = useParams();
-
-  log.info(params); // ▶ URLSearchParams {}
-  useEffect(() => {}, []);
+  const [face, setFace] = useState({
+    id: '',
+    image_path: '',
+    label: '',
+    sentiment: 0,
+    status: 0,
+    x: 0,
+    y: 0,
+    directory: '',
+  });
+  const [faces, setFaces] = useState(remote.getGlobal('propFaces'));
 
   const faceClicked = (e: SyntheticEvent) => {
     // use the id value stored in the alt attribute
@@ -40,16 +47,35 @@ export default function ParticipantInfo() {
   const widthDiff = Math.abs(window.outerWidth - HUD_STARTING_WIDTH);
   const width = widthDiff < 20 ? mainHudWidth : 330;
 
-  const face = {
-    id: '',
-    image_path: '',
-    label: '',
-    sentiment: 0,
-    status: 0,
-    x: 0,
-    y: 0,
-    directory: '',
-  };
+  // on initial load only
+  useEffect(() => {
+    const interval = setInterval(
+      () => setFaces(remote.getGlobal('propFaces')),
+      200
+    );
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
+  useEffect(() => {
+    setFace(
+      () => faces.filter((participant) => participant.id === params.pid)[0]
+    );
+
+    log.info(face);
+  }, [face, faces, params.pid]);
+
+  // const face = {
+  //   id: '',
+  //   image_path: '',
+  //   label: '',
+  //   sentiment: 0,
+  //   status: 0,
+  //   x: 0,
+  //   y: 0,
+  //   directory: '',
+  // };
 
   // function delayedDisplay(diff: number) {
   //   const show = diff < 20;

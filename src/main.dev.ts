@@ -118,6 +118,11 @@ const createWindow = async () => {
   new AppUpdater();
 };
 
+function resetGlobalParticipants() {
+  (global as any).participantFaces = [];
+  (global as any).faceIdsToRemove = [];
+}
+
 /**
  * Add event listeners...
  */
@@ -130,6 +135,17 @@ ipcMain.on('setGlobalServerPID', (_event, serverPID) => {
 ipcMain.on('setAutoDetectBoolean', (_event, autoDetectBoolean) => {
   log.info(autoDetectBoolean);
   (global as any).autoDetectOn = autoDetectBoolean;
+});
+
+ipcMain.on('addParticipant', (_event, face) => {
+  log.info(`adding face`);
+  (global as any).participantFaces.push(face);
+});
+
+ipcMain.on('setPropFaces', (_event, filteredFaces) => {
+  // this will run every time a new msg is recieved from
+  // the face server
+  (global as any).propFaces = filteredFaces;
 });
 
 ipcMain.on('removeParticipant', (_event, pid) => {
@@ -166,8 +182,7 @@ app.on('will-quit', () => {
 app.on('ready', () => {
   console.log('app is ready');
   (global as any).autoDetectOn = true;
-
-  (global as any).faceIdsToRemove = [];
+  resetGlobalParticipants();
 
   const primaryDisplay = screen.getPrimaryDisplay();
   console.log('primary display', primaryDisplay);
@@ -248,7 +263,10 @@ ipcMain.handle('bounce-server', async () => {
   // get the global server process variable,
   // then kill it, then restart it
   (global as any).serverProcess.kill(9);
-  (global as any).faceIdsToRemove = [];
+
+  // reset globals related to participants
+  resetGlobalParticipants();
+
   // set the global variable
   (global as any).serverProcess = startServer();
   return (global as any).serverProcess !== null;
