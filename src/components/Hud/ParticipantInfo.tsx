@@ -1,27 +1,14 @@
+/* eslint-disable jsx-a11y/control-has-associated-label */
 import React, { SyntheticEvent, useEffect, useState } from 'react';
 import { ipcRenderer, remote } from 'electron';
 import { useParams } from 'react-router-dom';
 import log from 'electron-log';
 import xImg from '../../../assets/x-icon.png';
 
-interface Face {
-  id: string;
-  x: number;
-  y: number;
-  label: string;
-  sentiment: number;
-  image_path: string;
-  status: number;
-  directory: string;
-}
-
 export default function ParticipantInfo() {
   // const { faces, faceClickHandler } = props;
   const HUD_STARTING_WIDTH = 175;
-  const HUD_EXPANDED_WIDTH = 340;
-  const HUD_STARTING_HEIGHT = 120;
   const mainHudWidth = 165;
-  const mainHudHeight = 110;
   const params: { pid: string } = useParams();
   const [face, setFace] = useState({
     id: '',
@@ -33,9 +20,9 @@ export default function ParticipantInfo() {
     y: 0,
     directory: '',
   });
-  const [faces, setFaces] = useState(remote.getGlobal('propFaces'));
 
-  const faceClicked = (e: SyntheticEvent) => {
+  const [faces, setFaces] = useState(remote.getGlobal('propFaces'));
+  const faceClicked = () => {
     // use the id value stored in the alt attribute
     // to get the face id
     // faceClickHandler(e.target.id);
@@ -66,21 +53,10 @@ export default function ParticipantInfo() {
     log.info(face);
   }, [face, faces, params.pid]);
 
-  // const face = {
-  //   id: '',
-  //   image_path: '',
-  //   label: '',
-  //   sentiment: 0,
-  //   status: 0,
-  //   x: 0,
-  //   y: 0,
-  //   directory: '',
-  // };
-
-  // function delayedDisplay(diff: number) {
-  //   const show = diff < 20;
-  //   return setTimeout(() => (show ? 'w-full' : 'w-1/2'), 2000);
-  // }
+  // Last check before rendering
+  if (face === undefined) {
+    window.close();
+  }
   return (
     <div
       className="z-0 fixed fixed left-0 shadow-hud min-h-[110px] flex flex-grow flex-end bg-gray-100 content-center rounded-hud"

@@ -59,6 +59,7 @@ const newFace = (x: number, y: number): Face => {
 };
 
 const SOCKET_URL = 'ws://localhost:8765';
+const SPACE_ABOVE_HUD = 40;
 const { platform } = process;
 
 export function removeItemById(
@@ -69,12 +70,19 @@ export function removeItemById(
 }
 
 function handleNewParticipant(pid: string) {
-  const NOTES_WIDTH = 300;
+  const numFaces = remote.getGlobal('propFaces').length;
+
+  const NOTES_WIDTH = 150;
   const NOTES_HEIGHT = 150;
+  const spaceBetween = 40;
 
   const hudWindow = new remote.BrowserWindow({
-    x: window.screen.width / 2 - NOTES_WIDTH / 2,
-    y: window.screen.height / 2 - NOTES_HEIGHT / 2,
+    x:
+      window.screen.width / 2 -
+      NOTES_WIDTH / 2 +
+      (numFaces + 1) * NOTES_WIDTH +
+      spaceBetween,
+    y: SPACE_ABOVE_HUD,
     width: NOTES_WIDTH,
     height: NOTES_HEIGHT,
     frame: false,
@@ -117,15 +125,15 @@ export default function Hud() {
   const HUD_STARTING_WIDTH = 175;
   const HUD_EXPANDED_WIDTH = 340;
   const HUD_STARTING_HEIGHT = 120;
-  const mainHudWidth = 165;
+  const mainHudWidth = 175;
   const mainHudHeight = 110;
 
   const electronWindow = remote.getCurrentWindow();
 
   // Fix for Windows off by 1 pixel errors
-  useEffect(() => {
-    window.resizeTo(HUD_STARTING_WIDTH, HUD_STARTING_HEIGHT);
-  }, []);
+  // useEffect(() => {
+  //   window.resizeTo(HUD_STARTING_WIDTH, HUD_STARTING_HEIGHT);
+  // }, []);
 
   const { sendMessage, sendJsonMessage, readyState } = useWebSocket(
     SOCKET_URL,
@@ -232,6 +240,7 @@ export default function Hud() {
   // function that slowly resizes the window
   // x,y must be multiples of 5
   function animatedResizeTo(x: number, y: number) {
+    return;
     if (x % 5 !== 0 || y % 5 !== 0) {
       return;
     }
@@ -332,7 +341,6 @@ export default function Hud() {
     ipcRenderer.send('addParticipant', face);
 
     // spawn a new BrowserWindow with ParticipantInfo component
-
     handleNewParticipant(face.id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clickCoords]);
@@ -373,7 +381,7 @@ export default function Hud() {
               overflow: 'hidden',
               width: `${
                 Math.abs(window.outerWidth - HUD_STARTING_WIDTH) < 20 // participants hidden, hide shadow
-                  ? '165px'
+                  ? '175px'
                   : '175px'
               }`,
             }}
@@ -517,10 +525,12 @@ export default function Hud() {
               </div>
             </div>
           </div>
-          <ParticipantsList
-            faces={propFaces}
-            faceClickHandler={memoizedRemoveFace}
-          />
+          <div className="hidden">
+            <ParticipantsList
+              faces={propFaces}
+              faceClickHandler={memoizedRemoveFace}
+            />
+          </div>
         </div>
       )}
     </>
