@@ -82,7 +82,7 @@ function handleNewParticipant(pid: string) {
       x:
         window.screen.width / 2 -
         POPUP_WIDTH / 2 +
-        (numFaces + 1) * POPUP_WIDTH +
+        (numFaces + 2) * POPUP_WIDTH +
         SPACE_BETWEEN,
       y: SPACE_ABOVE_HUD,
       width: POPUP_WIDTH,
@@ -128,7 +128,7 @@ export default function Hud() {
 
   const electronWindow = remote.getCurrentWindow();
 
-  const [showParticipants, setShowParticipants] = useState(false);
+  const [showParticipants, setShowParticipants] = useState(true);
 
   // Fix for Windows off by 1 pixel errors
   // useEffect(() => {
@@ -264,32 +264,13 @@ export default function Hud() {
   }
 
   function clickExpand() {
-    // // if on Windows, just set the width directly
-    // log.info(platform);
-    // if (platform !== 'darwin') {
-    //   const widthDiff = Math.abs(window.outerWidth - HUD_STARTING_WIDTH);
-    //   log.info(widthDiff);
-    //   // if the difference between the window.outerWidth and starting width
-    //   // is within an acceptable range (0 to 20px), then the HUD is NOT expanded
-    //   // else if window.outerWidth - starting width is g.t. ~20px, then the window is
-    //   // expanded
-    //   if (widthDiff > 20) {
-    //     log.info('hide participants');
+    ipcRenderer.invoke('hide-participants');
+    setShowParticipants(false);
+  }
 
-    //     window.resizeTo(HUD_STARTING_WIDTH, HUD_STARTING_HEIGHT);
-    //     electronWindow.setAlwaysOnTop(true, 'screen-saver');
-    //   } else {
-    //     // if diff is g.t. 20, width is expanded
-    //     log.info('show participants');
-    //     window.resizeTo(HUD_EXPANDED_WIDTH, HUD_STARTING_HEIGHT);
-    //     electronWindow.setAlwaysOnTop(true, 'screen-saver');
-    //   }
-    //   return null;
-    // }
-    // return window.outerWidth > HUD_STARTING_WIDTH
-    //   ? animatedResizeTo(HUD_STARTING_WIDTH, HUD_STARTING_HEIGHT)
-    //   : animatedResizeTo(HUD_EXPANDED_WIDTH, HUD_STARTING_HEIGHT);
-    setShowParticipants((showParticipants) => !showParticipants);
+  function clickHide() {
+    ipcRenderer.invoke('show-participants');
+    setShowParticipants(true);
   }
 
   function clickPlayPause() {
@@ -529,7 +510,9 @@ export default function Hud() {
                     </span>
                   </span>
                   <img
-                    onClick={clickExpand}
+                    onClick={
+                      showParticipants === false ? clickHide : clickExpand
+                    }
                     src={expandIconWhite}
                     className={`w-[14px] h-[23px] cursor-pointer ${
                       showParticipants && 'transform rotate-180'

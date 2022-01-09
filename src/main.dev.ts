@@ -67,7 +67,7 @@ const installExtensions = async () => {
 };
 
 // store all browserWindows in a set
-const windows: Set<BrowserWindow> = new Set();
+const windows: Set<IWindow> = new Set();
 
 const RESOURCES_PATH = app.isPackaged
   ? path.join(process.resourcesPath, 'assets')
@@ -76,6 +76,18 @@ const RESOURCES_PATH = app.isPackaged
 export const getAssetPath = (...paths: string[]): string => {
   return path.join(RESOURCES_PATH, ...paths);
 };
+
+enum WindowType {
+  Hud = 1,
+  Participant,
+  ExtraParticipant,
+}
+
+interface IWindow {
+  id: number;
+  window: BrowserWindow;
+  type: WindowType;
+}
 
 let mb: Menubar;
 const createWindow = async () => {
@@ -223,6 +235,51 @@ export const startServer = () => {
   }
 };
 
+function hideParticipants() {
+  windows.forEach((iWindow) => {
+    try {
+      if (
+        iWindow.type === WindowType.Participant ||
+        iWindow.type === WindowType.ExtraParticipant
+      ) {
+        iWindow.window.hide();
+      }
+    } catch (e) {
+      log.error(e);
+    }
+  });
+}
+
+function showParticipants() {
+  windows.forEach((iWindow) => {
+    try {
+      if (
+        iWindow.type === WindowType.Participant ||
+        iWindow.type === WindowType.ExtraParticipant
+      ) {
+        iWindow.window.show();
+      }
+    } catch (e) {
+      log.error(e);
+    }
+  });
+}
+
+function killMeetingWindows() {
+  windows.forEach((iWindow) => {
+    try {
+      if (
+        iWindow.type === WindowType.Participant ||
+        iWindow.type === WindowType.ExtraParticipant
+      ) {
+        iWindow.window.close();
+      }
+    } catch (e) {
+      log.error(e);
+    }
+  });
+}
+
 const MouseListener = () => {
   let service: ChildProcessWithoutNullStreams;
 
@@ -273,6 +330,8 @@ ipcMain.handle('kill-server', async () => {
 ipcMain.handle('bounce-server', async () => {
   // get the global server process variable,
   // then kill it, then restart it
+  killMeetingWindows();
+  windows.clear();
   (global as any).serverProcess.kill(9);
 
   // reset globals related to participants
@@ -289,8 +348,8 @@ ipcMain.handle('get-cursor-pos', () => {
   return result;
 });
 
-ipcMain.handle('new-hud-window', (event, json) => {
-  log.info(json);
+ipcMain.handle('new-hud-window', (_event, json) => {
+  // create HUD window
   const hudWindow = new BrowserWindow(json);
   hudWindow.setVisibleOnAllWorkspaces(true, {
     visibleOnFullScreen: true,
@@ -299,14 +358,62 @@ ipcMain.handle('new-hud-window', (event, json) => {
   hudWindow.setResizable(false);
   hudWindow.setHasShadow(true);
   hudWindow.loadURL(`file://${__dirname}/index.html#/live`);
+
+  const POPUP_WIDTH = 172;
+  const POPUP_HEIGHT = 148;
+  const SPACE_BETWEEN = 20;
+  const SPACE_ABOVE_HUD = 40;
+
+  // create a new face window
+  const mainParticipantWindow = new BrowserWindow({
+    x:
+      screen.getPrimaryDisplay().size.width / 2 -
+      POPUP_WIDTH / 2 +
+      1 * POPUP_WIDTH +
+      SPACE_BETWEEN,
+    y: SPACE_ABOVE_HUD,
+    width: POPUP_WIDTH,
+    height: POPUP_HEIGHT,
+    frame: false,
+    alwaysOnTop: true,
+    transparent: true,
+    paintWhenInitiallyHidden: false,
+    webPreferences: {
+      nodeIntegration: true,
+      additionalArguments: [`--USER-DATA-DIR=${app.getPath('userData')}`],
+      nativeWindowOpen: false,
+      enableRemoteModule: true,
+    },
+    hasShadow: true,
+    resizable: false,
+  });
+
   mb.hideWindow();
-  windows.add(hudWindow);
+
+  mainParticipantWindow.setVisibleOnAllWorkspaces(true, {
+    visibleOnFullScreen: true,
+  });
+  mainParticipantWindow.setAlwaysOnTop(true, 'screen-saver');
+  mainParticipantWindow.setResizable(false);
+  mainParticipantWindow.setHasShadow(true);
+  mainParticipantWindow.loadURL(
+    `file://${__dirname}/index.html#/participant/000`
+  );
+
+  // mainParticipantWindow.hide();
+
+  windows.add({ id: 1, window: hudWindow, type: WindowType.Hud });
+  windows.add({
+    id: 2,
+    window: mainParticipantWindow,
+    type: WindowType.Participant,
+  });
 });
 
 ipcMain.handle(
   'new-participant-window',
   (
-    event,
+    _event,
     json: {
       browserWindowParams: BrowserWindowConstructorOptions;
       extra: { pid: string };
@@ -322,14 +429,27 @@ ipcMain.handle(
     participantWindow.loadURL(
       `file://${__dirname}/index.html#/participant/${json.extra.pid}`
     );
+    windows.add({
+      id: 2,
+      window: participantWindow,
+      type: WindowType.ExtraParticipant,
+    });
+    showParticipants();
   }
 );
+
+ipcMain.handle('hide-participants', hideParticipants);
+ipcMain.handle('show-participants', showParticipants);
 
 ipcMain.on('reset-meeting', (event, json) => {
   log.info('reset current meeting');
 
-  windows.forEach((window: BrowserWindow) => {
-    window.webContents.send('main-says-reset', 'reset fool');
+  windows.forEach((iWindow: IWindow) => {
+    try {
+      iWindow.window.webContents.send('main-says-reset', 'reset fool');
+    } catch (e) {
+      log.error(e);
+    }
   });
 });
 

@@ -44,9 +44,6 @@ export default function ParticipantInfo() {
     window.close();
   };
 
-  const widthDiff = Math.abs(window.outerWidth - HUD_STARTING_WIDTH);
-  const width = widthDiff < 20 ? mainHudWidth : 330;
-
   // on initial load only
   useEffect(() => {
     const interval = setInterval(
@@ -58,11 +55,10 @@ export default function ParticipantInfo() {
     };
   }, []);
 
+  // Grab the correct face using the pid query param
   useEffect(() => {
-    setFace(
-      () =>
-        faces.filter((participant: Face) => participant.id === params.pid)[0]
-    );
+    const displayFace = faces.find((f: Face) => f.id === params.pid) || face;
+    setFace(displayFace);
   }, [face, faces, params.pid]);
 
   function clickReset() {
@@ -72,10 +68,10 @@ export default function ParticipantInfo() {
 
   // Last check before rendering
   if (face === undefined) {
-    window.close();
+    // window.close();
   }
   return (
-    <div className="flex flex-wrap dark:bg-spotgraydk justify-evenly p-3">
+    <div className="flex flex-wrap h-screen dark:bg-spotgraydk justify-evenly p-3">
       <img
         onClick={clickReset}
         src={resetIcon}
@@ -83,11 +79,6 @@ export default function ParticipantInfo() {
                     w-3 h-3 cursor-pointer`}
         onAnimationEnd={() => setEffect(false)}
         alt="reset"
-      />
-      <div
-        className={`w-full font-semibold text-center ${
-          widthDiff > 20 ? '' : 'hidden'
-        }`}
       />
       {
         <div
