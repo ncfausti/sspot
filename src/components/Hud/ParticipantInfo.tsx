@@ -1,10 +1,14 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable jsx-a11y/control-has-associated-label */
-import React, { SyntheticEvent, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { ipcRenderer, remote } from 'electron';
 import { useParams } from 'react-router-dom';
 import log from 'electron-log';
 import xImg from '../../../assets/x-icon.png';
 import resetIcon from '../../../assets/reset.png';
+import spottingIcon from '../../../assets/spotting-icon-gray.png';
+import spottingIconOn from '../../../assets/spotting-icon.png';
 
 interface Face {
   id: string;
@@ -34,6 +38,8 @@ export default function ParticipantInfo() {
     directory: '',
   });
 
+  const spottingBtn = useRef(null);
+  const [isSpotting, setIsSpotting] = useState(false);
   const [faces, setFaces] = useState(remote.getGlobal('propFaces'));
   const faceClicked = () => {
     // use the id value stored in the alt attribute
@@ -43,6 +49,7 @@ export default function ParticipantInfo() {
     ipcRenderer.send('removeParticipant', params.pid);
     window.close();
   };
+  const [inAppUI, setInAppUI] = useState(false);
 
   // on initial load only
   useEffect(() => {
@@ -66,12 +73,67 @@ export default function ParticipantInfo() {
     ipcRenderer.send('reset-meeting');
   }
 
+  useEffect(() => {
+    ipcRenderer.on('main-says-in-ui', () => {
+      setInAppUI(true);
+      // setIsSpotting((prev) => !prev);
+    });
+  }, []);
+
+  useEffect(() => {
+    ipcRenderer.on('main-says-out-ui', () => {
+      // setIsSpotting((prev) => !prev);
+      setInAppUI(false);
+    });
+  }, []);
+
   // Last check before rendering
   if (face === undefined) {
     // window.close();
   }
   return (
-    <div className="flex flex-wrap h-screen dark:bg-spotgraydk justify-evenly p-3">
+    <div
+      onMouseEnter={() => {
+        log.info('mouse entered, set no spotting flag');
+        ipcRenderer.invoke('set-in-ui');
+        setInAppUI(true);
+      }}
+      onMouseLeave={() => {
+        log.info('mouse exit, remove no spotting flag');
+        ipcRenderer.invoke('set-out-ui');
+        setInAppUI(false);
+      }}
+      className="flex flex-wrap h-screen dark:bg-spotgraydk justify-evenly p-3"
+    >
+      <span className="flex space-x-1">
+        <span className="relative w-3 h-3">
+          {inAppUI && 'in'}
+
+          <img
+            ref={spottingBtn}
+            onClick={() => {
+              setIsSpotting((prev) => !prev);
+              ipcRenderer.invoke('set-spotting');
+            }}
+            src={isSpotting ? spottingIconOn : spottingIcon}
+            className={`${
+              isSpotting && 'animate-ping'
+            } w-3 h-3 cursor-pointer mr-1 absolute`}
+            alt="spotting"
+          />
+          {isSpotting && (
+            <img
+              className="absolute cursor-pointer w-3 h-3"
+              src={spottingIconOn}
+              alt="spotting on"
+              onClick={() => {
+                setIsSpotting((prev) => !prev);
+                ipcRenderer.invoke('set-spotting');
+              }}
+            />
+          )}
+        </span>
+      </span>
       <img
         onClick={clickReset}
         src={resetIcon}

@@ -126,8 +126,6 @@ export default function Hud() {
   const mainHudWidth = 166;
   const mainHudHeight = 148;
 
-  const electronWindow = remote.getCurrentWindow();
-
   const [showParticipants, setShowParticipants] = useState(true);
 
   // Fix for Windows off by 1 pixel errors
@@ -295,14 +293,30 @@ export default function Hud() {
   }
 
   useEffect(() => {
-    ipcRenderer.on(
-      'main-says-reset',
-      // (e) => log.info('resetttinggg in HUD')
-      () => {
-        clickReset();
-        clickPlayPause();
-      }
-    );
+    ipcRenderer.on('main-says-reset', () => {
+      clickReset();
+      clickPlayPause();
+    });
+  }, []);
+
+  useEffect(() => {
+    ipcRenderer.on('main-says-spot', () => {
+      setIsSpotting((prev) => !prev);
+    });
+  }, []);
+
+  useEffect(() => {
+    ipcRenderer.on('main-says-in-ui', () => {
+      setInAppUI(true);
+      // setIsSpotting((prev) => !prev);
+    });
+  }, []);
+
+  useEffect(() => {
+    ipcRenderer.on('main-says-out-ui', () => {
+      // setIsSpotting((prev) => !prev);
+      setInAppUI(false);
+    });
   }, []);
 
   function clickEnd() {
@@ -358,10 +372,12 @@ export default function Hud() {
         <div
           onMouseEnter={() => {
             log.info('mouse entered, set no spotting flag');
+            ipcRenderer.invoke('set-in-ui');
             setInAppUI(true);
           }}
           onMouseLeave={() => {
             log.info('mouse exit, remove no spotting flag');
+            ipcRenderer.invoke('set-out-ui');
             setInAppUI(false);
           }}
           className="flex items-start rounded-hud"
@@ -387,8 +403,8 @@ export default function Hud() {
               className="flex z-50 shadow-hud flex-col p-3 bg-white dark:bg-black dark:text-white rounded-hud"
             >
               <div className="flex flex-grow flex-wrap justify-between pb-1">
-                <div className="hidden w-8">
-                  {/* {inAppUI && 'in'} */}
+                <div className=" w-8">
+                  {inAppUI && 'in'}
                   {/* <img
                     // onClick={clickBlind}
                     src={blindIcon}
@@ -472,17 +488,7 @@ export default function Hud() {
                     <span className="relative w-3 h-3">
                       <img
                         ref={spottingBtn}
-                        onClick={() =>
-                          setIsSpotting((prev) => {
-                            if (prev === false) {
-                              animatedResizeTo(
-                                HUD_EXPANDED_WIDTH,
-                                HUD_STARTING_HEIGHT
-                              );
-                            }
-                            return !prev;
-                          })
-                        }
+                        onClick={() => setIsSpotting((prev) => !prev)}
                         src={isSpotting ? spottingIconOn : spottingIcon}
                         className={`${
                           isSpotting && 'animate-ping'
@@ -494,17 +500,7 @@ export default function Hud() {
                           className="absolute cursor-pointer w-3 h-3"
                           src={spottingIconOn}
                           alt="spotting on"
-                          onClick={() =>
-                            setIsSpotting((prev) => {
-                              if (prev === false) {
-                                animatedResizeTo(
-                                  HUD_EXPANDED_WIDTH,
-                                  HUD_STARTING_HEIGHT
-                                );
-                              }
-                              return !prev;
-                            })
-                          }
+                          onClick={() => setIsSpotting((prev) => !prev)}
                         />
                       )}
                     </span>

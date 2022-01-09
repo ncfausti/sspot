@@ -453,6 +453,48 @@ ipcMain.on('reset-meeting', (event, json) => {
   });
 });
 
+ipcMain.handle('set-spotting', (event, json) => {
+  windows.forEach((iWindow: IWindow) => {
+    try {
+      iWindow.window.webContents.send('main-says-spot');
+    } catch (e) {
+      log.error(e);
+    }
+  });
+});
+
+ipcMain.handle('set-in-ui', (event, json) => {
+  windows.forEach((iWindow: IWindow) => {
+    try {
+      iWindow.window.webContents.send('main-says-in-ui');
+    } catch (e) {
+      log.error(e);
+    }
+  });
+});
+
+ipcMain.handle('set-out-ui', (event, json) => {
+  windows.forEach((iWindow: IWindow) => {
+    try {
+      iWindow.window.webContents.send('main-says-out-ui');
+    } catch (e) {
+      log.error(e);
+    }
+  });
+});
+
+// ipcMain.handle('stop-spotting', (event, json) => {
+//   log.info('setting spotting mode');
+
+//   windows.forEach((iWindow: IWindow) => {
+//     try {
+//       iWindow.window.webContents.send('main-says-stop-spot');
+//     } catch (e) {
+//       log.error(e);
+//     }
+//   });
+// });
+
 // Close the main process and exit the app
 ipcMain.on('close-me', () => {
   resetGlobalParticipants();
