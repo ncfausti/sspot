@@ -68,10 +68,12 @@ export default function ParticipantInfo() {
     setFace(displayFace);
   }, [face, faces, params.pid]);
 
-  function clickReset() {
-    log.info('sending reset to main from Participant Info');
-    ipcRenderer.send('reset-meeting');
-  }
+  useEffect(() => {
+    ipcRenderer.on('main-says-reset', () => {
+      ipcRenderer.send('removeParticipant', params.pid);
+      window.close();
+    });
+  }, []);
 
   useEffect(() => {
     ipcRenderer.on('main-says-in-ui', () => {

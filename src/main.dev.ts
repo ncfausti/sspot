@@ -470,6 +470,14 @@ ipcMain.on('reset-meeting', (event, json) => {
     } catch (e) {
       log.error(e);
     }
+    // try {
+    //   if (iWindow.type === WindowType.ParticipantWindow) {
+    //     iWindow.window.close();
+    //   }
+    //   windows.delete(iWindow);
+    // } catch (e) {
+    //   log.error(e);
+    // }
   });
 });
 
