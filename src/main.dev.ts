@@ -20,25 +20,20 @@ import { autoUpdater } from 'electron-updater';
 import { Menubar, menubar } from 'menubar';
 import { BrowserWindowConstructorOptions } from 'electron/main';
 
+const HUD_WIDTH = 172;
+const HUD_HEIGHT = 148;
+const CONTROLS_WIDTH = 65;
+const SPACE_BETWEEN = 20;
+const SPACE_ABOVE_HUD = 40;
+const PARTICIPANT_WIDTH = 148;
+const PARTICIPANT_HEIGHT = HUD_HEIGHT;
+
 export default class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
     autoUpdater.logger = log;
     autoUpdater.checkForUpdatesAndNotify();
   }
-  // import { AppImageUpdater, MacUpdater, NsisUpdater } from "electron-updater"
-
-  // const options = { … }
-
-  // if (process.platform === "win32") {
-  //     autoUpdater = new NsisUpdater(options)
-  // }
-  // else if (process.platform === "darwin") {
-  //     autoUpdater = new MacUpdater(options)
-  // }
-  // else {
-  //     autoUpdater = new AppImageUpdater(options)
-  // }
 }
 
 if (process.env.NODE_ENV === 'production') {
@@ -65,11 +60,21 @@ const installExtensions = async () => {
     )
     .catch(console.log);
 };
+
 enum WindowType {
   Hud = 1,
   ParticipantControls,
   ParticipantWindow,
 }
+
+// A wrapper around a BrowserWindow that includes
+// some extra information
+interface IWindow {
+  id: string;
+  window: BrowserWindow;
+  type: WindowType;
+}
+
 // store all browserWindows in a set
 const windows: Set<IWindow> = new Set();
 
@@ -96,14 +101,6 @@ const RESOURCES_PATH = app.isPackaged
 export const getAssetPath = (...paths: string[]): string => {
   return path.join(RESOURCES_PATH, ...paths);
 };
-
-// A wrapper around a BrowserWindow that includes
-// some extra information
-interface IWindow {
-  id: string;
-  window: BrowserWindow;
-  type: WindowType;
-}
 
 let mb: Menubar;
 const createWindow = async () => {
@@ -359,12 +356,6 @@ ipcMain.handle('bounce-server', async () => {
   return (global as any).serverProcess !== null;
 });
 
-const POPUP_WIDTH = 172;
-const CONTROLS_WIDTH = 65;
-const POPUP_HEIGHT = 148;
-const SPACE_BETWEEN = 20;
-const SPACE_ABOVE_HUD = 40;
-
 // Main process
 ipcMain.handle('get-cursor-pos', () => {
   const result = screen.getCursorScreenPoint();
@@ -385,13 +376,10 @@ ipcMain.handle('new-hud-window', (_event, json) => {
   // create the participant controls window
   const participantControlsWindow = new BrowserWindow({
     x:
-      screen.getPrimaryDisplay().size.width / 2 -
-      POPUP_WIDTH / 2 +
-      1 * POPUP_WIDTH +
-      SPACE_BETWEEN,
+      screen.getPrimaryDisplay().size.width / 2 + HUD_WIDTH / 2 + SPACE_BETWEEN,
     y: SPACE_ABOVE_HUD,
     width: CONTROLS_WIDTH,
-    height: POPUP_HEIGHT,
+    height: HUD_HEIGHT,
     frame: false,
     alwaysOnTop: true,
     transparent: true,
@@ -435,15 +423,21 @@ ipcMain.handle(
       extra: { pid: string };
     }
   ) => {
-    // override whatever window x position the renderer sends
+    // override whatever window x, y, height, width that the renderer sends
     // and calculate based on windowing layout and number of faces
-    const numWindows = windows.size - 2 === 0 ? 1 : windows.size - 2;
+    const numWindows = windows.size - 2;
     json.browserWindowParams.x =
       screen.getPrimaryDisplay().size.width / 2 + // halfway across the screen
-      numWindows * POPUP_WIDTH + // num participant windows * each width
-      CONTROLS_WIDTH; // controls width
-    // POPUP_WIDTH / 2 + // half hud width
-    // SPACE_BETWEEN; // include spacer width
+      HUD_WIDTH / 2 + // halfway across the HUD
+      SPACE_BETWEEN + // space between HUD and controls
+      CONTROLS_WIDTH + // halfway across the controls
+      SPACE_BETWEEN + // space between controls and participant window
+      numWindows * PARTICIPANT_WIDTH + // participant window width
+      SPACE_BETWEEN; // space between participant windows
+    json.browserWindowParams.y = SPACE_ABOVE_HUD;
+    json.browserWindowParams.width = PARTICIPANT_WIDTH;
+    json.browserWindowParams.height = PARTICIPANT_HEIGHT;
+
     const participantWindow = new BrowserWindow(json.browserWindowParams);
 
     participantWindow.setVisibleOnAllWorkspaces(true, {
@@ -472,7 +466,7 @@ ipcMain.on('reset-meeting', (event, json) => {
 
   windows.forEach((iWindow: IWindow) => {
     try {
-      iWindow.window.webContents.send('main-says-reset', 'reset fool');
+      iWindow.window.webContents.send('main-says-reset');
     } catch (e) {
       log.error(e);
     }

@@ -79,14 +79,6 @@ function handleNewParticipant(pid: string) {
 
   ipcRenderer.invoke('new-participant-window', {
     browserWindowParams: {
-      x:
-        window.screen.width / 2 -
-        POPUP_WIDTH / 2 +
-        (numFaces + 2) * POPUP_WIDTH +
-        SPACE_BETWEEN,
-      y: SPACE_ABOVE_HUD,
-      width: POPUP_WIDTH,
-      height: POPUP_HEIGHT,
       frame: false,
       alwaysOnTop: true,
       transparent: true,
@@ -289,13 +281,13 @@ export default function Hud() {
     setCommand(2);
     setEffect(true); // for animation of reset button
     setElapsed(0); // reset timer back to 0
-    setPaused(false);
+    // setPaused(false);
   }
 
   useEffect(() => {
     ipcRenderer.on('main-says-reset', () => {
       clickReset();
-      clickPlayPause();
+      setTimeout(() => clickPlayPause(), 500);
     });
   }, []);
 
