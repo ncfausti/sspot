@@ -18,6 +18,7 @@ import { app, screen, ipcMain, BrowserWindow } from 'electron';
 import { arch } from 'os';
 import { autoUpdater } from 'electron-updater';
 import { Menubar, menubar } from 'menubar';
+import { BrowserWindowConstructorOptions } from 'electron/main';
 
 export default class AppUpdater {
   constructor() {
@@ -288,19 +289,41 @@ ipcMain.handle('get-cursor-pos', () => {
   return result;
 });
 
-ipcMain.handle('new-participant-window', (event, json) => {
+ipcMain.handle('new-hud-window', (event, json) => {
   log.info(json);
-  const participantWindow = new BrowserWindow(json);
-  participantWindow.setVisibleOnAllWorkspaces(true, {
+  const hudWindow = new BrowserWindow(json);
+  hudWindow.setVisibleOnAllWorkspaces(true, {
     visibleOnFullScreen: true,
   });
-  participantWindow.setAlwaysOnTop(true, 'screen-saver');
-  participantWindow.setResizable(false);
-  participantWindow.setHasShadow(true);
-  participantWindow.loadURL(`file://${__dirname}/index.html#/live`);
+  hudWindow.setAlwaysOnTop(true, 'screen-saver');
+  hudWindow.setResizable(false);
+  hudWindow.setHasShadow(true);
+  hudWindow.loadURL(`file://${__dirname}/index.html#/live`);
   mb.hideWindow();
-  windows.add(participantWindow);
+  windows.add(hudWindow);
 });
+
+ipcMain.handle(
+  'new-participant-window',
+  (
+    event,
+    json: {
+      browserWindowParams: BrowserWindowConstructorOptions;
+      extra: { pid: string };
+    }
+  ) => {
+    const participantWindow = new BrowserWindow(json.browserWindowParams);
+    participantWindow.setVisibleOnAllWorkspaces(true, {
+      visibleOnFullScreen: true,
+    });
+    participantWindow.setAlwaysOnTop(true, 'screen-saver');
+    participantWindow.setResizable(false);
+    participantWindow.setHasShadow(true);
+    participantWindow.loadURL(
+      `file://${__dirname}/index.html#/participant/${json.extra.pid}`
+    );
+  }
+);
 
 ipcMain.on('reset-meeting', (event, json) => {
   log.info('reset current meeting');

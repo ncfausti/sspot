@@ -77,36 +77,33 @@ function handleNewParticipant(pid: string) {
   const POPUP_HEIGHT = 148;
   const SPACE_BETWEEN = 40;
 
-  const hudWindow = new remote.BrowserWindow({
-    x:
-      window.screen.width / 2 -
-      POPUP_WIDTH / 2 +
-      (numFaces + 1) * POPUP_WIDTH +
-      SPACE_BETWEEN,
-    y: SPACE_ABOVE_HUD,
-    width: POPUP_WIDTH,
-    height: POPUP_HEIGHT,
-    frame: false,
-    alwaysOnTop: true,
-    transparent: true,
-    paintWhenInitiallyHidden: false,
-    webPreferences: {
-      nodeIntegration: true,
-      additionalArguments: [
-        `--USER-DATA-DIR=${remote.getGlobal('userDataDir')}`,
-      ],
-      nativeWindowOpen: false,
-      enableRemoteModule: true,
+  ipcRenderer.invoke('new-participant-window', {
+    browserWindowParams: {
+      x:
+        window.screen.width / 2 -
+        POPUP_WIDTH / 2 +
+        (numFaces + 1) * POPUP_WIDTH +
+        SPACE_BETWEEN,
+      y: SPACE_ABOVE_HUD,
+      width: POPUP_WIDTH,
+      height: POPUP_HEIGHT,
+      frame: false,
+      alwaysOnTop: true,
+      transparent: true,
+      paintWhenInitiallyHidden: false,
+      webPreferences: {
+        nodeIntegration: true,
+        additionalArguments: [
+          `--USER-DATA-DIR=${remote.getGlobal('userDataDir')}`,
+        ],
+        nativeWindowOpen: false,
+        enableRemoteModule: true,
+      },
+      hasShadow: true,
+      resizable: false,
     },
-    hasShadow: true,
-    resizable: false,
+    extra: { pid },
   });
-
-  hudWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
-  hudWindow.setAlwaysOnTop(true, 'screen-saver');
-  hudWindow.setResizable(false);
-  hudWindow.setHasShadow(true);
-  hudWindow.loadURL(`file://${__dirname}/index.html#/participant/${pid}`);
 }
 
 export default function Hud() {

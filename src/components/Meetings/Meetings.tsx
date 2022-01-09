@@ -75,7 +75,7 @@ export default function Meetings() {
       remote.getGlobal('userDataDir')
     );
 
-    ipcRenderer.invoke('new-participant-window', {
+    ipcRenderer.invoke('new-hud-window', {
       x: midPointLessHalfHudWidth,
       y: SPACE_ABOVE_HUD,
       width: HUD_STARTING_WIDTH,
