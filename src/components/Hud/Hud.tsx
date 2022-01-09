@@ -14,6 +14,7 @@ import pauseIcon from '../../../assets/pause.png';
 import blindIcon from '../../../assets/blind.png';
 import resetIcon from '../../../assets/reset.png';
 import expandIcon from '../../../assets/expand.png';
+import expandIconWhite from '../../../assets/expand-white.png';
 import defaultImg from '../../../assets/loading.gif';
 import salespotLogo from '../../../assets/salespot-logo-red.png';
 import { userDataDir } from '../../utils';
@@ -72,8 +73,8 @@ export function removeItemById(
 function handleNewParticipant(pid: string) {
   const numFaces = remote.getGlobal('propFaces').length;
 
-  const POPUP_WIDTH = 120;
-  const POPUP_HEIGHT = 110;
+  const POPUP_WIDTH = 172;
+  const POPUP_HEIGHT = 148;
   const SPACE_BETWEEN = 40;
 
   const hudWindow = new remote.BrowserWindow({
@@ -122,13 +123,15 @@ export default function Hud() {
   const [effect, setEffect] = useState(false);
   const [paused, setPaused] = useState(false);
 
-  const HUD_STARTING_WIDTH = 175;
+  const HUD_STARTING_WIDTH = 166;
   const HUD_EXPANDED_WIDTH = 340;
-  const HUD_STARTING_HEIGHT = 120;
-  const mainHudWidth = 175;
-  const mainHudHeight = 110;
+  const HUD_STARTING_HEIGHT = 148;
+  const mainHudWidth = 166;
+  const mainHudHeight = 148;
 
   const electronWindow = remote.getCurrentWindow();
+
+  const [showParticipants, setShowParticipants] = useState(false);
 
   // Fix for Windows off by 1 pixel errors
   // useEffect(() => {
@@ -264,31 +267,32 @@ export default function Hud() {
   }
 
   function clickExpand() {
-    // if on Windows, just set the width directly
-    log.info(platform);
-    if (platform !== 'darwin') {
-      const widthDiff = Math.abs(window.outerWidth - HUD_STARTING_WIDTH);
-      log.info(widthDiff);
-      // if the difference between the window.outerWidth and starting width
-      // is within an acceptable range (0 to 20px), then the HUD is NOT expanded
-      // else if window.outerWidth - starting width is g.t. ~20px, then the window is
-      // expanded
-      if (widthDiff > 20) {
-        log.info('hide participants');
+    // // if on Windows, just set the width directly
+    // log.info(platform);
+    // if (platform !== 'darwin') {
+    //   const widthDiff = Math.abs(window.outerWidth - HUD_STARTING_WIDTH);
+    //   log.info(widthDiff);
+    //   // if the difference between the window.outerWidth and starting width
+    //   // is within an acceptable range (0 to 20px), then the HUD is NOT expanded
+    //   // else if window.outerWidth - starting width is g.t. ~20px, then the window is
+    //   // expanded
+    //   if (widthDiff > 20) {
+    //     log.info('hide participants');
 
-        window.resizeTo(HUD_STARTING_WIDTH, HUD_STARTING_HEIGHT);
-        electronWindow.setAlwaysOnTop(true, 'screen-saver');
-      } else {
-        // if diff is g.t. 20, width is expanded
-        log.info('show participants');
-        window.resizeTo(HUD_EXPANDED_WIDTH, HUD_STARTING_HEIGHT);
-        electronWindow.setAlwaysOnTop(true, 'screen-saver');
-      }
-      return null;
-    }
-    return window.outerWidth > HUD_STARTING_WIDTH
-      ? animatedResizeTo(HUD_STARTING_WIDTH, HUD_STARTING_HEIGHT)
-      : animatedResizeTo(HUD_EXPANDED_WIDTH, HUD_STARTING_HEIGHT);
+    //     window.resizeTo(HUD_STARTING_WIDTH, HUD_STARTING_HEIGHT);
+    //     electronWindow.setAlwaysOnTop(true, 'screen-saver');
+    //   } else {
+    //     // if diff is g.t. 20, width is expanded
+    //     log.info('show participants');
+    //     window.resizeTo(HUD_EXPANDED_WIDTH, HUD_STARTING_HEIGHT);
+    //     electronWindow.setAlwaysOnTop(true, 'screen-saver');
+    //   }
+    //   return null;
+    // }
+    // return window.outerWidth > HUD_STARTING_WIDTH
+    //   ? animatedResizeTo(HUD_STARTING_WIDTH, HUD_STARTING_HEIGHT)
+    //   : animatedResizeTo(HUD_EXPANDED_WIDTH, HUD_STARTING_HEIGHT);
+    setShowParticipants((showParticipants) => !showParticipants);
   }
 
   function clickPlayPause() {
@@ -309,8 +313,19 @@ export default function Hud() {
     setCommand(2);
     setEffect(true); // for animation of reset button
     setElapsed(0); // reset timer back to 0
-    setPaused(true);
+    setPaused(false);
   }
+
+  useEffect(() => {
+    ipcRenderer.on(
+      'main-says-reset',
+      // (e) => log.info('resetttinggg in HUD')
+      () => {
+        clickReset();
+        clickPlayPause();
+      }
+    );
+  }, []);
 
   function clickEnd() {
     ipcRenderer.invoke('bounce-server');
@@ -354,7 +369,7 @@ export default function Hud() {
   return (
     <>
       {connectionStatus !== 'Open' && (
-        <div className="text-center pt-5 bg-gray-100">
+        <div className="text-center pt-5 bg-gray-100 dark:bg-black">
           <img src={salespotLogo} className="inline w-1/2" alt="expand" />
           <div className="">
             <Loading x={60} y={60} />
@@ -377,7 +392,7 @@ export default function Hud() {
             id="contain-main-hud-shadow-bottom"
             className="flex items-start rounded-hud"
             style={{
-              maxHeight: '110px',
+              height: '148px',
               overflow: 'hidden',
               width: `${
                 Math.abs(window.outerWidth - HUD_STARTING_WIDTH) < 20 // participants hidden, hide shadow
@@ -391,38 +406,38 @@ export default function Hud() {
                 width: `${mainHudWidth}px`,
                 height: `${mainHudHeight}px`,
               }}
-              className="flex z-50 shadow-hud flex-col px-2 py-1 content-center bg-white rounded-hud"
+              className="flex z-50 shadow-hud flex-col p-3 bg-white dark:bg-black dark:text-white rounded-hud"
             >
-              <div className="flex flex-grow flex-wrap justify-between content-center pb-1">
-                <div className="w-8">
+              <div className="flex flex-grow flex-wrap justify-between pb-1">
+                <div className="hidden w-8">
                   {/* {inAppUI && 'in'} */}
-                  <img
+                  {/* <img
                     // onClick={clickBlind}
                     src={blindIcon}
                     className="hidden w-4 h-4 cursor-pointer mr-1"
                     alt="blind"
-                  />
+                  /> */}
                 </div>
-                {/*
-              <span>scale: {remote.screen.getPrimaryDisplay().scaleFactor}</span> */}
-                {/* {clickCoords.x},{clickCoords.y} */}
-                <span className="text-sm text-gray-900 font-semibold">
+                {/* Top Row */}
+                <span className="pl-1 text-base text-gray-900 dark:text-white font-semibold">
                   {timeStyle.format(new Date())}
                 </span>
                 <div className="text-xs font-light">
                   <button
                     onClick={clickEnd}
-                    className="bg-white border border-gray-900
-                  rounded-sm text-gray-900 bg-white hover:bg-gray-900
-                  hover:text-white text-xs font-bold px-1 cursor-pointer focus:outline-none"
+                    className="cursor-pointer bg-white text-gray-900 dark:bg-spotgray dark:text-white dark:hover:bg-spotgraylt border dark:border-none
+                  rounded text-sm w-[40px] h-[28px] font-semibold px-1 focus:outline-none"
                     type="button"
                   >
                     End
                   </button>
                 </div>
               </div>
-              <div className="flex text-xs font-medium flex-grow space-x-2.5 justify-between">
-                <div className="flex flex-col justify-end border border-spotblue bg-spotblue text-white flex-1 px-1 leading-tight">
+              {/* /end Top Row */}
+              {/* Main Content */}
+              <div className="flex text-xs font-medium flex-grow">
+                {/* My Score (hidden) */}
+                <div className="flex flex-col hidden justify-end border border-spotblue bg-spotblue text-white flex-1 px-1 leading-tight">
                   <div className="text-sm">
                     {/* <CountUp elapsed={elapsed} /> */}
                     <div className="text-base font-bold">
@@ -434,27 +449,39 @@ export default function Hud() {
                   </div>
                   <div className="pb-1">My Score</div>
                 </div>
+                {/* /end My Score */}
+
                 <div className="hidden flex flex-col justify-end bg-spotblue text-white flex-1 px-1">
                   <div>{Math.floor(voiceMetrics.current_monologue / 60)}m</div>
                   <div>Monologue</div>
                 </div>
-                <div className="flex flex-col justify-end border border-gray-900 text-gray-900 font-medium flex-1 px-1 leading-tight">
-                  <div className="text-base text-spotblue font-bold">
+
+                {/* Talk Ratio */}
+                <div
+                  className="flex flex-col justify-end border border-spotgraydk text-gray-900 dark:bg-spotgraydk
+                font-medium w-[92%] px-4 py-1 leading-none"
+                >
+                  <div className="text-3xl text-spotblue dark:text-white font-bold">
                     {voiceMetrics.talk_ratio}
                     <span className="font-medium">%</span>
                   </div>
-                  <div className="pb-1">Talk Ratio</div>
+                  <div className="dark:text-spotgrayltst text-lg">
+                    Talk Ratio
+                  </div>
                 </div>
+                {/* /end Talk Ratio */}
               </div>
+              {/* /end Main Content */}
+              {/* Bottom row */}
               <div className="flex flex-grow flex-wrap justify-between items-center pt-1">
                 <div className="flex ">
                   <img
                     onClick={clickPlayPause}
                     src={command === 1 ? pauseIcon : playIcon}
-                    className="w-3 h-3 cursor-pointer mt-1 mr-1"
+                    className="hidden w-3 h-3 cursor-pointer mt-1 mr-1"
                     alt="SaleSpot"
                   />
-                  <span className="text-sm">
+                  <span className="pl-1 text-base">
                     {/* {voiceMetrics.is_talking ? '🗣' : '😶'} */}
                     <CountUp elapsed={elapsed} />
                   </span>
@@ -464,14 +491,6 @@ export default function Hud() {
                 </div>
                 <div className="flex text-gray-700 space-x-8">
                   <span className="flex space-x-1">
-                    <img
-                      onClick={clickReset}
-                      src={resetIcon}
-                      className={`${effect && 'animate-reverse-spin'}
-                    w-3 h-3 cursor-pointer`}
-                      onAnimationEnd={() => setEffect(false)}
-                      alt="reset"
-                    />
                     <span className="relative w-3 h-3">
                       <img
                         ref={spottingBtn}
@@ -514,15 +533,15 @@ export default function Hud() {
                   </span>
                   <img
                     onClick={clickExpand}
-                    src={expandIcon}
-                    className={`w-2 h-3 cursor-pointer mr-1 ${
-                      Math.abs(window.outerWidth - HUD_STARTING_WIDTH) > 20 &&
-                      'transform rotate-180'
+                    src={expandIconWhite}
+                    className={`w-[14px] h-[23px] cursor-pointer ${
+                      showParticipants && 'transform rotate-180'
                     }`}
                     alt="expand"
                   />
                 </div>
               </div>
+              {/* /end Bottom Row */}
             </div>
           </div>
           <div className="hidden">

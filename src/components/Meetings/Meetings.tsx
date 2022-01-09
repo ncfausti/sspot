@@ -14,8 +14,8 @@ export default function Meetings() {
   const [autoDetect, setAutoDetect] = useState(false);
 
   const SPACE_ABOVE_HUD = 40;
-  const HUD_STARTING_WIDTH = 175;
-  const HUD_STARTING_HEIGHT = 120;
+  const HUD_STARTING_WIDTH = 166;
+  const HUD_STARTING_HEIGHT = 148;
 
   // on initial load only
   useEffect(() => {
@@ -75,7 +75,7 @@ export default function Meetings() {
       remote.getGlobal('userDataDir')
     );
 
-    const hudWindow = new remote.BrowserWindow({
+    ipcRenderer.invoke('new-participant-window', {
       x: midPointLessHalfHudWidth,
       y: SPACE_ABOVE_HUD,
       width: HUD_STARTING_WIDTH,
@@ -96,13 +96,6 @@ export default function Meetings() {
       hasShadow: true,
       resizable: false,
     });
-
-    hudWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
-    hudWindow.setAlwaysOnTop(true, 'screen-saver');
-    hudWindow.setResizable(false);
-    hudWindow.setHasShadow(true);
-    hudWindow.loadURL(`file://${__dirname}/index.html#/live`);
-    ipcRenderer.send('hideTrayWindow');
   }
 
   const memoizedBackClick = useCallback((e) => {
@@ -116,12 +109,12 @@ export default function Meetings() {
   }, []);
 
   return (
-    <div className="flex rounded-hud bg-gray-100 flex-grow flex-col p-3 min-h-screen content-center">
+    <div className="flex rounded-hud bg-gray-100 dark:bg-black dark:text-white flex-grow flex-col p-3 min-h-screen content-center">
       <>
         {!showSettingsView && (
           <>
             <div className="flex flex-grow flex-wrap justify-between">
-              <div className="text-xs text-gray-800 font-semibold">
+              <div className="text-xs text-gray-800 dark:text-white font-semibold">
                 {dateStyle.format(time)}
               </div>
               <div className="text-xs font-light">{timeStyle.format(time)}</div>

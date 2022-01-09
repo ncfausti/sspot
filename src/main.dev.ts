@@ -14,10 +14,10 @@ import 'regenerator-runtime/runtime';
 import log from 'electron-log';
 import path from 'path';
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
-import { app, screen, ipcMain } from 'electron';
+import { app, screen, ipcMain, BrowserWindow } from 'electron';
 import { arch } from 'os';
 import { autoUpdater } from 'electron-updater';
-import { menubar } from 'menubar';
+import { Menubar, menubar } from 'menubar';
 
 export default class AppUpdater {
   constructor() {
@@ -65,6 +65,9 @@ const installExtensions = async () => {
     .catch(console.log);
 };
 
+// store all browserWindows in a set
+const windows: Set<BrowserWindow> = new Set();
+
 const RESOURCES_PATH = app.isPackaged
   ? path.join(process.resourcesPath, 'assets')
   : path.join(__dirname, '../assets');
@@ -73,6 +76,7 @@ export const getAssetPath = (...paths: string[]): string => {
   return path.join(RESOURCES_PATH, ...paths);
 };
 
+let mb: Menubar;
 const createWindow = async () => {
   if (
     process.env.NODE_ENV === 'development' ||
@@ -82,7 +86,7 @@ const createWindow = async () => {
   }
 
   // Tray popout
-  const mb = menubar({
+  mb = menubar({
     icon: getAssetPath('tray.png'),
     tooltip: 'SaleSpot',
     browserWindow: {
@@ -282,6 +286,28 @@ ipcMain.handle('bounce-server', async () => {
 ipcMain.handle('get-cursor-pos', () => {
   const result = screen.getCursorScreenPoint();
   return result;
+});
+
+ipcMain.handle('new-participant-window', (event, json) => {
+  log.info(json);
+  const participantWindow = new BrowserWindow(json);
+  participantWindow.setVisibleOnAllWorkspaces(true, {
+    visibleOnFullScreen: true,
+  });
+  participantWindow.setAlwaysOnTop(true, 'screen-saver');
+  participantWindow.setResizable(false);
+  participantWindow.setHasShadow(true);
+  participantWindow.loadURL(`file://${__dirname}/index.html#/live`);
+  mb.hideWindow();
+  windows.add(participantWindow);
+});
+
+ipcMain.on('reset-meeting', (event, json) => {
+  log.info('reset current meeting');
+
+  windows.forEach((window: BrowserWindow) => {
+    window.webContents.send('main-says-reset', 'reset fool');
+  });
 });
 
 // Close the main process and exit the app

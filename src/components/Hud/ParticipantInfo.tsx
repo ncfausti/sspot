@@ -4,6 +4,7 @@ import { ipcRenderer, remote } from 'electron';
 import { useParams } from 'react-router-dom';
 import log from 'electron-log';
 import xImg from '../../../assets/x-icon.png';
+import resetIcon from '../../../assets/reset.png';
 
 interface Face {
   id: string;
@@ -21,6 +22,7 @@ export default function ParticipantInfo() {
   const HUD_STARTING_WIDTH = 175;
   const mainHudWidth = 165;
   const params: { pid: string } = useParams();
+  const [effect, setEffect] = useState(false);
   const [face, setFace] = useState({
     id: '',
     image_path: '',
@@ -63,12 +65,25 @@ export default function ParticipantInfo() {
     );
   }, [face, faces, params.pid]);
 
+  function clickReset() {
+    log.info('sending reset to main from Participant Info');
+    ipcRenderer.send('reset-meeting');
+  }
+
   // Last check before rendering
   if (face === undefined) {
     window.close();
   }
   return (
-    <div className="flex flex-wrap justify-evenly p-3">
+    <div className="flex flex-wrap dark:bg-spotgraydk justify-evenly p-3">
+      <img
+        onClick={clickReset}
+        src={resetIcon}
+        className={`${effect && 'animate-reverse-spin'}
+                    w-3 h-3 cursor-pointer`}
+        onAnimationEnd={() => setEffect(false)}
+        alt="reset"
+      />
       <div
         className={`w-full font-semibold text-center ${
           widthDiff > 20 ? '' : 'hidden'

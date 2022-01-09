@@ -1,7 +1,7 @@
 module.exports = {
   mode: 'jit',
   purge: ['./public/**/*.html', './src/**/*.{js,jsx,ts,tsx,vue}'],
-  darkMode: false, // or 'media' or 'class'
+  darkMode: 'media', // or 'media' or 'class'
   theme: {
     fontSize: {
       xxs: '.5rem',
@@ -36,6 +36,10 @@ module.exports = {
       colors: {
         spotblue: '#3190FF',
         spotred: 'rgba(219, 61, 72, 1)',
+        spotgray: '#303030',
+        spotgraylt: '#404040',
+        spotgrayltst: '#8A8888',
+        spotgraydk: '#191919',
       },
       borderRadius: {
         hud: '10px',
