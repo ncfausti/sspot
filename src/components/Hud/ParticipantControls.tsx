@@ -5,7 +5,6 @@ import React, { useRef, useEffect, useState } from 'react';
 import { ipcRenderer, remote } from 'electron';
 import { useParams } from 'react-router-dom';
 import log from 'electron-log';
-import xImg from '../../../assets/x-icon.png';
 import resetIcon from '../../../assets/reset.png';
 import spottingIcon from '../../../assets/spotting-icon-gray.png';
 import spottingIconOn from '../../../assets/spotting-icon.png';
@@ -21,10 +20,7 @@ interface Face {
   directory: string;
 }
 
-export default function ParticipantInfo() {
-  // const { faces, faceClickHandler } = props;
-  const HUD_STARTING_WIDTH = 175;
-  const mainHudWidth = 165;
+export default function ParticipantControls() {
   const params: { pid: string } = useParams();
   const [effect, setEffect] = useState(false);
   const [face, setFace] = useState({
@@ -103,45 +99,46 @@ export default function ParticipantInfo() {
         ipcRenderer.invoke('set-out-ui');
         setInAppUI(false);
       }}
-      className="flex flex-wrap h-screen dark:bg-spotgraydk justify-evenly p-3"
+      className="flex flex-wrap h-screen dark:bg-spotgraydk justify-evenly"
     >
-      {
-        <div
-          key={face.id}
-          className="text-sm text-center relative hover-trigger"
-        >
-          <button
-            type="button"
-            id={face.id}
-            onClick={faceClicked}
-            style={{
-              position: 'absolute',
-              right: '-25px',
-              top: '1px',
-              background: `url(${xImg}) no-repeat`,
-              backgroundSize: '13px',
-            }}
-            className="absolute text-tiny w-6 h-6 transparent hover-target cursor-pointer focus:outline-none"
-          />
+      <span className="flex flex-col justify-between p-5">
+        <span className="relative">
+          {/* {inAppUI && 'in'} */}
           <img
-            src={face.image_path}
-            className={`w-10 rounded-full border-4 ${
-              face.sentiment >= 20 ? 'border-green-600' : 'border-gray-300'
-            }`}
-            alt={face.id}
+            ref={spottingBtn}
+            onClick={() => {
+              setIsSpotting((prev) => !prev);
+              ipcRenderer.invoke('set-spotting');
+            }}
+            src={isSpotting ? spottingIconOn : spottingIcon}
+            className={`${
+              isSpotting && 'animate-ping'
+            } cursor-pointer absolute`}
+            alt="spotting"
           />
-          {/* <div>{face.label}</div> */}
-          <div
-            className={`pl-1 w-10 rounded-full font-semibold ${
-              face.sentiment > 20 ? 'text-green-600' : 'text-gray-900'
-            }`}
-          >
-            {face.sentiment <= 0 || !face.sentiment
-              ? '0%'
-              : `${face.sentiment}%`}
-          </div>
-        </div>
-      }
+          {isSpotting && (
+            <img
+              className="absolute cursor-pointer"
+              src={spottingIconOn}
+              alt="spotting on"
+              onClick={() => {
+                setIsSpotting((prev) => !prev);
+                ipcRenderer.invoke('set-spotting');
+              }}
+            />
+          )}
+        </span>
+        <span>
+          <img
+            onClick={clickReset}
+            src={resetIcon}
+            className={`${effect && 'animate-reverse-spin'}
+                    cursor-pointer`}
+            onAnimationEnd={() => setEffect(false)}
+            alt="reset"
+          />
+        </span>
+      </span>
     </div>
   );
 }

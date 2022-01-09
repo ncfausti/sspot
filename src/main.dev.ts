@@ -65,9 +65,29 @@ const installExtensions = async () => {
     )
     .catch(console.log);
 };
-
+enum WindowType {
+  Hud = 1,
+  ParticipantControls,
+  ParticipantWindow,
+}
 // store all browserWindows in a set
 const windows: Set<IWindow> = new Set();
+
+function killParticipantWindow(participantId: string) {
+  windows.forEach((iWindow) => {
+    try {
+      if (
+        iWindow.type === WindowType.ParticipantWindow &&
+        iWindow.id === participantId
+      ) {
+        iWindow.window.close();
+        windows.delete(iWindow);
+      }
+    } catch (e) {
+      log.error(e);
+    }
+  });
+}
 
 const RESOURCES_PATH = app.isPackaged
   ? path.join(process.resourcesPath, 'assets')
@@ -77,14 +97,10 @@ export const getAssetPath = (...paths: string[]): string => {
   return path.join(RESOURCES_PATH, ...paths);
 };
 
-enum WindowType {
-  Hud = 1,
-  Participant,
-  ExtraParticipant,
-}
-
+// A wrapper around a BrowserWindow that includes
+// some extra information
 interface IWindow {
-  id: number;
+  id: string;
   window: BrowserWindow;
   type: WindowType;
 }
@@ -173,6 +189,7 @@ ipcMain.on('setPropFaces', (_event, filteredFaces) => {
 ipcMain.on('removeParticipant', (_event, pid) => {
   log.info(`removing participant: ${pid}`);
   (global as any).faceIdsToRemove.push(pid);
+  killParticipantWindow(pid);
 });
 
 app.on('window-all-closed', () => {
@@ -239,8 +256,8 @@ function hideParticipants() {
   windows.forEach((iWindow) => {
     try {
       if (
-        iWindow.type === WindowType.Participant ||
-        iWindow.type === WindowType.ExtraParticipant
+        iWindow.type === WindowType.ParticipantControls ||
+        iWindow.type === WindowType.ParticipantWindow
       ) {
         iWindow.window.hide();
       }
@@ -254,8 +271,8 @@ function showParticipants() {
   windows.forEach((iWindow) => {
     try {
       if (
-        iWindow.type === WindowType.Participant ||
-        iWindow.type === WindowType.ExtraParticipant
+        iWindow.type === WindowType.ParticipantControls ||
+        iWindow.type === WindowType.ParticipantWindow
       ) {
         iWindow.window.show();
       }
@@ -269,8 +286,8 @@ function killMeetingWindows() {
   windows.forEach((iWindow) => {
     try {
       if (
-        iWindow.type === WindowType.Participant ||
-        iWindow.type === WindowType.ExtraParticipant
+        iWindow.type === WindowType.ParticipantControls ||
+        iWindow.type === WindowType.ParticipantWindow
       ) {
         iWindow.window.close();
       }
@@ -342,6 +359,12 @@ ipcMain.handle('bounce-server', async () => {
   return (global as any).serverProcess !== null;
 });
 
+const POPUP_WIDTH = 172;
+const CONTROLS_WIDTH = 65;
+const POPUP_HEIGHT = 148;
+const SPACE_BETWEEN = 20;
+const SPACE_ABOVE_HUD = 40;
+
 // Main process
 ipcMain.handle('get-cursor-pos', () => {
   const result = screen.getCursorScreenPoint();
@@ -359,20 +382,15 @@ ipcMain.handle('new-hud-window', (_event, json) => {
   hudWindow.setHasShadow(true);
   hudWindow.loadURL(`file://${__dirname}/index.html#/live`);
 
-  const POPUP_WIDTH = 172;
-  const POPUP_HEIGHT = 148;
-  const SPACE_BETWEEN = 20;
-  const SPACE_ABOVE_HUD = 40;
-
-  // create a new face window
-  const mainParticipantWindow = new BrowserWindow({
+  // create the participant controls window
+  const participantControlsWindow = new BrowserWindow({
     x:
       screen.getPrimaryDisplay().size.width / 2 -
       POPUP_WIDTH / 2 +
       1 * POPUP_WIDTH +
       SPACE_BETWEEN,
     y: SPACE_ABOVE_HUD,
-    width: POPUP_WIDTH,
+    width: CONTROLS_WIDTH,
     height: POPUP_HEIGHT,
     frame: false,
     alwaysOnTop: true,
@@ -390,23 +408,21 @@ ipcMain.handle('new-hud-window', (_event, json) => {
 
   mb.hideWindow();
 
-  mainParticipantWindow.setVisibleOnAllWorkspaces(true, {
+  participantControlsWindow.setVisibleOnAllWorkspaces(true, {
     visibleOnFullScreen: true,
   });
-  mainParticipantWindow.setAlwaysOnTop(true, 'screen-saver');
-  mainParticipantWindow.setResizable(false);
-  mainParticipantWindow.setHasShadow(true);
-  mainParticipantWindow.loadURL(
-    `file://${__dirname}/index.html#/participant/000`
-  );
+  participantControlsWindow.setAlwaysOnTop(true, 'screen-saver');
+  participantControlsWindow.setResizable(false);
+  participantControlsWindow.setHasShadow(true);
+  participantControlsWindow.loadURL(`file://${__dirname}/index.html#/controls`);
 
   // mainParticipantWindow.hide();
 
-  windows.add({ id: 1, window: hudWindow, type: WindowType.Hud });
+  windows.add({ id: '1', window: hudWindow, type: WindowType.Hud });
   windows.add({
-    id: 2,
-    window: mainParticipantWindow,
-    type: WindowType.Participant,
+    id: '2',
+    window: participantControlsWindow,
+    type: WindowType.ParticipantControls,
   });
 });
 
@@ -419,7 +435,17 @@ ipcMain.handle(
       extra: { pid: string };
     }
   ) => {
+    // override whatever window x position the renderer sends
+    // and calculate based on windowing layout and number of faces
+    const numWindows = windows.size - 2 === 0 ? 1 : windows.size - 2;
+    json.browserWindowParams.x =
+      screen.getPrimaryDisplay().size.width / 2 + // halfway across the screen
+      numWindows * POPUP_WIDTH + // num participant windows * each width
+      CONTROLS_WIDTH; // controls width
+    // POPUP_WIDTH / 2 + // half hud width
+    // SPACE_BETWEEN; // include spacer width
     const participantWindow = new BrowserWindow(json.browserWindowParams);
+
     participantWindow.setVisibleOnAllWorkspaces(true, {
       visibleOnFullScreen: true,
     });
@@ -430,9 +456,9 @@ ipcMain.handle(
       `file://${__dirname}/index.html#/participant/${json.extra.pid}`
     );
     windows.add({
-      id: 2,
+      id: json.extra.pid,
       window: participantWindow,
-      type: WindowType.ExtraParticipant,
+      type: WindowType.ParticipantWindow,
     });
     showParticipants();
   }
@@ -482,18 +508,6 @@ ipcMain.handle('set-out-ui', (event, json) => {
     }
   });
 });
-
-// ipcMain.handle('stop-spotting', (event, json) => {
-//   log.info('setting spotting mode');
-
-//   windows.forEach((iWindow: IWindow) => {
-//     try {
-//       iWindow.window.webContents.send('main-says-stop-spot');
-//     } catch (e) {
-//       log.error(e);
-//     }
-//   });
-// });
 
 // Close the main process and exit the app
 ipcMain.on('close-me', () => {

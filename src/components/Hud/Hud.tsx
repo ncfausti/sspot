@@ -403,8 +403,8 @@ export default function Hud() {
               className="flex z-50 shadow-hud flex-col p-3 bg-white dark:bg-black dark:text-white rounded-hud"
             >
               <div className="flex flex-grow flex-wrap justify-between pb-1">
-                <div className=" w-8">
-                  {inAppUI && 'in'}
+                <div className="hidden w-8">
+                  {/* {inAppUI && 'in'} */}
                   {/* <img
                     // onClick={clickBlind}
                     src={blindIcon}
@@ -484,7 +484,7 @@ export default function Hud() {
                   </span>
                 </div>
                 <div className="flex text-gray-700 space-x-8">
-                  <span className="flex space-x-1">
+                  <span className="flex hidden space-x-1">
                     <span className="relative w-3 h-3">
                       <img
                         ref={spottingBtn}
@@ -505,16 +505,18 @@ export default function Hud() {
                       )}
                     </span>
                   </span>
-                  <img
-                    onClick={
-                      showParticipants === false ? clickHide : clickExpand
-                    }
-                    src={expandIconWhite}
-                    className={`w-[14px] h-[23px] cursor-pointer ${
-                      showParticipants && 'transform rotate-180'
-                    }`}
-                    alt="expand"
-                  />
+                  <span className="pr-4">
+                    <img
+                      onClick={
+                        showParticipants === false ? clickHide : clickExpand
+                      }
+                      src={expandIconWhite}
+                      className={`w-[14px] h-[23px] cursor-pointer ${
+                        showParticipants && 'transform rotate-180'
+                      }`}
+                      alt="expand"
+                    />
+                  </span>
                 </div>
               </div>
               {/* /end Bottom Row */}

@@ -8,6 +8,7 @@ import Hud from './components/Hud/Hud';
 import Meetings from './components/Meetings/Meetings';
 import Release from './components/Release/Release';
 import ParticipantInfo from './components/Hud/ParticipantInfo';
+import ParticipantControls from './components/Hud/ParticipantControls';
 // import SignIn from './components/SignIn';
 
 export default function App() {
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="/live" component={Hud} />
         <Route path="/release" component={Release} />
         <Route path="/participant/:pid" component={ParticipantInfo} />
+        <Route path="/controls" component={ParticipantControls} />
       </Switch>
       {/* </AuthProvider> */}
     </Router>
