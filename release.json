@@ -1,11 +1,11 @@
 {
   "versions": [
     {
-      "version": "0.7.10",
+      "version": "0.7.11",
       "notes": [
-        "- Participants now have their own window",
-        "- Dark mode UI toggle in settings view",
-        "- Added release notes information"
+        "- Participants have been moved out into separate windows",
+        "- Dark mode cooresponding to OS setting",
+        "- Added release notes information view"
       ]
     },
     {

@@ -120,6 +120,22 @@ export default function Hud() {
 
   const [showParticipants, setShowParticipants] = useState(true);
 
+  const [expand, setExpandIcon] = useState(expandIcon);
+
+  useEffect(() => {
+    if (
+      window.matchMedia &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches
+    ) {
+      // dark mode
+      log.info('dark mode');
+      setExpandIcon(expandIconWhite);
+    } else {
+      // light mode
+      log.info('light mode');
+      setExpandIcon(expandIcon);
+    }
+  }, []);
   // Fix for Windows off by 1 pixel errors
   // useEffect(() => {
   //   window.resizeTo(HUD_STARTING_WIDTH, HUD_STARTING_HEIGHT);
@@ -392,7 +408,7 @@ export default function Hud() {
                 width: `${mainHudWidth}px`,
                 height: `${mainHudHeight}px`,
               }}
-              className="flex z-50 shadow-hud flex-col p-3 bg-white dark:bg-black dark:text-white rounded-hud"
+              className="flex z-50 shadow-hud flex-col p-3 bg-gray-100 dark:bg-black dark:text-white rounded-hud"
             >
               <div className="flex flex-grow flex-wrap justify-between pb-1">
                 <div className="hidden w-8">
@@ -502,7 +518,7 @@ export default function Hud() {
                       onClick={
                         showParticipants === false ? clickHide : clickExpand
                       }
-                      src={expandIconWhite}
+                      src={expand}
                       className={`w-[14px] h-[23px] cursor-pointer ${
                         showParticipants && 'transform rotate-180'
                       }`}

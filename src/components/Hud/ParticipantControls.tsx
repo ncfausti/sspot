@@ -5,9 +5,11 @@ import React, { useRef, useEffect, useState } from 'react';
 import { ipcRenderer, remote } from 'electron';
 import { useParams } from 'react-router-dom';
 import log from 'electron-log';
-import resetIcon from '../../../assets/reset.png';
-import spottingIcon from '../../../assets/spotting-icon-gray.png';
-import spottingIconOn from '../../../assets/spotting-icon.png';
+import resetIconBlack from '../../../assets/reset.png';
+import resetIconWhite from '../../../assets/reset-white.png';
+import spottingIconWhite from '../../../assets/user-add-white.png';
+import spottingIconBlack from '../../../assets/user-add.png';
+import spottingIconOn from '../../../assets/user-add-red.png';
 
 interface Face {
   id: string;
@@ -46,12 +48,28 @@ export default function ParticipantControls() {
     window.close();
   };
   const [inAppUI, setInAppUI] = useState(false);
-
+  const [spotIcon, setSpotIcon] = useState(spottingIconWhite);
+  const [resetIcon, setResetIcon] = useState(resetIconWhite);
   // on initial load only
   useEffect(() => {
+    if (
+      window.matchMedia &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches
+    ) {
+      // dark mode
+      log.info('dark mode');
+      setSpotIcon(spottingIconWhite);
+      setResetIcon(resetIconWhite);
+    } else {
+      // light mode
+      log.info('light mode');
+      setSpotIcon(spottingIconBlack);
+      setResetIcon(resetIconBlack);
+    }
+
     const interval = setInterval(
       () => setFaces(remote.getGlobal('propFaces')),
-      200
+      20
     );
     return () => {
       clearInterval(interval);
@@ -66,6 +84,7 @@ export default function ParticipantControls() {
 
   function clickReset() {
     log.info('sending reset to main from Participant Info');
+    setEffect(true);
     ipcRenderer.send('reset-meeting');
   }
 
@@ -99,7 +118,7 @@ export default function ParticipantControls() {
         ipcRenderer.invoke('set-out-ui');
         setInAppUI(false);
       }}
-      className="flex flex-wrap h-screen dark:bg-spotgraydk justify-evenly"
+      className="flex flex-wrap h-screen bg-gray-100 dark:bg-spotgraydk justify-evenly"
     >
       <span className="flex flex-col justify-between p-5">
         <span className="relative">
@@ -110,7 +129,7 @@ export default function ParticipantControls() {
               setIsSpotting((prev) => !prev);
               ipcRenderer.invoke('set-spotting');
             }}
-            src={isSpotting ? spottingIconOn : spottingIcon}
+            src={isSpotting ? spottingIconOn : spotIcon}
             className={`${
               isSpotting && 'animate-ping'
             } cursor-pointer absolute`}

@@ -5,10 +5,8 @@ import React, { useRef, useEffect, useState } from 'react';
 import { ipcRenderer, remote } from 'electron';
 import { useParams } from 'react-router-dom';
 import log from 'electron-log';
-import xImg from '../../../assets/x-icon.png';
-import resetIcon from '../../../assets/reset.png';
-import spottingIcon from '../../../assets/spotting-icon-gray.png';
-import spottingIconOn from '../../../assets/spotting-icon.png';
+import xImgWhite from '../../../assets/x-icon-white.png';
+import xImgBlack from '../../../assets/x-icon.png';
 
 interface Face {
   id: string;
@@ -50,6 +48,23 @@ export default function ParticipantInfo() {
     window.close();
   };
   const [inAppUI, setInAppUI] = useState(false);
+
+  const [xImg, setXImg] = useState(xImgWhite);
+
+  useEffect(() => {
+    if (
+      window.matchMedia &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches
+    ) {
+      // dark mode
+      log.info('dark mode');
+      setXImg(xImgWhite);
+    } else {
+      // light mode
+      log.info('light mode');
+      setXImg(xImgBlack);
+    }
+  }, []);
 
   // on initial load only
   useEffect(() => {
@@ -105,7 +120,7 @@ export default function ParticipantInfo() {
         ipcRenderer.invoke('set-out-ui');
         setInAppUI(false);
       }}
-      className="flex flex-wrap h-screen dark:bg-spotgraydk justify-evenly p-3"
+      className="flex flex-wrap h-screen dark:bg-spotgraydk justify-evenly pt-5 px-7"
     >
       {
         <div
@@ -118,7 +133,7 @@ export default function ParticipantInfo() {
             onClick={faceClicked}
             style={{
               position: 'absolute',
-              right: '-25px',
+              right: '-12px',
               top: '1px',
               background: `url(${xImg}) no-repeat`,
               backgroundSize: '13px',
@@ -127,14 +142,14 @@ export default function ParticipantInfo() {
           />
           <img
             src={face.image_path}
-            className={`w-10 rounded-full border-4 ${
+            className={`p-1 rounded-full border-4 ${
               face.sentiment >= 20 ? 'border-green-600' : 'border-gray-300'
             }`}
             alt={face.id}
           />
           {/* <div>{face.label}</div> */}
           <div
-            className={`pl-1 w-10 rounded-full font-semibold ${
+            className={`pl-2 rounded-full font-semibold ${
               face.sentiment > 20 ? 'text-green-600' : 'text-gray-900'
             }`}
           >
