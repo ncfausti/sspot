@@ -2,24 +2,22 @@
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 import React, { useCallback, useRef, useState, useEffect } from 'react';
 import log from 'electron-log';
-import { ipcRenderer, remote } from 'electron';
-import { uuid } from 'uuidv4';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 import { ChildProcessWithoutNullStreams } from 'child_process';
+import { ipcRenderer, remote } from 'electron';
+import { uuid } from 'uuidv4';
+import CountUp from '../Clocks/CountUp';
+import Loading from '../Loading';
 import ParticipantsList from './ParticipantsList';
-import spottingIcon from '../../../assets/spotting-icon-gray.png';
-import spottingIconOn from '../../../assets/spotting-icon.png';
-import playIcon from '../../../assets/play.png';
-import pauseIcon from '../../../assets/pause.png';
-import blindIcon from '../../../assets/blind.png';
-import resetIcon from '../../../assets/reset.png';
+import defaultImg from '../../../assets/loading.gif';
 import expandIcon from '../../../assets/expand.png';
 import expandIconWhite from '../../../assets/expand-white.png';
-import defaultImg from '../../../assets/loading.gif';
+import pauseIcon from '../../../assets/pause.png';
+import playIcon from '../../../assets/play.png';
 import salespotLogo from '../../../assets/salespot-logo-red.png';
+import spottingIcon from '../../../assets/spotting-icon-gray.png';
+import spottingIconOn from '../../../assets/spotting-icon.png';
 import { userDataDir } from '../../utils';
-import Loading from '../Loading';
-import CountUp from '../Clocks/CountUp';
 
 interface Face {
   directory: string;
@@ -60,8 +58,6 @@ const newFace = (x: number, y: number): Face => {
 };
 
 const SOCKET_URL = 'ws://localhost:8765';
-const SPACE_ABOVE_HUD = 40;
-const { platform } = process;
 
 export function removeItemById(
   id: string | number,
@@ -71,12 +67,6 @@ export function removeItemById(
 }
 
 function handleNewParticipant(pid: string) {
-  const numFaces = remote.getGlobal('propFaces').length;
-
-  const POPUP_WIDTH = 172;
-  const POPUP_HEIGHT = 148;
-  const SPACE_BETWEEN = 40;
-
   ipcRenderer.invoke('new-participant-window', {
     browserWindowParams: {
       frame: false,
@@ -99,47 +89,34 @@ function handleNewParticipant(pid: string) {
 }
 
 export default function Hud() {
-  const [elapsed, setElapsed] = useState(0);
-  const [faces, setFaces] = useState<Face[]>([]);
-  const [command, setCommand] = useState(1);
-  const [propFaces, setPropFaces] = useState([]);
-  // const [faceIdsToRemove, setFaceIdsToRemove] = useState<string[]>([]);
-  const [voiceMetrics, setVoiceMetrics] = useState(voiceMetricsDefault);
-  const [isSpotting, setIsSpotting] = useState(false);
-  const spottingBtn = useRef(null);
   const [clickCoords, setClickCoords] = useState({ x: -1, y: -1 });
+  const [command, setCommand] = useState(1);
+  const [elapsed, setElapsed] = useState(0);
+  const [expand, setExpandIcon] = useState(expandIcon);
+  const [faces, setFaces] = useState<Face[]>([]);
   const [inAppUI, setInAppUI] = useState(false);
-  const [effect, setEffect] = useState(false);
+  const [isSpotting, setIsSpotting] = useState(false);
   const [paused, setPaused] = useState(false);
+  const [propFaces, setPropFaces] = useState([]);
+  const [showParticipants, setShowParticipants] = useState(true);
+  const [voiceMetrics, setVoiceMetrics] = useState(voiceMetricsDefault);
+  const spottingBtn = useRef(null);
 
   const HUD_STARTING_WIDTH = 166;
-  const HUD_EXPANDED_WIDTH = 340;
-  const HUD_STARTING_HEIGHT = 148;
   const mainHudWidth = 166;
   const mainHudHeight = 148;
 
-  const [showParticipants, setShowParticipants] = useState(true);
-
-  const [expand, setExpandIcon] = useState(expandIcon);
-
+  // Swap icons for dark mode / light mode
   useEffect(() => {
     if (
       window.matchMedia &&
       window.matchMedia('(prefers-color-scheme: dark)').matches
     ) {
-      // dark mode
-      log.info('dark mode');
       setExpandIcon(expandIconWhite);
     } else {
-      // light mode
-      log.info('light mode');
       setExpandIcon(expandIcon);
     }
   }, []);
-  // Fix for Windows off by 1 pixel errors
-  // useEffect(() => {
-  //   window.resizeTo(HUD_STARTING_WIDTH, HUD_STARTING_HEIGHT);
-  // }, []);
 
   const { sendMessage, sendJsonMessage, readyState } = useWebSocket(
     SOCKET_URL,
@@ -224,7 +201,6 @@ export default function Hud() {
     const service: ChildProcessWithoutNullStreams =
       remote.getGlobal('mouseListener');
     service.stderr.on('data', (e) => {
-      log.error('error in mouse listener:');
       log.error(e);
     });
     service.stdout.on('data', (e) => {
@@ -243,32 +219,6 @@ export default function Hud() {
     };
   }, []);
 
-  // function that slowly resizes the window
-  // x,y must be multiples of 5
-  function animatedResizeTo(x: number, y: number) {
-    return;
-    if (x % 5 !== 0 || y % 5 !== 0) {
-      return;
-    }
-    if (x === 0 || y === 0) {
-      return;
-    }
-    const timer = setInterval(() => {
-      if (window.outerWidth === x && window.outerHeight === y) {
-        clearInterval(timer);
-      } else {
-        // if window is less than desired size, increase it
-        if (window.outerWidth < x) {
-          window.resizeBy(15, 0);
-        }
-        // if window is more than desired size, decrease it
-        if (window.outerWidth > x) {
-          window.resizeBy(-15, 0);
-        }
-      }
-    }, 0);
-  }
-
   function clickExpand() {
     ipcRenderer.invoke('hide-participants');
     setShowParticipants(false);
@@ -282,11 +232,9 @@ export default function Hud() {
   function clickPlayPause() {
     setCommand((prev) => {
       if (prev === 1) {
-        log.info('previously in play mode, now in pause mode');
         setPaused(true);
         return 3;
       }
-      log.info('previously in pause mode, now in play mode');
       setPaused(false);
       return 1;
     });
@@ -295,9 +243,7 @@ export default function Hud() {
   // send reset command to server and reset timer on client
   function clickReset() {
     setCommand(2);
-    setEffect(true); // for animation of reset button
-    setElapsed(0); // reset timer back to 0
-    // setPaused(false);
+    setElapsed(0);
   }
 
   useEffect(() => {
@@ -316,13 +262,11 @@ export default function Hud() {
   useEffect(() => {
     ipcRenderer.on('main-says-in-ui', () => {
       setInAppUI(true);
-      // setIsSpotting((prev) => !prev);
     });
   }, []);
 
   useEffect(() => {
     ipcRenderer.on('main-says-out-ui', () => {
-      // setIsSpotting((prev) => !prev);
       setInAppUI(false);
     });
   }, []);
@@ -334,7 +278,6 @@ export default function Hud() {
 
   useEffect(() => {
     document.body.addEventListener('click', () => {
-      // e.stopPropagation();
       log.info('document.body.click');
       setInAppUI(true);
     });
@@ -361,8 +304,6 @@ export default function Hud() {
   }, [clickCoords]);
 
   const memoizedRemoveFace = useCallback((faceId: string) => {
-    log.info('sending removeParticipant from Hud', faceId);
-    // setFaceIdsToRemove((prev) => [...prev, faceId]);
     ipcRenderer.send('removeParticipant', faceId);
   }, []);
 
@@ -397,7 +338,8 @@ export default function Hud() {
               height: '148px',
               overflow: 'hidden',
               width: `${
-                Math.abs(window.outerWidth - HUD_STARTING_WIDTH) < 20 // participants hidden, hide shadow
+                // participants hidden, hide shadow
+                Math.abs(window.outerWidth - HUD_STARTING_WIDTH) < 20
                   ? '175px'
                   : '175px'
               }`,
@@ -411,15 +353,7 @@ export default function Hud() {
               className="flex z-50 shadow-hud flex-col p-3 bg-gray-100 dark:bg-black dark:text-white rounded-hud"
             >
               <div className="flex flex-grow flex-wrap justify-between pb-1">
-                <div className="hidden w-8">
-                  {/* {inAppUI && 'in'} */}
-                  {/* <img
-                    // onClick={clickBlind}
-                    src={blindIcon}
-                    className="hidden w-4 h-4 cursor-pointer mr-1"
-                    alt="blind"
-                  /> */}
-                </div>
+                <div className="hidden w-8">{/* {inAppUI && 'in'} */}</div>
                 {/* Top Row */}
                 <span className="pl-1 text-base text-gray-900 dark:text-white font-semibold">
                   {timeStyle.format(new Date())}
