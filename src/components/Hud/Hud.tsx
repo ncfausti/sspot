@@ -350,12 +350,12 @@ export default function Hud() {
                 width: `${mainHudWidth}px`,
                 height: `${mainHudHeight}px`,
               }}
-              className="flex z-50 shadow-hud flex-col p-3 bg-gray-100 dark:bg-black dark:text-white rounded-hud"
+              className="flex z-50 shadow-hud flex-col p-[10px] px-5 bg-gray-100 dark:bg-black dark:text-white rounded-hud"
             >
               <div className="flex flex-grow flex-wrap justify-between pb-1">
                 <div className="hidden w-8">{/* {inAppUI && 'in'} */}</div>
                 {/* Top Row */}
-                <span className="pl-1 text-base text-gray-900 dark:text-white font-semibold">
+                <span className="pl-1 text-lg text-gray-900 dark:text-white font-semibold">
                   {timeStyle.format(new Date())}
                 </span>
                 <div className="text-xs font-light">
@@ -375,7 +375,6 @@ export default function Hud() {
                 {/* My Score (hidden) */}
                 <div className="flex flex-col hidden justify-end border border-spotblue bg-spotblue text-white flex-1 px-1 leading-tight">
                   <div className="text-sm">
-                    {/* <CountUp elapsed={elapsed} /> */}
                     <div className="text-base font-bold">
                       {propFaces[0]
                         ? (propFaces[0] as DetectedFace).sentiment
@@ -395,7 +394,7 @@ export default function Hud() {
                 {/* Talk Ratio */}
                 <div
                   className="flex flex-col justify-end border border-spotgraydk text-gray-900 dark:bg-spotgraydk
-                font-medium w-[92%] px-4 py-1 leading-none"
+                font-medium w-full px-4 py-1 leading-none"
                 >
                   <div className="text-3xl text-spotblue dark:text-white font-bold">
                     {voiceMetrics.talk_ratio}
@@ -417,8 +416,7 @@ export default function Hud() {
                     className="hidden w-3 h-3 cursor-pointer mt-1 mr-1"
                     alt="SaleSpot"
                   />
-                  <span className="pl-1 text-base">
-                    {/* {voiceMetrics.is_talking ? '🗣' : '😶'} */}
+                  <span className="pl-1 text-lg">
                     <CountUp elapsed={elapsed} />
                   </span>
                   <span>
@@ -447,7 +445,7 @@ export default function Hud() {
                       )}
                     </span>
                   </span>
-                  <span className="pr-4">
+                  <span>
                     <img
                       onClick={
                         showParticipants === false ? clickHide : clickExpand

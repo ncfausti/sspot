@@ -118,7 +118,7 @@ export default function ParticipantControls() {
         ipcRenderer.invoke('set-out-ui');
         setInAppUI(false);
       }}
-      className="flex flex-wrap h-screen bg-gray-100 dark:bg-spotgraydk justify-evenly"
+      className="flex flex-wrap h-screen bg-gray-100 dark:bg-black justify-evenly"
     >
       <span className="flex flex-col justify-between p-5">
         <span className="relative">
