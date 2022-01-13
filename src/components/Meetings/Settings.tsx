@@ -96,24 +96,23 @@ export default function Settings(props: {
           </span>
         </div>
       </div>
-      <div className="flex flex-grow">
+      <div className="flex flex-col">
+        <button
+          type="button"
+          onClick={() => handleView('alerts')}
+          className="cursor-pointer text-left text-xs text-spotblue hover:text-blue-700 outline-none "
+        >
+          Manage Alerts
+        </button>
         <button
           type="button"
           onClick={() => handleView('release')}
-          className="cursor-pointer text-xs text-spotblue hover:text-blue-700 outline-none "
+          className="cursor-pointer text-left text-xs text-spotblue hover:text-blue-700 outline-none "
         >
           Release Notes
         </button>
       </div>
-      <div className="flex flex-grow">
-        <button
-          type="button"
-          onClick={() => handleView('alerts')}
-          className="cursor-pointer text-xs text-spotblue hover:text-blue-700 outline-none "
-        >
-          Alerts Config
-        </button>
-      </div>
+
       <div className={`${true && 'hidden'} relative flex items-start`}>
         <div className="flex items-center h-5">
           <input
@@ -135,7 +134,7 @@ export default function Settings(props: {
           </span>
         </div>
       </div>
-      <div className="pt-5">
+      <div>
         <button
           type="button"
           onClick={backClick}

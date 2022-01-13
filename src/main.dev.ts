@@ -65,6 +65,7 @@ enum WindowType {
   Hud = 1,
   ParticipantControls,
   ParticipantWindow,
+  AlertWindow,
 }
 
 // A wrapper around a BrowserWindow that includes
@@ -284,7 +285,8 @@ function killMeetingWindows() {
     try {
       if (
         iWindow.type === WindowType.ParticipantControls ||
-        iWindow.type === WindowType.ParticipantWindow
+        iWindow.type === WindowType.ParticipantWindow ||
+        iWindow.type === WindowType.AlertWindow
       ) {
         iWindow.window.close();
       }
@@ -470,14 +472,6 @@ ipcMain.on('reset-meeting', (event, json) => {
     } catch (e) {
       log.error(e);
     }
-    // try {
-    //   if (iWindow.type === WindowType.ParticipantWindow) {
-    //     iWindow.window.close();
-    //   }
-    //   windows.delete(iWindow);
-    // } catch (e) {
-    //   log.error(e);
-    // }
   });
 });
 
@@ -505,6 +499,60 @@ ipcMain.handle('set-out-ui', (event, json) => {
   windows.forEach((iWindow: IWindow) => {
     try {
       iWindow.window.webContents.send('main-says-out-ui');
+    } catch (e) {
+      log.error(e);
+    }
+  });
+});
+
+ipcMain.handle(
+  'open-alert-window',
+  (
+    _event,
+    json: {
+      browserWindowParams: BrowserWindowConstructorOptions;
+      extra: { pid: string };
+    }
+  ) => {
+    // override whatever window x, y, height, width that the renderer sends
+    // and calculate based on windowing layout and number of faces
+    const numWindows = windows.size - 2;
+    json.browserWindowParams.x =
+      screen.getPrimaryDisplay().size.width / 2 - // halfway across the screen
+      HUD_WIDTH / 4 +
+      10; // 1/4 of the way across the HUD
+
+    json.browserWindowParams.y = SPACE_ABOVE_HUD + HUD_HEIGHT + 10;
+    json.browserWindowParams.width = 50;
+    json.browserWindowParams.height = 50;
+
+    const alertWindow = new BrowserWindow(json.browserWindowParams);
+
+    alertWindow.setVisibleOnAllWorkspaces(true, {
+      visibleOnFullScreen: true,
+    });
+    alertWindow.setAlwaysOnTop(true, 'screen-saver');
+    alertWindow.setResizable(false);
+    alertWindow.setHasShadow(true);
+    alertWindow.loadURL(`file://${__dirname}/index.html#/alert/alert-abc`);
+
+    windows.add({
+      id: 'alert-abc',
+      window: alertWindow,
+      type: WindowType.AlertWindow,
+    });
+
+    // showParticipants();
+  }
+);
+
+ipcMain.handle('close-alert-window', (event, json) => {
+  windows.forEach((iWindow: IWindow) => {
+    try {
+      if (iWindow.type === WindowType.AlertWindow) {
+        iWindow.window.close();
+        windows.delete(iWindow);
+      }
     } catch (e) {
       log.error(e);
     }
