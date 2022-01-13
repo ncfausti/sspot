@@ -9,10 +9,10 @@
 @tailwind utilities;
 
 body { background: rgba(42, 42, 42, 0.01); overflow: hidden; }
-@font-face {
+/* @font-face {
   font-family: neon;
   src: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/707108/neon.ttf);
-}
+} */
 
 .container {
   display: table-cell;
@@ -21,7 +21,7 @@ body { background: rgba(42, 42, 42, 0.01); overflow: hidden; }
 }
 
 .neon {
-  font-family: neon;
+  font-family: Arial, Helvetica, sans-serif;
   color: #FB4264;
   /* font-size: 9vw; */
   /* line-height: 9vw; */
@@ -29,7 +29,7 @@ body { background: rgba(42, 42, 42, 0.01); overflow: hidden; }
 }
 
 .flux {
-  font-family: neon;
+  font-family: Arial, Helvetica, sans-serif;
   color: #426DFB;
   /* font-size: 9vw; */
   /* line-height: 9vw; */

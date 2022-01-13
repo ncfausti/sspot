@@ -28,6 +28,11 @@ export default function MeetingAlert(props: MeetingAlertProps) {
   const { id, message, rules, voiceMetrics } = props;
   const [wait, setWait] = useState(remote.getGlobal('alertWait'));
 
+  const [timeToFire, setTimeToFire] = useState(remote.getGlobal('ttf'));
+  // const [message, setMessage] = useState(remote.getGlobal('alertMsg'));
+  const [threshold, setThreshold] = useState(remote.getGlobal('threshold'));
+  // const [wait, setWait] = useState(remote.getGlobal('alertWait'));
+
   // log.info(id);
   // log.info(rules);
   // log.info(message);
@@ -38,8 +43,7 @@ export default function MeetingAlert(props: MeetingAlertProps) {
     const interval = setInterval(
       ((counter) => {
         return () => {
-          const THRESHOLD = 5;
-          if (refTalkRatio.current.value > 10 && counter >= THRESHOLD) {
+          if (refTalkRatio.current.value > threshold && counter >= timeToFire) {
             log.info('launching some alert now');
             // open window at middle of screen under hud
             ipcRenderer.invoke('open-alert-window', {
@@ -62,7 +66,10 @@ export default function MeetingAlert(props: MeetingAlertProps) {
               extra: { id, message, rules },
             });
             counter = -1 * wait;
-          } else if (refTalkRatio.current.value > 10 && counter < THRESHOLD) {
+          } else if (
+            refTalkRatio.current.value > threshold &&
+            counter < timeToFire
+          ) {
             counter += 1;
           } else {
             counter = 0;

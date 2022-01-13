@@ -25,7 +25,7 @@ export default function AlertMessage() {
   }, []);
 
   return (
-    <div className="pt-[3px] text-center h-screen text-3xl dark:bg-black dark:text-white flux">
+    <div className="pt-[6px] text-center h-screen text-xl dark:bg-black dark:text-white flux">
       {/* <link
         rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Monoton&effect=neon"
