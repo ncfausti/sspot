@@ -6,6 +6,7 @@ import Hud from './components/Hud/Hud';
 // import { AuthProvider } from './contexts/AuthContext';
 // import PrivateRoute from './components/PrivateRoute';
 import Meetings from './components/Meetings/Meetings';
+import AlertsConfig from './components/Meetings/AlertsConfig';
 import Release from './components/Release/Release';
 import ParticipantInfo from './components/Hud/ParticipantInfo';
 import ParticipantControls from './components/Hud/ParticipantControls';
@@ -22,6 +23,7 @@ export default function App() {
         <Route path="/release" component={Release} />
         <Route path="/participant/:pid" component={ParticipantInfo} />
         <Route path="/controls" component={ParticipantControls} />
+        <Route path="/alerts" component={AlertsConfig} />
       </Switch>
       {/* </AuthProvider> */}
     </Router>

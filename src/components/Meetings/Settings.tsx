@@ -23,7 +23,7 @@ export default function Settings(props: {
     log.info('autodetect is: ', isAutoDetectOn);
   }, [isAutoDetectOn]);
 
-  function handleViewNotes() {
+  function handleView(view: string) {
     const NOTES_WIDTH = 400;
     const NOTES_HEIGHT = 200;
 
@@ -52,7 +52,7 @@ export default function Settings(props: {
     hudWindow.setAlwaysOnTop(true, 'screen-saver');
     hudWindow.setResizable(false);
     hudWindow.setHasShadow(true);
-    hudWindow.loadURL(`file://${__dirname}/index.html#/release`);
+    hudWindow.loadURL(`file://${__dirname}/index.html#/${view}`);
   }
 
   return (
@@ -99,10 +99,19 @@ export default function Settings(props: {
       <div className="flex flex-grow">
         <button
           type="button"
-          onClick={handleViewNotes}
+          onClick={() => handleView('release')}
           className="cursor-pointer text-xs text-spotblue hover:text-blue-700 outline-none "
         >
           Release Notes
+        </button>
+      </div>
+      <div className="flex flex-grow">
+        <button
+          type="button"
+          onClick={() => handleView('alerts')}
+          className="cursor-pointer text-xs text-spotblue hover:text-blue-700 outline-none "
+        >
+          Alerts Config
         </button>
       </div>
       <div className={`${true && 'hidden'} relative flex items-start`}>

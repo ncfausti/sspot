@@ -18,6 +18,7 @@ import salespotLogo from '../../../assets/salespot-logo-red.png';
 import spottingIcon from '../../../assets/spotting-icon-gray.png';
 import spottingIconOn from '../../../assets/spotting-icon.png';
 import { userDataDir } from '../../utils';
+import MeetingAlert from '../Meetings/MeetingAlert';
 
 interface Face {
   directory: string;
@@ -101,7 +102,7 @@ export default function Hud() {
   const [showParticipants, setShowParticipants] = useState(true);
   const [voiceMetrics, setVoiceMetrics] = useState(voiceMetricsDefault);
   const spottingBtn = useRef(null);
-
+  const refTalkRatio = useRef(null);
   const HUD_STARTING_WIDTH = 166;
   const mainHudWidth = 166;
   const mainHudHeight = 148;
@@ -399,6 +400,17 @@ export default function Hud() {
                   <div className="text-3xl text-spotblue dark:text-white font-bold">
                     {voiceMetrics.talk_ratio}
                     <span className="font-medium">%</span>
+                    <MeetingAlert
+                      voiceMetrics={voiceMetrics}
+                      id="123"
+                      message="abc"
+                      rules={{
+                        thresholdPercent: 0,
+                        secondsUntilTrigger: 0,
+                        showAlertForNSeconds: 0,
+                        secondsDelayAfterTrigger: 0,
+                      }}
+                    />
                   </div>
                   <div className="dark:text-spotgrayltst text-lg">
                     Talk Ratio
