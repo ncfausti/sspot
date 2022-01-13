@@ -138,9 +138,7 @@ export default function Meetings() {
                 <span
                   style={{ fontSize: '8px' }}
                   className="inline text-xs text-gray-400 font-light"
-                >
-                  ⌘ + Y to toggle
-                </span>
+                 />
               </div>
               <div className="text-gray-700">
                 <CogIcon

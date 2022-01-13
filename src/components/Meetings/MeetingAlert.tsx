@@ -26,6 +26,8 @@ interface MeetingAlertProps {
 export default function MeetingAlert(props: MeetingAlertProps) {
   const [isTalking, setIsTalking] = useState(false);
   const { id, message, rules, voiceMetrics } = props;
+  const [wait, setWait] = useState(remote.getGlobal('alertWait'));
+
   // log.info(id);
   // log.info(rules);
   // log.info(message);
@@ -59,7 +61,7 @@ export default function MeetingAlert(props: MeetingAlertProps) {
               },
               extra: { id, message, rules },
             });
-            counter = -5;
+            counter = -1 * wait;
           } else if (refTalkRatio.current.value > 10 && counter < THRESHOLD) {
             counter += 1;
           } else {

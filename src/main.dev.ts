@@ -219,6 +219,11 @@ app.on('will-quit', () => {
 app.on('ready', () => {
   console.log('app is ready');
   (global as any).autoDetectOn = true;
+  (global as any).threshold = 20;
+  (global as any).ttf = 10;
+  (global as any).alertMsg = '👍';
+  (global as any).alertWait = 30;
+
   resetGlobalParticipants();
 
   const primaryDisplay = screen.getPrimaryDisplay();
@@ -523,7 +528,7 @@ ipcMain.handle(
       10; // 1/4 of the way across the HUD
 
     json.browserWindowParams.y = SPACE_ABOVE_HUD + HUD_HEIGHT + 10;
-    json.browserWindowParams.width = 50;
+    json.browserWindowParams.width = 80;
     json.browserWindowParams.height = 50;
 
     const alertWindow = new BrowserWindow(json.browserWindowParams);
@@ -546,10 +551,29 @@ ipcMain.handle(
   }
 );
 
-ipcMain.handle('close-alert-window', (event, json) => {
+ipcMain.handle('set-threshold', (_event, threshold) => {
+  (global as any).threshold = threshold;
+});
+
+ipcMain.handle('set-time-to-fire', (_event, ttf) => {
+  (global as any).ttf = ttf;
+});
+
+ipcMain.handle('set-alert-message', (_event, alertMsg) => {
+  log.info(alertMsg);
+  (global as any).alertMsg = alertMsg;
+});
+
+ipcMain.handle('set-additional-msg-wait', (_event, wait) => {
+  log.info(wait);
+  (global as any).alertWait = wait;
+});
+
+ipcMain.handle('close-alert-window', (_event, json) => {
   windows.forEach((iWindow: IWindow) => {
     try {
       if (iWindow.type === WindowType.AlertWindow) {
+        log.info(json);
         iWindow.window.close();
         windows.delete(iWindow);
       }

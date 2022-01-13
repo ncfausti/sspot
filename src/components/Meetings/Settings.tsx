@@ -25,7 +25,7 @@ export default function Settings(props: {
 
   function handleView(view: string) {
     const NOTES_WIDTH = 400;
-    const NOTES_HEIGHT = 200;
+    const NOTES_HEIGHT = 400;
 
     const hudWindow = new remote.BrowserWindow({
       x: window.screen.width / 2 - NOTES_WIDTH / 2,
