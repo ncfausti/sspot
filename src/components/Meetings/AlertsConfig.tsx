@@ -85,7 +85,7 @@ export default function AlertsConfig() {
         <input
           id="talk-ratio-threshold"
           name="talk-ratio-threshold"
-          className="w-1/4 py-1 bg-spotgray rounded"
+          className="w-1/4 py-1 bg-gray-50 dark:bg-spotgray rounded"
           onChange={updateThreshold}
           value={threshold}
           type="number"
@@ -96,7 +96,7 @@ export default function AlertsConfig() {
         <input
           id="time-to-fire"
           name="time-to-fire"
-          className="w-1/4 py-1 bg-spotgray rounded"
+          className="w-1/4 py-1 bg-gray-50 dark:bg-spotgray rounded"
           onChange={updateTimeToFire}
           value={timeToFire}
           type="number"
@@ -108,7 +108,7 @@ export default function AlertsConfig() {
         <input
           id="time-to-fire"
           name="time-to-fire"
-          className="w-1/4 py-1 mt-4 bg-spotgray rounded"
+          className="w-1/4 py-1 mt-4 bg-gray-50 dark:bg-spotgray rounded"
           onChange={updateWait}
           value={wait}
           type="number"
@@ -121,7 +121,7 @@ export default function AlertsConfig() {
         <input
           id="message"
           name="message"
-          className="bg-spotgray py-1 rounded w-full"
+          className="bg-gray-50 dark:bg-spotgray py-1 rounded w-full"
           onChange={updateMessage}
           value={message}
           type="text"

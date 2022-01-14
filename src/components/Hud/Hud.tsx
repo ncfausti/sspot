@@ -6,6 +6,7 @@ import useWebSocket, { ReadyState } from 'react-use-websocket';
 import { ChildProcessWithoutNullStreams } from 'child_process';
 import { ipcRenderer, remote } from 'electron';
 import { uuid } from 'uuidv4';
+import { platform } from 'os';
 import CountUp from '../Clocks/CountUp';
 import Loading from '../Loading';
 import ParticipantsList from './ParticipantsList';
@@ -73,6 +74,7 @@ function handleNewParticipant(pid: string) {
       frame: false,
       alwaysOnTop: true,
       transparent: true,
+      backgroundColor: '#00000000',
       paintWhenInitiallyHidden: false,
       webPreferences: {
         nodeIntegration: true,
@@ -104,8 +106,8 @@ export default function Hud() {
   const spottingBtn = useRef(null);
   const refTalkRatio = useRef(null);
   const HUD_STARTING_WIDTH = 166;
-  const mainHudWidth = 166;
-  const mainHudHeight = 148;
+  const mainHudWidth = process.platform === 'darwin' ? 166 : 163;
+  const mainHudHeight = process.platform === 'darwin' ? 148 : 145;
 
   // Swap icons for dark mode / light mode
   useEffect(() => {

@@ -8,13 +8,8 @@ import { useParams } from 'react-router-dom';
 
 export default function AlertMessage() {
   const params: { aid: string } = useParams();
-  // log.info('AlertMessage', params.aid);
-  // get the alert message and TTD from queryParams
-  // or
-  // store the alert message and TTD in localStorage
-  // and get it from there
-
   const [message, setMessage] = useState(remote.getGlobal('alertMsg'));
+
   useEffect(() => {
     const timeout = setTimeout(() => {
       ipcRenderer.invoke('close-alert-window', params.aid);
@@ -25,11 +20,7 @@ export default function AlertMessage() {
   }, []);
 
   return (
-    <div className="pt-[6px] text-center h-screen text-xl dark:bg-black dark:text-white flux">
-      {/* <link
-        rel="stylesheet"
-        href="https://fonts.googleapis.com/css?family=Monoton&effect=neon"
-      /> */}
+    <div className="pt-[6px] text-center h-screen text-xl dark:bg-black dark:text-white flux rounded-hud">
       {message}
     </div>
   );

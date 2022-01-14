@@ -32,7 +32,7 @@ export default function Settings(props: {
       y: window.screen.height / 2 - NOTES_HEIGHT / 2,
       width: NOTES_WIDTH,
       height: NOTES_HEIGHT,
-      frame: true,
+      frame: false,
       alwaysOnTop: false,
       transparent: false,
       paintWhenInitiallyHidden: false,

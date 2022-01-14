@@ -120,7 +120,7 @@ export default function ParticipantInfo() {
         ipcRenderer.invoke('set-out-ui');
         setInAppUI(false);
       }}
-      className="flex flex-wrap h-screen dark:bg-black justify-evenly pt-5 px-7"
+      className="flex flex-wrap h-screen bg-gray-100 dark:bg-black justify-evenly pt-5 px-7 rounded-hud"
     >
       {
         <div

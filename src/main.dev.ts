@@ -390,6 +390,7 @@ ipcMain.handle('new-hud-window', (_event, json) => {
     frame: false,
     alwaysOnTop: true,
     transparent: true,
+    backgroundColor: '#00000000',
     paintWhenInitiallyHidden: false,
     webPreferences: {
       nodeIntegration: true,
