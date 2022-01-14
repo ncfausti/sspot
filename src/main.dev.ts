@@ -439,8 +439,8 @@ ipcMain.handle(
       SPACE_BETWEEN + // space between HUD and controls
       CONTROLS_WIDTH + // halfway across the controls
       SPACE_BETWEEN + // space between controls and participant window
-      numWindows * PARTICIPANT_WIDTH + // participant window width
-      10; // space between participant windows
+      numWindows * (PARTICIPANT_WIDTH + SPACE_BETWEEN); // participant window width // space between participant windows
+
     json.browserWindowParams.y = SPACE_ABOVE_HUD;
     json.browserWindowParams.width = PARTICIPANT_WIDTH;
     json.browserWindowParams.height = PARTICIPANT_HEIGHT;
