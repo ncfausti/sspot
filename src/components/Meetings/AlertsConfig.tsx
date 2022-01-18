@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import log from 'electron-log';
 import { ipcRenderer, remote } from 'electron';
+import { XIcon } from '@heroicons/react/solid';
 
 export default function AlertsConfig() {
   (global as any).threshold = 20;
@@ -80,6 +81,15 @@ export default function AlertsConfig() {
 
   return (
     <div className="p-6 text-sm h-screen dark:bg-black dark:text-white">
+      <div className="flex justify-between border-b pb-1 mb-2">
+        <div>Alerts</div>
+        <div>
+          <XIcon
+            className="cursor-pointer w-5 h-5 dark:text-white hover:dark:text-gray-400"
+            onClick={() => window.close()}
+          />
+        </div>
+      </div>
       <div className="leading-8">
         Display an alert after my talk ratio has been above{' '}
         <input
@@ -128,33 +138,6 @@ export default function AlertsConfig() {
           maxLength={20}
         />
       </div>
-      <div className="pt-3 text-right">
-        <button
-          type="button"
-          onClick={() => window.close()}
-          className="outline-none hover:bg-red-900 rounded text-xxs font-bold p-1 bg-spotred mr-3 text-white"
-        >
-          Back
-        </button>
-      </div>
-      {/* <button
-        type="button"
-        className="bg-gray-600 rounded p-3 outline-none"
-        onClick={() => ++refTalking.current.value}
-      >
-        Talk
-      </button>
-      <button
-        type="button"
-        className="bg-gray-600 rounded p-3 outline-none"
-        onClick={() => --refTalking.current.value}
-      >
-        Talk Less
-      </button>
-      <input type="hidden" ref={refTalking} />
-      <br />
-      {isTalking && 'talking'} */}
-      {/* select box for hours, minutes, seconds */}
     </div>
   );
 }

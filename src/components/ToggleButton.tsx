@@ -32,7 +32,7 @@ export default function ToggleButton(props: {
       onChange={() => handleChange()}
       className={classNames(
         enabled ? 'bg-spotblue' : 'bg-gray-200',
-        `relative inline-flex flex-shrink-0 h-${slideH} w-${slideW} border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-spotblue`
+        `relative inline-flex flex-shrink-0 h-${slideH} w-${slideW} border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none`
       )}
     >
       <span className="sr-only">Use setting</span>

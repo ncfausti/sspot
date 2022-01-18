@@ -5,8 +5,8 @@ import React, { useEffect, useState } from 'react';
 import { ipcRenderer, remote } from 'electron';
 import { useParams } from 'react-router-dom';
 import log from 'electron-log';
-import xImgWhite from '../../../assets/x-icon-white.png';
-import xImgBlack from '../../../assets/x-icon.png';
+import xImgWhite from '../../../assets/Delete.png';
+import xImgBlack from '../../../assets/Delete.png';
 
 interface Face {
   id: string;
@@ -131,7 +131,7 @@ export default function ParticipantInfo() {
           />
           <img
             src={face.image_path}
-            className={`p-1 rounded-full border-4 ${
+            className={`rounded-full border-4 ${
               face.sentiment >= 20 ? 'border-green-600' : 'border-spotgraylt'
             }`}
             alt={face.id}

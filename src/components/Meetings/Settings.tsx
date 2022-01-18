@@ -1,6 +1,7 @@
 import React, { SyntheticEvent, useEffect, useRef } from 'react';
 import { ipcRenderer, remote } from 'electron';
 import log from 'electron-log';
+import { XIcon } from '@heroicons/react/solid';
 import ToggleButton from '../ToggleButton';
 
 export default function Settings(props: {
@@ -52,80 +53,54 @@ export default function Settings(props: {
 
   return (
     <fieldset className="space-y-0">
-      <div className="relative flex items-start">
-        <div className="flex items-center h-5">
-          <ToggleButton
-            size="sm"
-            isEnabled={isAutoDetectOn}
-            onChangeCallback={autoDetectChanged}
+      <div className="flex justify-between border-b pb-1 mb-1">
+        <div>Settings</div>
+        <div>
+          <XIcon
+            className="cursor-pointer w-5 h-5 dark:text-white hover:dark:text-gray-400"
+            onClick={backClick}
           />
         </div>
-        <div className="ml-3 text-xs">
-          <label
-            htmlFor="check-auto-detect"
-            className="font-medium text-gray-700"
+      </div>
+      <div className="flex flex-col items-start mt-2">
+        <div className="text-xs">
+          <span
+            id="auto-detect-description"
+            className="text-black dark:text-white font-semibold mr-3"
           >
-            Auto-detect{' '}
-          </label>
-          <span id="auto-detect-description" className="text-gray-500">
-            <span className="sr-only">Auto-detect </span>faces when{' '}
-            <span className="font-semibold">Launch SaleSpot</span> is clicked.
+            Auto Spot Faces
+          </span>
+          <span className="cursor-pointer">
+            <ToggleButton
+              size="sm"
+              isEnabled={isAutoDetectOn}
+              onChangeCallback={autoDetectChanged}
+            />
           </span>
         </div>
-      </div>
-      <div className="flex flex-col align-start">
         <button
           type="button"
           onClick={() => handleView('alerts')}
-          className="cursor-pointer self-start text-left align-start text-xs text-spotblue hover:text-blue-700 outline-none "
+          className="cursor-pointer outline-none text-black dark:text-white hover:dark:text-spotgrayltst text-xs font-semibold"
         >
           Manage Alerts
         </button>
         <button
           type="button"
+          onClick={exitApp}
+          className="cursor-pointer outline-none text-black dark:text-white hover:dark:text-spotgrayltst text-xs font-semibold"
+        >
+          Quit Application
+        </button>
+      </div>
+
+      <div className="flex justify-end">
+        <button
+          type="button"
           onClick={() => handleView('release')}
-          className="cursor-pointer self-start text-left text-xs text-spotblue hover:text-blue-700 outline-none "
+          className="cursor-pointer text-xs text-spotblue hover:text-blue-700 outline-none"
         >
           Release Notes
-        </button>
-      </div>
-
-      <div className={`${true && 'hidden'} relative flex items-start`}>
-        <div className="flex items-center h-5">
-          <input
-            id="check-debug"
-            aria-describedby="debug-description"
-            name="check-debug"
-            type="checkbox"
-            className="focus:ring-spotblue h-4 w-4 text-spotblue border-gray-300 rounded"
-          />
-        </div>
-        <div className="ml-3 text-xs">
-          <label htmlFor="check-debug" className="font-medium text-gray-700">
-            Debug mode
-          </label>
-          <span id="debug-description" className="text-gray-500">
-            <span id="check-debug" className="sr-only">
-              Debug{' '}
-            </span>
-          </span>
-        </div>
-      </div>
-      <div>
-        <button
-          type="button"
-          onClick={backClick}
-          className="cursor-pointer float-right text-right bg-spotblue hover:bg-blue-700 text-white font-bold text-xxs py-1 px-2 rounded"
-        >
-          Back
-        </button>
-
-        <button
-          type="button"
-          onClick={exitApp}
-          className="cursor-pointer float-right text-right mr-3 bg-spotred hover:bg-red-800 text-white font-bold text-xxs py-1 px-2 rounded"
-        >
-          Quit
         </button>
       </div>
     </fieldset>

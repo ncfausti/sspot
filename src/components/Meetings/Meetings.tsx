@@ -4,7 +4,9 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { CogIcon } from '@heroicons/react/solid';
 import log from 'electron-log';
 import { app, ipcRenderer, remote } from 'electron';
-import logo from '../../../assets/salespot-logo-red.png';
+import logo from '../../../assets/salespot-logo-long.png';
+import logoDark from '../../../assets/salespot-logo-long-dark.png';
+
 // import { startServer } from '../../utils';
 import Settings from './Settings';
 
@@ -16,6 +18,8 @@ export default function Meetings() {
   const SPACE_ABOVE_HUD = 40;
   const HUD_STARTING_WIDTH = 166;
   const HUD_STARTING_HEIGHT = 148;
+
+  const [saleSpotLogo, setSaleSpotLogo] = useState(logo);
 
   // on initial load only
   useEffect(() => {
@@ -109,6 +113,28 @@ export default function Meetings() {
     setAutoDetect((prev) => !prev);
   }, []);
 
+  // on initial load only
+  useEffect(() => {
+    if (
+      window.matchMedia &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches
+    ) {
+      // dark mode
+      setSaleSpotLogo(logo);
+    } else {
+      // light mode
+      setSaleSpotLogo(logoDark);
+    }
+
+    const interval = setInterval(
+      () => setFaces(remote.getGlobal('propFaces')),
+      20
+    );
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
   return (
     <div className="flex rounded-hud bg-gray-100 dark:bg-black dark:text-white flex-grow flex-col p-3 min-h-screen content-center">
       <>
@@ -124,10 +150,8 @@ export default function Meetings() {
               <button
                 type="button"
                 onClick={handleLaunchClick}
-                className="w-full
-          border border-transparent text-xs font-semibold
-          font-medium rounded-md shadow-sm text-white
-          bg-blue-500 hover:bg-blue-600 focus:outline-none"
+                className="w-full border border-transparent text-xs font-semibold
+                font-medium rounded-md shadow-sm text-white bg-spotblue focus:outline-none"
               >
                 Launch SaleSpot
                 {/* {autoDetect ? '(auto-detect)' : ''} */}
@@ -135,7 +159,11 @@ export default function Meetings() {
             </div>
             <div className="flex flex-grow flex-wrap justify-between items-center">
               <div className="">
-                <img src={logo} className="inline w-16 mr-1" alt="SaleSpot" />
+                <img
+                  src={saleSpotLogo}
+                  className="inline w-20 mr-1"
+                  alt="SaleSpot"
+                />
                 <span
                   style={{ fontSize: '8px' }}
                   className="inline text-xs text-gray-400 font-light"
@@ -144,7 +172,7 @@ export default function Meetings() {
               <div className="text-gray-700">
                 <CogIcon
                   onClick={() => setShowSettingsView(true)}
-                  className="h-4 w-4 cursor-pointer"
+                  className="h-5 w-5 cursor-pointer dark:text-white text-black"
                 />
               </div>
             </div>

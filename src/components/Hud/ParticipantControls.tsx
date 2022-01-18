@@ -110,7 +110,7 @@ export default function ParticipantControls() {
         <span className="text-black text-center font-semibold text-lg dark:text-white">
           ({faces.length})
         </span>
-        <span className="bg-spotgray rounded">
+        <span className="dark:bg-spotgray rounded">
           <img
             className={`cursor-pointer ${isSpotting && 'animate-pulse'}`}
             src={isSpotting ? spottingIconOn : spotIcon}
@@ -121,7 +121,7 @@ export default function ParticipantControls() {
             }}
           />
         </span>
-        <span className="bg-spotgray rounded">
+        <span className="dark:bg-spotgray rounded">
           <img
             onClick={clickReset}
             src={resetIcon}
