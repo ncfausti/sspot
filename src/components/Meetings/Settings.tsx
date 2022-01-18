@@ -1,12 +1,7 @@
 import React, { SyntheticEvent, useEffect, useRef } from 'react';
 import { ipcRenderer, remote } from 'electron';
 import log from 'electron-log';
-
-const showDebugMode = () => {
-  return (
-    process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
-  );
-};
+import ToggleButton from '../ToggleButton';
 
 export default function Settings(props: {
   isAutoDetectOn: boolean;
@@ -59,29 +54,7 @@ export default function Settings(props: {
     <fieldset className="space-y-0">
       <div className="relative flex items-start">
         <div className="flex items-center h-5">
-          <>
-            {isAutoDetectOn && (
-              <input
-                id="check-auto-detect"
-                onChange={autoDetectChanged}
-                aria-describedby="auto-detect-description"
-                name="check-auto-detect"
-                type="checkbox"
-                checked
-                className="focus:ring-spotblue h-4 w-4 text-spotblue border-gray-300 rounded"
-              />
-            )}
-            {!isAutoDetectOn && (
-              <input
-                id="check-auto-detect"
-                onChange={autoDetectChanged}
-                aria-describedby="auto-detect-description"
-                name="check-auto-detect"
-                type="checkbox"
-                className="focus:ring-spotblue h-4 w-4 text-spotblue border-gray-300 rounded"
-              />
-            )}
-          </>
+          <ToggleButton />
         </div>
         <div className="ml-3 text-xs">
           <label
