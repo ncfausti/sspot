@@ -13,7 +13,6 @@ export default function ToggleButton(props: {
   const { isEnabled, size, onChangeCallback } = props;
   const [enabled, setEnabled] = useState(isEnabled);
 
-  const translateX = size === 'sm' ? '4' : '6';
   const slideH = size === 'sm' ? '4' : '6';
   const slideW = size === 'sm' ? '8' : '11';
 
@@ -39,7 +38,7 @@ export default function ToggleButton(props: {
       <span className="sr-only">Use setting</span>
       <span
         className={classNames(
-          enabled ? `translate-x-${translateX}` : 'translate-x-0',
+          enabled ? `translate-x-4` : 'translate-x-0',
           `pointer-events-none relative inline-block h-${circleH} w-${circleW} rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200`
         )}
       >
