@@ -22,11 +22,12 @@ import { BrowserWindowConstructorOptions } from 'electron/main';
 
 const HUD_WIDTH = 172;
 const HUD_HEIGHT = 148;
-const CONTROLS_WIDTH = 65;
-const SPACE_BETWEEN = 20;
+const CONTROLS_WIDTH = 45;
+const SPACE_BETWEEN = 12;
 const SPACE_ABOVE_HUD = 40;
-const PARTICIPANT_WIDTH = 148;
-const PARTICIPANT_HEIGHT = HUD_HEIGHT;
+const PARTICIPANT_WIDTH = 110;
+const DIFF = 20;
+const PARTICIPANT_HEIGHT = HUD_HEIGHT - DIFF;
 
 export default class AppUpdater {
   constructor() {
@@ -384,9 +385,9 @@ ipcMain.handle('new-hud-window', (_event, json) => {
   const participantControlsWindow = new BrowserWindow({
     x:
       screen.getPrimaryDisplay().size.width / 2 + HUD_WIDTH / 2 + SPACE_BETWEEN,
-    y: SPACE_ABOVE_HUD,
+    y: SPACE_ABOVE_HUD + DIFF,
     width: CONTROLS_WIDTH,
-    height: HUD_HEIGHT,
+    height: PARTICIPANT_HEIGHT,
     frame: false,
     alwaysOnTop: true,
     transparent: true,
@@ -442,7 +443,7 @@ ipcMain.handle(
       SPACE_BETWEEN + // space between controls and participant window
       numWindows * (PARTICIPANT_WIDTH + SPACE_BETWEEN); // participant window width // space between participant windows
 
-    json.browserWindowParams.y = SPACE_ABOVE_HUD;
+    json.browserWindowParams.y = SPACE_ABOVE_HUD + DIFF;
     json.browserWindowParams.width = PARTICIPANT_WIDTH;
     json.browserWindowParams.height = PARTICIPANT_HEIGHT;
 

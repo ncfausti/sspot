@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable jsx-a11y/control-has-associated-label */
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ipcRenderer, remote } from 'electron';
 import { useParams } from 'react-router-dom';
 import log from 'electron-log';
@@ -21,10 +21,7 @@ interface Face {
 
 export default function ParticipantInfo() {
   // const { faces, faceClickHandler } = props;
-  const HUD_STARTING_WIDTH = 175;
-  const mainHudWidth = 165;
   const params: { pid: string } = useParams();
-  const [effect, setEffect] = useState(false);
   const [face, setFace] = useState({
     id: '',
     image_path: '',
@@ -36,8 +33,6 @@ export default function ParticipantInfo() {
     directory: '',
   });
 
-  const spottingBtn = useRef(null);
-  const [isSpotting, setIsSpotting] = useState(false);
   const [faces, setFaces] = useState(remote.getGlobal('propFaces'));
   const faceClicked = () => {
     // use the id value stored in the alt attribute
@@ -93,21 +88,15 @@ export default function ParticipantInfo() {
   useEffect(() => {
     ipcRenderer.on('main-says-in-ui', () => {
       setInAppUI(true);
-      // setIsSpotting((prev) => !prev);
     });
   }, []);
 
   useEffect(() => {
     ipcRenderer.on('main-says-out-ui', () => {
-      // setIsSpotting((prev) => !prev);
       setInAppUI(false);
     });
   }, []);
 
-  // Last check before rendering
-  if (face === undefined) {
-    // window.close();
-  }
   return (
     <div
       onMouseEnter={() => {
@@ -120,7 +109,7 @@ export default function ParticipantInfo() {
         ipcRenderer.invoke('set-out-ui');
         setInAppUI(false);
       }}
-      className="flex flex-wrap h-screen bg-gray-100 dark:bg-black justify-evenly pt-5 px-7 rounded-hud"
+      className="flex flex-wrap h-screen bg-gray-100 dark:bg-black justify-evenly pt-3 px-5 rounded-hud"
     >
       {
         <div
@@ -143,14 +132,14 @@ export default function ParticipantInfo() {
           <img
             src={face.image_path}
             className={`p-1 rounded-full border-4 ${
-              face.sentiment >= 20 ? 'border-green-600' : 'border-gray-300'
+              face.sentiment >= 20 ? 'border-green-600' : 'border-spotgraylt'
             }`}
             alt={face.id}
           />
           {/* <div>{face.label}</div> */}
           <div
-            className={`pl-2 rounded-full font-semibold ${
-              face.sentiment > 20 ? 'text-green-600' : 'text-gray-900'
+            className={`pt-2 pl-2 text-xl rounded-full font-semibold ${
+              face.sentiment > 20 ? 'text-green-600' : 'text-spotgraylt'
             }`}
           >
             {face.sentiment <= 0 || !face.sentiment

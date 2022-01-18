@@ -36,20 +36,12 @@ export default function ParticipantControls() {
     directory: '',
   });
 
-  const spottingBtn = useRef(null);
   const [isSpotting, setIsSpotting] = useState(false);
   const [faces, setFaces] = useState(remote.getGlobal('propFaces'));
-  const faceClicked = () => {
-    // use the id value stored in the alt attribute
-    // to get the face id
-    // faceClickHandler(e.target.id);
-    // invoke main.removeParam with the face id
-    ipcRenderer.send('removeParticipant', params.pid);
-    window.close();
-  };
   const [inAppUI, setInAppUI] = useState(false);
   const [spotIcon, setSpotIcon] = useState(spottingIconWhite);
   const [resetIcon, setResetIcon] = useState(resetIconWhite);
+
   // on initial load only
   useEffect(() => {
     if (
@@ -91,21 +83,15 @@ export default function ParticipantControls() {
   useEffect(() => {
     ipcRenderer.on('main-says-in-ui', () => {
       setInAppUI(true);
-      // setIsSpotting((prev) => !prev);
     });
   }, []);
 
   useEffect(() => {
     ipcRenderer.on('main-says-out-ui', () => {
-      // setIsSpotting((prev) => !prev);
       setInAppUI(false);
     });
   }, []);
 
-  // Last check before rendering
-  if (face === undefined) {
-    // window.close();
-  }
   return (
     <div
       onMouseEnter={() => {
@@ -118,41 +104,28 @@ export default function ParticipantControls() {
         ipcRenderer.invoke('set-out-ui');
         setInAppUI(false);
       }}
-      className="flex flex-wrap h-screen bg-gray-100 dark:bg-black justify-evenly rounded-hud"
+      className="flex flex-wrap h-screen bg-gray-100 dark:bg-black rounded-hud"
     >
-      <span className="flex flex-col justify-between p-5 rounded-hud">
-        <span className="relative">
-          {/* {inAppUI && 'in'} */}
+      <span className="flex flex-col justify-between p-1 rounded-hud">
+        <span className="text-black text-center font-semibold text-lg dark:text-white">
+          ({faces.length})
+        </span>
+        <span className="bg-spotgray rounded">
           <img
-            ref={spottingBtn}
+            className={`cursor-pointer ${isSpotting && 'animate-pulse'}`}
+            src={isSpotting ? spottingIconOn : spotIcon}
+            alt="spotting on"
             onClick={() => {
               setIsSpotting((prev) => !prev);
               ipcRenderer.invoke('set-spotting');
             }}
-            src={isSpotting ? spottingIconOn : spotIcon}
-            className={`${
-              isSpotting && 'animate-ping'
-            } cursor-pointer absolute`}
-            alt="spotting"
           />
-          {isSpotting && (
-            <img
-              className="absolute cursor-pointer"
-              src={spottingIconOn}
-              alt="spotting on"
-              onClick={() => {
-                setIsSpotting((prev) => !prev);
-                ipcRenderer.invoke('set-spotting');
-              }}
-            />
-          )}
         </span>
-        <span>
+        <span className="bg-spotgray rounded">
           <img
             onClick={clickReset}
             src={resetIcon}
-            className={`${effect && 'animate-reverse-spin'}
-                    cursor-pointer`}
+            className={`${effect && 'animate-reverse-spin'} cursor-pointer`}
             onAnimationEnd={() => setEffect(false)}
             alt="reset"
           />
