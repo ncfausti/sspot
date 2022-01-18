@@ -104,7 +104,8 @@ export default function Meetings() {
   }, []);
 
   const memoizedAutoDetectChanged = useCallback((e) => {
-    log.info('auto detect changed', e.target.checked);
+    log.info(e);
+    log.info('auto detect changed', e);
     setAutoDetect((prev) => !prev);
   }, []);
 
@@ -138,7 +139,7 @@ export default function Meetings() {
                 <span
                   style={{ fontSize: '8px' }}
                   className="inline text-xs text-gray-400 font-light"
-                 />
+                />
               </div>
               <div className="text-gray-700">
                 <CogIcon

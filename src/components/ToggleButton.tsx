@@ -5,20 +5,32 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
 }
 
-export default function ToggleButton(props: { size: 'sm' | 'lg' }) {
-  const [enabled, setEnabled] = useState(false);
-  const { size } = props;
-  const translateX = size === 'sm' ? '4' : '5';
+export default function ToggleButton(props: {
+  isEnabled: boolean;
+  size: 'sm' | 'lg';
+  onChangeCallback: (value: boolean) => void;
+}) {
+  const { isEnabled, size, onChangeCallback } = props;
+  const [enabled, setEnabled] = useState(isEnabled);
+
+  const translateX = size === 'sm' ? '4' : '6';
   const slideH = size === 'sm' ? '4' : '6';
   const slideW = size === 'sm' ? '8' : '11';
 
   const circleH = size === 'sm' ? '3' : '5';
   const circleW = size === 'sm' ? '3' : '5';
 
+  function handleChange() {
+    setEnabled((prev) => {
+      onChangeCallback(!prev);
+      return !prev;
+    });
+  }
+
   return (
     <Switch
-      checked={enabled}
-      onChange={setEnabled}
+      checked={isEnabled}
+      onChange={() => handleChange()}
       className={classNames(
         enabled ? 'bg-spotblue' : 'bg-gray-200',
         `relative inline-flex flex-shrink-0 h-${slideH} w-${slideW} border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-spotblue`

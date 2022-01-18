@@ -54,7 +54,11 @@ export default function Settings(props: {
     <fieldset className="space-y-0">
       <div className="relative flex items-start">
         <div className="flex items-center h-5">
-          <ToggleButton size="sm" />
+          <ToggleButton
+            size="sm"
+            isEnabled={isAutoDetectOn}
+            onChangeCallback={autoDetectChanged}
+          />
         </div>
         <div className="ml-3 text-xs">
           <label
