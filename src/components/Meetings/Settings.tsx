@@ -54,7 +54,7 @@ export default function Settings(props: {
     <fieldset className="space-y-0">
       <div className="relative flex items-start">
         <div className="flex items-center h-5">
-          <ToggleButton />
+          <ToggleButton size="sm" />
         </div>
         <div className="ml-3 text-xs">
           <label
@@ -69,18 +69,18 @@ export default function Settings(props: {
           </span>
         </div>
       </div>
-      <div className="flex flex-col">
+      <div className="flex flex-col align-start">
         <button
           type="button"
           onClick={() => handleView('alerts')}
-          className="cursor-pointer text-left text-xs text-spotblue hover:text-blue-700 outline-none "
+          className="cursor-pointer self-start text-left align-start text-xs text-spotblue hover:text-blue-700 outline-none "
         >
           Manage Alerts
         </button>
         <button
           type="button"
           onClick={() => handleView('release')}
-          className="cursor-pointer text-left text-xs text-spotblue hover:text-blue-700 outline-none "
+          className="cursor-pointer self-start text-left text-xs text-spotblue hover:text-blue-700 outline-none "
         >
           Release Notes
         </button>
