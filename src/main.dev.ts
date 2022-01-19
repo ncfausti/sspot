@@ -27,7 +27,8 @@ const SPACE_BETWEEN = 12;
 const SPACE_ABOVE_HUD = 40;
 const PARTICIPANT_WIDTH = 110;
 const DIFF = 20;
-const PARTICIPANT_HEIGHT = HUD_HEIGHT - DIFF;
+const PARTICIPANT_HEIGHT =
+  HUD_HEIGHT - DIFF - (process.platform === 'darwin' ? 0 : 3);
 
 export default class AppUpdater {
   constructor() {
