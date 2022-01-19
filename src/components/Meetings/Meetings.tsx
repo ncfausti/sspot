@@ -125,14 +125,6 @@ export default function Meetings() {
       // light mode
       setSaleSpotLogo(logoDark);
     }
-
-    const interval = setInterval(
-      () => setFaces(remote.getGlobal('propFaces')),
-      20
-    );
-    return () => {
-      clearInterval(interval);
-    };
   }, []);
 
   return (
