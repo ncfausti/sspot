@@ -8,6 +8,19 @@
 
 @tailwind utilities;
 
+.tooltip {
+  @apply invisible absolute;
+  /* transition-delay: 1s; */
+}
+
+.has-tooltip:hover .tooltip {
+  @apply visible z-50;
+  transition-delay:1s;
+
+}
+
+.tooltip-left { transform: translate(-50px, 0)}
+
 body { background: rgba(42, 42, 42, 0.01); overflow: hidden; }
 
 .container {

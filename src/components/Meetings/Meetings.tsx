@@ -161,11 +161,14 @@ export default function Meetings() {
                   className="inline text-xs text-gray-400 font-light"
                 />
               </div>
-              <div className="text-gray-700">
+              <div className="text-gray-700 hover:delay-1000 has-tooltip ">
                 <CogIcon
                   onClick={() => setShowSettingsView(true)}
                   className="h-5 w-5 cursor-pointer dark:text-white text-black"
                 />
+                <span className="tooltip tooltip-left rounded shadow-lg p-1 bg-gray-100 text-red-500 -mt-8">
+                  View Settings
+                </span>
               </div>
             </div>
           </>
