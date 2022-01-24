@@ -110,7 +110,15 @@ export default function ParticipantControls() {
         <span className="text-black text-center font-semibold text-lg dark:text-white">
           ({faces.length})
         </span>
-        <span className="dark:bg-spotgray rounded">
+        <span className="dark:bg-spotgray rounded has-tooltip">
+          <span className="tooltip text-xxs translate-y-[-20px] rounded shadow-lg">
+            Add add-
+            <br />
+            itional
+            <br />
+            /new
+            <br /> participants to spot.
+          </span>
           <img
             className={`cursor-pointer ${isSpotting && 'animate-pulse'}`}
             src={isSpotting ? spottingIconOn : spotIcon}

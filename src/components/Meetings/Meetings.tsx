@@ -166,9 +166,9 @@ export default function Meetings() {
                   onClick={() => setShowSettingsView(true)}
                   className="h-5 w-5 cursor-pointer dark:text-white text-black"
                 />
-                <span className="tooltip tooltip-left rounded shadow-lg p-1 bg-gray-100 text-red-500 -mt-8">
+                <div className="tooltip rounded whitespace-nowrap translate-x-[-100px] shadow-lg p-1 bg-gray-100 -mt-8">
                   View Settings
-                </span>
+                </div>
               </div>
             </div>
           </>

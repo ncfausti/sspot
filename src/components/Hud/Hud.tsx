@@ -362,14 +362,19 @@ export default function Hud() {
                   {timeStyle.format(new Date())}
                 </span>
                 <div className="text-xs font-light">
-                  <button
-                    onClick={clickEnd}
-                    className="cursor-pointer bg-white text-gray-900 dark:bg-spotgray dark:text-white dark:hover:bg-spotgraylt border dark:border-none
+                  <span className="has-tooltip">
+                    <span className="tooltip rounded shadow-lg w-5/6 translate-x-[-80px] p-1 mt-8">
+                      End SaleSpot Session
+                    </span>
+                    <button
+                      onClick={clickEnd}
+                      className="cursor-pointer bg-white text-gray-900 dark:bg-spotgray dark:text-white dark:hover:bg-spotgraylt border dark:border-none
                   rounded text-sm w-[40px] h-[28px] font-semibold px-1 focus:outline-none"
-                    type="button"
-                  >
-                    End
-                  </button>
+                      type="button"
+                    >
+                      End
+                    </button>
+                  </span>
                 </div>
               </div>
               {/* /end Top Row */}
@@ -397,8 +402,11 @@ export default function Hud() {
                 {/* Talk Ratio */}
                 <div
                   className="flex flex-col justify-end border border-spotgraydk text-gray-900 dark:bg-spotgraydk
-                font-medium w-full px-4 py-1 leading-none"
+                font-medium w-full px-4 py-1 leading-none has-tooltip"
                 >
+                  <span className="tooltip rounded shadow-lg translate-y-[-20px] py-1 px-3">
+                    Your talk time
+                  </span>
                   <div className="text-3xl text-spotblue dark:text-white font-bold">
                     {voiceMetrics.talk_ratio}
                     <span className="font-medium">%</span>
@@ -459,7 +467,10 @@ export default function Hud() {
                       )}
                     </span>
                   </span>
-                  <span>
+                  <span className="has-tooltip">
+                    <span className="tooltip rounded shadow-lg translate-x-[-110px] w-4/5 py-1 px-3 -mt-6">
+                      Show Participants
+                    </span>
                     <img
                       onClick={
                         showParticipants === false ? clickHide : clickExpand

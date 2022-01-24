@@ -9,17 +9,18 @@
 @tailwind utilities;
 
 .tooltip {
-  @apply invisible absolute;
-  /* transition-delay: 1s; */
+  @apply invisible absolute text-xs font-normal;
 }
 
+/* For some child element .tooltip of .has-tooltip, on
+hover, set .tooltip to visible using a 1s delay */
 .has-tooltip:hover .tooltip {
-  @apply visible z-50;
+  @apply visible z-50 dark:bg-spotgray dark:text-white;
   transition-delay:1s;
-
 }
 
 .tooltip-left { transform: translate(-50px, 0)}
+.tooltip-right { transform: translate(50px, 0)}
 
 body { background: rgba(42, 42, 42, 0.01); overflow: hidden; }
 

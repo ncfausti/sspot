@@ -116,32 +116,43 @@ export default function ParticipantInfo() {
           key={face.id}
           className="text-sm text-center relative hover-trigger"
         >
-          <button
-            type="button"
-            id={face.id}
-            onClick={faceClicked}
-            style={{
-              position: 'absolute',
-              right: '-12px',
-              top: '1px',
-              background: `url(${xImg}) no-repeat`,
-              backgroundSize: '13px',
-            }}
-            className="absolute text-tiny w-6 h-6 transparent hover-target cursor-pointer focus:outline-none"
-          />
-          <img
-            src={face.image_path}
-            className={`rounded-full border-4 ${
-              face.sentiment >= 20 ? 'border-green-600' : 'border-spotgraylt'
-            }`}
-            alt={face.id}
-          />
+          <span className="has-tooltip">
+            <span className="tooltip rounded shadow-lg w-full translate-x-[-40px] p-1">
+              Hover over participant to delete
+            </span>
+            <button
+              type="button"
+              id={face.id}
+              onClick={faceClicked}
+              style={{
+                position: 'absolute',
+                right: '-12px',
+                top: '1px',
+                background: `url(${xImg}) no-repeat`,
+                backgroundSize: '13px',
+              }}
+              className="absolute text-tiny w-6 h-6 transparent hover-target cursor-pointer focus:outline-none"
+            />
+
+            <img
+              src={face.image_path}
+              className={`rounded-full border-4 ${
+                face.sentiment >= 20 ? 'border-green-600' : 'border-spotgraylt'
+              }`}
+              alt={face.id}
+            />
+          </span>
           {/* <div>{face.label}</div> */}
           <div
-            className={`pt-2 pl-2 text-xl rounded-full font-semibold ${
+            className={`pt-2 pl-2 text-xl rounded-full font-semibold has-tooltip ${
               face.sentiment > 20 ? 'text-green-600' : 'text-spotgraylt'
             }`}
           >
+            <span className="tooltip rounded shadow-lg w-full translate-x-[-30px] translate-y-[-70px] p-1">
+              Partici-
+              <br />
+              pant's current emotional state.
+            </span>
             {face.sentiment <= 0 || !face.sentiment
               ? '0%'
               : `${face.sentiment}%`}
