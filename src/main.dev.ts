@@ -391,9 +391,9 @@ ipcMain.handle(
       extra: { pid: string };
     }
   ) => {
-    // override whatever window x, y, height, width that the renderer sends
-    // and calculate based on windowing layout and number of faces
-    const numWindows = windows.size - 2;
+    const numWindows = [...windows].filter(
+      (window) => window.type === WindowType.ParticipantWindow
+    ).length;
     json.browserWindowParams.x =
       screen.getPrimaryDisplay().size.width / 2 + // halfway across the screen
       HUD_WIDTH / 2 + // halfway across the HUD
@@ -544,7 +544,8 @@ ipcMain.handle('set-additional-msg-wait', (_event, wait) => {
 });
 
 ipcMain.handle('close-alert-window', (_event, alertId) => {
-  // should close participants windows too if alertwindowid is 'autodetect-disclaimer'q
+  // should close participants windows too if
+  // alertwindowid is 'autodetect-disclaimer'
   windows.forEach((iWindow: IWindow) => {
     try {
       if (iWindow.type === WindowType.AlertWindow && iWindow.id === alertId) {
