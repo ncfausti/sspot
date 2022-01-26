@@ -74,17 +74,16 @@ export default function ParticipantControls() {
 
     // get the difference between the current participant windows and the new faces
     const facesToOpenWindowsFor = faces.filter(
-      (newFace: Face) =>
-        windowIds.indexOf(newFace.id) === -1 &&
-        !newFace.image_path.startsWith('data')
+      (newFace: Face) => windowIds.indexOf(newFace.id) === -1
     );
     log.info('opening windows for...');
     log.info(facesToOpenWindowsFor);
 
     // Open windows for the new faces
-    facesToOpenWindowsFor.forEach((newFace: Face) =>
-      handleNewParticipant(newFace.id)
-    );
+    facesToOpenWindowsFor.forEach((newFace: Face) => {
+      log.info('HANDLE NEW PARTICIPANT ID: ', newFace.id);
+      handleNewParticipant(newFace.id);
+    });
   }, [faces.length]);
 
   // on initial load only

@@ -391,9 +391,20 @@ ipcMain.handle(
       extra: { pid: string };
     }
   ) => {
-    const numWindows = [...windows].filter(
+    // if json.extra.pid is in windows, then we already have a window for this participant
+
+    const windowsList = [...windows].filter(
       (window) => window.type === WindowType.ParticipantWindow
-    ).length;
+    );
+
+    if (
+      windowsList.filter((window) => window.id === json.extra.pid).length > 0
+    ) {
+      return; // we already have a window for this participant
+    }
+
+    const numWindows = windowsList.length;
+
     json.browserWindowParams.x =
       screen.getPrimaryDisplay().size.width / 2 + // halfway across the screen
       HUD_WIDTH / 2 + // halfway across the HUD

@@ -14,7 +14,8 @@ import expandIcon from '../../../assets/expand.png';
 import expandIconWhite from '../../../assets/expand-white.png';
 import pauseIcon from '../../../assets/pause.png';
 import playIcon from '../../../assets/play.png';
-import salespotLogo from '../../../assets/salespot-logo-red.png';
+import logo from '../../../assets/salespot-logo-long.png';
+import logoDark from '../../../assets/salespot-logo-long-dark.png';
 import spottingIcon from '../../../assets/spotting-icon-gray.png';
 import spottingIconOn from '../../../assets/spotting-icon.png';
 import { userDataDir } from '../../utils';
@@ -107,6 +108,7 @@ export default function Hud() {
   const HUD_STARTING_WIDTH = 166;
   const mainHudWidth = process.platform === 'darwin' ? 166 : 163;
   const mainHudHeight = process.platform === 'darwin' ? 148 : 145;
+  const [saleSpotLogo, setSaleSpotLogo] = useState(logo);
 
   // Swap icons for dark mode / light mode
   useEffect(() => {
@@ -115,8 +117,10 @@ export default function Hud() {
       window.matchMedia('(prefers-color-scheme: dark)').matches
     ) {
       setExpandIcon(expandIconWhite);
+      setSaleSpotLogo(logo);
     } else {
       setExpandIcon(expandIcon);
+      setSaleSpotLogo(logoDark);
     }
   }, []);
 
@@ -341,8 +345,8 @@ export default function Hud() {
   return (
     <>
       {connectionStatus !== 'Open' && (
-        <div className="text-center pt-5 bg-gray-100 dark:bg-black">
-          <img src={salespotLogo} className="inline w-1/2" alt="expand" />
+        <div className="text-center h-screen pt-5 bg-gray-100 dark:bg-black">
+          <img src={saleSpotLogo} className="inline w-1/2" alt="expand" />
           <div className="">
             <Loading x={60} y={60} />
           </div>
