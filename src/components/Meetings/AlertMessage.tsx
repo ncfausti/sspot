@@ -17,7 +17,7 @@ export default function AlertMessage() {
 
   // if alertId === 'disclaimer'
   // set text to white, text to text-xs, bg-color to red
-  const disclaimerClass = 'text-xs bg-red-400 text-white';
+
   log.info(params);
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -30,14 +30,18 @@ export default function AlertMessage() {
 
   return (
     <div
-      className={`pt-[6px] text-center h-screen font-semibold ${disclaimerClass} rounded-hud`}
+      className={`pt-[6px] text-xs text-white text-center h-screen font-semibold ${
+        params.alertId.indexOf('disclaimer') >= 0
+          ? 'bg-red-400'
+          : 'bg-spotgrayltst'
+      } rounded-hud`}
     >
       {params.alertId.indexOf('disclaimer') >= 0 &&
         'By spotting someone, you are confirming that they consent to being recorded.'}
       {params.alertId.indexOf('disclaimer') === -1 && message}
       {params.alertId.indexOf('autodetect-disclaimer') >= 0 && (
         <XIcon
-          className="cursor-pointer w-5 h-5 dark:text-white hover:dark:text-gray-400"
+          className="inline cursor-pointer w-5 h-5 dark:text-white hover:dark:text-gray-400"
           onClick={() => {
             ipcRenderer.send('remove-alert', params.alertId);
             window.close();

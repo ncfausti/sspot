@@ -27,7 +27,7 @@ const CONTROLS_WIDTH = 45;
 const SPACE_BETWEEN = 12;
 const SPACE_ABOVE_HUD = 40;
 const PARTICIPANT_WIDTH = 110;
-const ALERT_HEIGHT = 40;
+const ALERT_HEIGHT = 30;
 const DIFF = 20;
 const PARTICIPANT_HEIGHT =
   HUD_HEIGHT - DIFF - (process.platform === 'darwin' ? 0 : 3);
