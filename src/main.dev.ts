@@ -228,7 +228,7 @@ app.on('ready', () => {
   (global as any).autoDetectOn = true;
   (global as any).threshold = 20;
   (global as any).ttf = 10;
-  (global as any).alertMsg = '👍';
+  (global as any).alertMsg = 'Nice job!';
   (global as any).alertWait = 30;
 
   resetGlobalParticipants();
