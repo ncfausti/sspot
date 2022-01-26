@@ -84,10 +84,13 @@ export default function AlertsConfig() {
       <div className="flex justify-between border-b pb-1 mb-2">
         <div>Alerts</div>
         <div>
-          <XIcon
-            className="cursor-pointer w-5 h-5 dark:text-white hover:dark:text-gray-400"
+          <button
+            type="button"
+            className="cursor-pointer outline-none h-5 dark:text-white hover:dark:text-gray-400"
             onClick={() => window.close()}
-          />
+          >
+            Save
+          </button>
         </div>
       </div>
       <div className="leading-8">

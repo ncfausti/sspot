@@ -130,29 +130,44 @@ export default function ParticipantControls() {
               setIsSpotting((prev) => !prev);
               // if going from not spotting -> spotting
               if (!isSpotting) {
-                ipcRenderer.invoke('open-alert-window', {
-                  browserWindowParams: {
-                    frame: false,
-                    alwaysOnTop: true,
-                    transparent: true,
-                    paintWhenInitiallyHidden: false,
-                    webPreferences: {
-                      nodeIntegration: true,
-                      additionalArguments: [
-                        `--USER-DATA-DIR=${remote.getGlobal('userDataDir')}`,
-                      ],
-                      nativeWindowOpen: false,
-                      enableRemoteModule: true,
-                    },
-                    hasShadow: true,
-                    resizable: false,
+                const browserOptions = {
+                  frame: false,
+                  alwaysOnTop: true,
+                  transparent: true,
+                  paintWhenInitiallyHidden: false,
+                  webPreferences: {
+                    nodeIntegration: true,
+                    additionalArguments: [
+                      `--USER-DATA-DIR=${remote.getGlobal('userDataDir')}`,
+                    ],
+                    nativeWindowOpen: false,
+                    enableRemoteModule: true,
                   },
+                  hasShadow: true,
+                  resizable: false,
+                };
+                ipcRenderer.invoke('open-alert-window', {
+                  browserWindowParams: browserOptions,
                   extra: {
-                    alertId: 'disclaimer',
+                    alertId: 'spotting-instructions',
                   },
                 });
+                if (localStorage.getItem('seen-disclaimer') !== 'true') {
+                  // have not seen disclaimer yet, show it
+                  ipcRenderer.invoke('open-alert-window', {
+                    browserWindowParams: browserOptions,
+                    extra: {
+                      alertId: 'disclaimer',
+                    },
+                  });
+                  localStorage.setItem('seen-disclaimer', 'true');
+                }
               } else {
                 ipcRenderer.invoke('close-alert-window', 'disclaimer');
+                ipcRenderer.invoke(
+                  'close-alert-window',
+                  'spotting-instructions'
+                );
               }
               ipcRenderer.invoke('set-spotting');
             }}

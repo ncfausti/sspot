@@ -496,7 +496,7 @@ ipcMain.handle(
       10 +
       numWindows * (ALERT_HEIGHT + SPACE_BETWEEN);
     json.browserWindowParams.width =
-      json.extra.alertId.indexOf('disclaimer') >= 0 ? 500 : 80;
+      json.extra.alertId.indexOf('disclaimer') >= 0 ? 500 : 300;
     json.browserWindowParams.height = ALERT_HEIGHT;
 
     const alertWindow = new BrowserWindow(json.browserWindowParams);

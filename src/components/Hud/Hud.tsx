@@ -6,7 +6,6 @@ import useWebSocket, { ReadyState } from 'react-use-websocket';
 import { ChildProcessWithoutNullStreams } from 'child_process';
 import { ipcRenderer, remote } from 'electron';
 import { uuid } from 'uuidv4';
-import { platform } from 'os';
 import CountUp from '../Clocks/CountUp';
 import Loading from '../Loading';
 import ParticipantsList from './ParticipantsList';
@@ -312,27 +311,30 @@ export default function Hud() {
 
   useEffect(() => {
     if (remote.getGlobal('autoDetectOn')) {
-      ipcRenderer.invoke('open-alert-window', {
-        browserWindowParams: {
-          frame: false,
-          alwaysOnTop: true,
-          transparent: true,
-          paintWhenInitiallyHidden: false,
-          webPreferences: {
-            nodeIntegration: true,
-            additionalArguments: [
-              `--USER-DATA-DIR=${remote.getGlobal('userDataDir')}`,
-            ],
-            nativeWindowOpen: false,
-            enableRemoteModule: true,
+      if (localStorage.getItem('seen-auto-disclaimer') !== 'true') {
+        ipcRenderer.invoke('open-alert-window', {
+          browserWindowParams: {
+            frame: false,
+            alwaysOnTop: true,
+            transparent: true,
+            paintWhenInitiallyHidden: false,
+            webPreferences: {
+              nodeIntegration: true,
+              additionalArguments: [
+                `--USER-DATA-DIR=${remote.getGlobal('userDataDir')}`,
+              ],
+              nativeWindowOpen: false,
+              enableRemoteModule: true,
+            },
+            hasShadow: true,
+            resizable: false,
           },
-          hasShadow: true,
-          resizable: false,
-        },
-        extra: {
-          alertId: 'autodetect-disclaimer',
-        },
-      });
+          extra: {
+            alertId: 'autodetect-disclaimer',
+          },
+        });
+        localStorage.setItem('seen-auto-disclaimer', 'true');
+      }
     }
   }, []);
 

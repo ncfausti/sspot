@@ -10,7 +10,11 @@ import { XIcon } from '@heroicons/react/solid';
 export default function AlertMessage() {
   const params: { alertId: string } = useParams();
   const [message, setMessage] = useState(remote.getGlobal('alertMsg'));
-  const timeoutMs = params.alertId.indexOf('disclaimer') >= 0 ? 10000000 : 5000;
+  const timeoutMs =
+    params.alertId.indexOf('disclaimer') >= 0 ||
+    params.alertId.indexOf('instructions') >= 0
+      ? 10000000
+      : 5000;
 
   // AutoDetectDisclaimer -> red, disclaimer message, include close button
   // SpottingDisclaimer -> red, disclaimer, no close button
@@ -36,9 +40,13 @@ export default function AlertMessage() {
           : 'bg-spotgrayltst'
       } rounded-hud`}
     >
+      {params.alertId.indexOf('spotting-instructions') >= 0 &&
+        'Click on a participant to add to spot.'}
       {params.alertId.indexOf('disclaimer') >= 0 &&
         'By spotting someone, you are confirming that they consent to being recorded.'}
-      {params.alertId.indexOf('disclaimer') === -1 && message}
+      {params.alertId.indexOf('disclaimer') === -1 &&
+        params.alertId.indexOf('instruction') === -1 &&
+        message}
       {params.alertId.indexOf('autodetect-disclaimer') >= 0 && (
         <XIcon
           className="inline cursor-pointer w-5 h-5 dark:text-white hover:dark:text-gray-400"
