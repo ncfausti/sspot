@@ -500,7 +500,7 @@ ipcMain.handle(
       10 +
       numWindows * (ALERT_HEIGHT + SPACE_BETWEEN);
     json.browserWindowParams.width =
-      json.extra.alertId === 'autodetect-disclaimer' ? 500 : 80;
+      json.extra.alertId.indexOf('disclaimer') >= 0 ? 500 : 80;
     json.browserWindowParams.height = ALERT_HEIGHT;
 
     const alertWindow = new BrowserWindow(json.browserWindowParams);
@@ -544,7 +544,7 @@ ipcMain.handle('set-additional-msg-wait', (_event, wait) => {
 });
 
 ipcMain.handle('close-alert-window', (_event, json) => {
-  // should close participants windows too if alertwindowid is 'autodetect-disclaimer'
+  // should close participants windows too if alertwindowid is 'autodetect-disclaimer'q
   windows.forEach((iWindow: IWindow) => {
     try {
       if (iWindow.type === WindowType.AlertWindow) {

@@ -128,7 +128,8 @@ export default function ParticipantControls() {
             alt="spotting on"
             onClick={() => {
               setIsSpotting((prev) => !prev);
-              if (isSpotting) {
+              // if going from not spotting -> spotting
+              if (!isSpotting) {
                 ipcRenderer.invoke('open-alert-window', {
                   browserWindowParams: {
                     frame: false,
@@ -150,6 +151,8 @@ export default function ParticipantControls() {
                     alertId: 'disclaimer',
                   },
                 });
+              } else {
+                ipcRenderer.invoke('close-alert-window', 'disclaimer');
               }
               ipcRenderer.invoke('set-spotting');
             }}
