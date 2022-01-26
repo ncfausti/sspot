@@ -489,11 +489,7 @@ ipcMain.handle(
       (window) => window.type === WindowType.AlertWindow
     );
     const numWindows = alertWindows.length;
-    json.browserWindowParams.x =
-      screen.getPrimaryDisplay().size.width / 2 - // halfway across the screen
-      HUD_WIDTH / 4 +
-      10;
-
+    json.browserWindowParams.x = screen.getPrimaryDisplay().size.width / 2 - 80;
     json.browserWindowParams.y =
       SPACE_ABOVE_HUD +
       HUD_HEIGHT +
