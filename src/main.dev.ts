@@ -543,12 +543,11 @@ ipcMain.handle('set-additional-msg-wait', (_event, wait) => {
   (global as any).alertWait = wait;
 });
 
-ipcMain.handle('close-alert-window', (_event, json) => {
+ipcMain.handle('close-alert-window', (_event, alertId) => {
   // should close participants windows too if alertwindowid is 'autodetect-disclaimer'q
   windows.forEach((iWindow: IWindow) => {
     try {
-      if (iWindow.type === WindowType.AlertWindow) {
-        log.info(json);
+      if (iWindow.type === WindowType.AlertWindow && iWindow.id === alertId) {
         iWindow.window.close();
         windows.delete(iWindow);
       }

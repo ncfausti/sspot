@@ -152,7 +152,10 @@ export default function ParticipantControls() {
                   },
                 });
               } else {
-                ipcRenderer.invoke('close-alert-window', 'disclaimer');
+                const disclaimerId = remote.getGlobal('autoDetectOn')
+                  ? 'disclaimer'
+                  : 'autodetect-disclaimer';
+                ipcRenderer.invoke('close-alert-window', disclaimerId);
               }
               ipcRenderer.invoke('set-spotting');
             }}
