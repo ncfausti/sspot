@@ -77,6 +77,12 @@ export default function Settings(props: {
               onChangeCallback={autoDetectChanged}
             />
           </span>
+          {isAutoDetectOn && (
+            <span className="text-xxs text-black dark:text-white absolute p-1 leading-tight">
+              By spotting someone, you are confirming that they consent to being
+              recorded.
+            </span>
+          )}
         </div>
         <button
           type="button"
