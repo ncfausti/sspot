@@ -1,7 +1,6 @@
 import React from 'react';
 import '@testing-library/jest-dom';
 import { render } from '@testing-library/react';
-import EventEmitter from 'events';
 import Hud, { removeItemById } from '../components/Hud/Hud';
 
 jest.mock('electron', () => {

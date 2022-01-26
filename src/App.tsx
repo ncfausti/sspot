@@ -26,7 +26,7 @@ export default function App() {
         <Route path="/participant/:pid" component={ParticipantInfo} />
         <Route path="/controls" component={ParticipantControls} />
         <Route path="/alerts" component={AlertsConfig} />
-        <Route path="/alert/:aid" component={AlertMessage} />
+        <Route path="/alert/:alertId" component={AlertMessage} />
       </Switch>
       {/* </AuthProvider> */}
     </Router>

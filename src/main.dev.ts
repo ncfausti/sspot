@@ -26,6 +26,7 @@ const CONTROLS_WIDTH = 45;
 const SPACE_BETWEEN = 12;
 const SPACE_ABOVE_HUD = 40;
 const PARTICIPANT_WIDTH = 110;
+const ALERT_HEIGHT = 40;
 const DIFF = 20;
 const PARTICIPANT_HEIGHT =
   HUD_HEIGHT - DIFF - (process.platform === 'darwin' ? 0 : 3);
@@ -68,6 +69,18 @@ enum WindowType {
   ParticipantControls,
   ParticipantWindow,
   AlertWindow,
+}
+
+interface Alert {
+  type: AlertType;
+  text: string;
+}
+
+enum AlertType {
+  Info = 1,
+  Success,
+  Caution,
+  Warning,
 }
 
 // A wrapper around a BrowserWindow that includes
@@ -456,6 +469,9 @@ ipcMain.handle(
     participantWindow.setAlwaysOnTop(true, 'screen-saver');
     participantWindow.setResizable(false);
     participantWindow.setHasShadow(true);
+
+    // extra.pid comes from the object that the invoker of 'new-participant-window'
+    // passes in
     participantWindow.loadURL(
       `file://${__dirname}/index.html#/participant/${json.extra.pid}`
     );
@@ -519,20 +535,27 @@ ipcMain.handle(
     _event,
     json: {
       browserWindowParams: BrowserWindowConstructorOptions;
-      extra: { pid: string };
+      extra: { pid: string; message: string; type: string };
     }
   ) => {
-    // override whatever window x, y, height, width that the renderer sends
-    // and calculate based on windowing layout and number of faces
-    const numWindows = windows.size - 2;
+    // filter windows on type == notification, count how many are present
+    // and adjust y position of alert window that spawns
+    const alertWindows = [...windows].filter(
+      (window) => window.type === WindowType.AlertWindow
+    );
+    const numWindows = alertWindows.length;
     json.browserWindowParams.x =
       screen.getPrimaryDisplay().size.width / 2 - // halfway across the screen
       HUD_WIDTH / 4 +
-      10; // 1/4 of the way across the HUD
+      10;
 
-    json.browserWindowParams.y = SPACE_ABOVE_HUD + HUD_HEIGHT + 10;
-    json.browserWindowParams.width = 80;
-    json.browserWindowParams.height = 50;
+    json.browserWindowParams.y =
+      SPACE_ABOVE_HUD +
+      HUD_HEIGHT +
+      10 +
+      numWindows * (ALERT_HEIGHT + SPACE_BETWEEN);
+    json.browserWindowParams.width = json.extra.pid === 'disclaimer' ? 500 : 80;
+    json.browserWindowParams.height = ALERT_HEIGHT;
 
     const alertWindow = new BrowserWindow(json.browserWindowParams);
 
@@ -542,10 +565,12 @@ ipcMain.handle(
     alertWindow.setAlwaysOnTop(true, 'screen-saver');
     alertWindow.setResizable(false);
     alertWindow.setHasShadow(true);
-    alertWindow.loadURL(`file://${__dirname}/index.html#/alert/alert-abc`);
+    alertWindow.loadURL(
+      `file://${__dirname}/index.html#/alert/${json.extra.pid}`
+    );
 
     windows.add({
-      id: 'alert-abc',
+      id: json.extra.pid,
       window: alertWindow,
       type: WindowType.AlertWindow,
     });

@@ -310,6 +310,31 @@ export default function Hud() {
     ipcRenderer.send('removeParticipant', faceId);
   }, []);
 
+  useEffect(() => {
+    ipcRenderer.invoke('open-alert-window', {
+      browserWindowParams: {
+        frame: false,
+        alwaysOnTop: true,
+        transparent: true,
+        paintWhenInitiallyHidden: false,
+        webPreferences: {
+          nodeIntegration: true,
+          additionalArguments: [
+            `--USER-DATA-DIR=${remote.getGlobal('userDataDir')}`,
+          ],
+          nativeWindowOpen: false,
+          enableRemoteModule: true,
+        },
+        hasShadow: true,
+        resizable: false,
+      },
+      extra: {
+        pid: 'disclaimer',
+        message: 'Must have consent to record users.',
+      },
+    });
+  }, []);
+
   return (
     <>
       {connectionStatus !== 'Open' && (

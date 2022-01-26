@@ -92,6 +92,9 @@ export default function ParticipantControls() {
     });
   }, []);
 
+  // When faces.length changes for the first time
+  // and auto-detect is on
+
   return (
     <div
       onMouseEnter={() => {
@@ -125,6 +128,33 @@ export default function ParticipantControls() {
             alt="spotting on"
             onClick={() => {
               setIsSpotting((prev) => !prev);
+              if (isSpotting) {
+                ipcRenderer.invoke('open-alert-window', {
+                  browserWindowParams: {
+                    frame: false,
+                    alwaysOnTop: true,
+                    transparent: true,
+                    paintWhenInitiallyHidden: false,
+                    webPreferences: {
+                      nodeIntegration: true,
+                      additionalArguments: [
+                        `--USER-DATA-DIR=${remote.getGlobal('userDataDir')}`,
+                      ],
+                      nativeWindowOpen: false,
+                      enableRemoteModule: true,
+                    },
+                    hasShadow: true,
+                    resizable: false,
+                  },
+                  extra: {
+                    pid: 'disclaimer',
+                    message: 'Must have consent to record users.',
+                    type: 'disclaimer',
+                  },
+                });
+              } else {
+                ipcRenderer.invoke('close-disclaimer');
+              }
               ipcRenderer.invoke('set-spotting');
             }}
           />
