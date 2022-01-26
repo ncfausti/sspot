@@ -19,6 +19,7 @@ import { arch } from 'os';
 import { autoUpdater } from 'electron-updater';
 import { Menubar, menubar } from 'menubar';
 import { BrowserWindowConstructorOptions } from 'electron/main';
+import WindowManager from './WindowManager';
 
 const HUD_WIDTH = 172;
 const HUD_HEIGHT = 148;
@@ -92,23 +93,24 @@ interface IWindow {
 }
 
 // store all browserWindows in a set
-const windows: Set<IWindow> = new Set();
-
-function killParticipantWindow(participantId: string) {
-  windows.forEach((iWindow) => {
-    try {
-      if (
-        iWindow.type === WindowType.ParticipantWindow &&
-        iWindow.id === participantId
-      ) {
-        iWindow.window.close();
-        windows.delete(iWindow);
-      }
-    } catch (e) {
-      log.error(e);
-    }
-  });
-}
+// const windows: Set<IWindow> = new Set();
+const windowManager = WindowManager.getInstance();
+const windows = windowManager.getWindows();
+// function killParticipantWindow(participantId: string) {
+//   windows.forEach((iWindow) => {
+//     try {
+//       if (
+//         iWindow.type === WindowType.ParticipantWindow &&
+//         iWindow.id === participantId
+//       ) {
+//         iWindow.window.close();
+//         windows.delete(iWindow);
+//       }
+//     } catch (e) {
+//       log.error(e);
+//     }
+//   });
+// }
 
 const RESOURCES_PATH = app.isPackaged
   ? path.join(process.resourcesPath, 'assets')
@@ -202,7 +204,7 @@ ipcMain.on('setPropFaces', (_event, filteredFaces) => {
 ipcMain.on('removeParticipant', (_event, pid) => {
   log.info(`removing participant: ${pid}`);
   (global as any).faceIdsToRemove.push(pid);
-  killParticipantWindow(pid);
+  windowManager.killParticipantWindow(pid);
 });
 
 app.on('window-all-closed', () => {
@@ -270,52 +272,6 @@ export const startServer = () => {
   }
 };
 
-function hideParticipants() {
-  windows.forEach((iWindow) => {
-    try {
-      if (
-        iWindow.type === WindowType.ParticipantControls ||
-        iWindow.type === WindowType.ParticipantWindow
-      ) {
-        iWindow.window.hide();
-      }
-    } catch (e) {
-      log.error(e);
-    }
-  });
-}
-
-function showParticipants() {
-  windows.forEach((iWindow) => {
-    try {
-      if (
-        iWindow.type === WindowType.ParticipantControls ||
-        iWindow.type === WindowType.ParticipantWindow
-      ) {
-        iWindow.window.show();
-      }
-    } catch (e) {
-      log.error(e);
-    }
-  });
-}
-
-function killMeetingWindows() {
-  windows.forEach((iWindow) => {
-    try {
-      if (
-        iWindow.type === WindowType.ParticipantControls ||
-        iWindow.type === WindowType.ParticipantWindow ||
-        iWindow.type === WindowType.AlertWindow
-      ) {
-        iWindow.window.close();
-      }
-    } catch (e) {
-      log.error(e);
-    }
-  });
-}
-
 const MouseListener = () => {
   let service: ChildProcessWithoutNullStreams;
 
@@ -366,8 +322,7 @@ ipcMain.handle('kill-server', async () => {
 ipcMain.handle('bounce-server', async () => {
   // get the global server process variable,
   // then kill it, then restart it
-  killMeetingWindows();
-  windows.clear();
+  windowManager.killMeetingWindows();
   (global as any).serverProcess.kill(9);
 
   // reset globals related to participants
@@ -480,12 +435,12 @@ ipcMain.handle(
       window: participantWindow,
       type: WindowType.ParticipantWindow,
     });
-    showParticipants();
+    windowManager.showParticipants();
   }
 );
 
-ipcMain.handle('hide-participants', hideParticipants);
-ipcMain.handle('show-participants', showParticipants);
+ipcMain.handle('hide-participants', () => windowManager.hideParticipants());
+ipcMain.handle('show-participants', () => windowManager.showParticipants());
 
 ipcMain.on('reset-meeting', (event, json) => {
   log.info('reset current meeting');
