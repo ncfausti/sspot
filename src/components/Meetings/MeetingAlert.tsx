@@ -24,19 +24,12 @@ interface MeetingAlertProps {
 // It is to be embedded in the HUD and will be shown when the user
 // talk-ratio and time-duration are above the threshold values
 export default function MeetingAlert(props: MeetingAlertProps) {
-  const [isTalking, setIsTalking] = useState(false);
-  const { id, message, rules, voiceMetrics } = props;
+  const { id, message, voiceMetrics } = props;
   const [wait, setWait] = useState(remote.getGlobal('alertWait'));
 
   const [timeToFire, setTimeToFire] = useState(remote.getGlobal('ttf'));
   // const [message, setMessage] = useState(remote.getGlobal('alertMsg'));
   const [threshold, setThreshold] = useState(remote.getGlobal('threshold'));
-  // const [wait, setWait] = useState(remote.getGlobal('alertWait'));
-
-  // log.info(id);
-  // log.info(rules);
-  // log.info(message);
-  // log.info(voiceMetrics);
 
   const refTalkRatio = useRef(null);
   useEffect(() => {
@@ -63,7 +56,7 @@ export default function MeetingAlert(props: MeetingAlertProps) {
                 hasShadow: true,
                 resizable: false,
               },
-              extra: { id, message, rules },
+              extra: { alertId: id, message },
             });
             counter = -1 * wait;
           } else if (

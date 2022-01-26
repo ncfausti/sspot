@@ -311,28 +311,29 @@ export default function Hud() {
   }, []);
 
   useEffect(() => {
-    ipcRenderer.invoke('open-alert-window', {
-      browserWindowParams: {
-        frame: false,
-        alwaysOnTop: true,
-        transparent: true,
-        paintWhenInitiallyHidden: false,
-        webPreferences: {
-          nodeIntegration: true,
-          additionalArguments: [
-            `--USER-DATA-DIR=${remote.getGlobal('userDataDir')}`,
-          ],
-          nativeWindowOpen: false,
-          enableRemoteModule: true,
+    if (remote.getGlobal('autoDetectOn')) {
+      ipcRenderer.invoke('open-alert-window', {
+        browserWindowParams: {
+          frame: false,
+          alwaysOnTop: true,
+          transparent: true,
+          paintWhenInitiallyHidden: false,
+          webPreferences: {
+            nodeIntegration: true,
+            additionalArguments: [
+              `--USER-DATA-DIR=${remote.getGlobal('userDataDir')}`,
+            ],
+            nativeWindowOpen: false,
+            enableRemoteModule: true,
+          },
+          hasShadow: true,
+          resizable: false,
         },
-        hasShadow: true,
-        resizable: false,
-      },
-      extra: {
-        pid: 'disclaimer',
-        message: 'Must have consent to record users.',
-      },
-    });
+        extra: {
+          alertId: 'autodetect-disclaimer',
+        },
+      });
+    }
   }, []);
 
   return (

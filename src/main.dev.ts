@@ -96,21 +96,6 @@ interface IWindow {
 // const windows: Set<IWindow> = new Set();
 const windowManager = WindowManager.getInstance();
 const windows = windowManager.getWindows();
-// function killParticipantWindow(participantId: string) {
-//   windows.forEach((iWindow) => {
-//     try {
-//       if (
-//         iWindow.type === WindowType.ParticipantWindow &&
-//         iWindow.id === participantId
-//       ) {
-//         iWindow.window.close();
-//         windows.delete(iWindow);
-//       }
-//     } catch (e) {
-//       log.error(e);
-//     }
-//   });
-// }
 
 const RESOURCES_PATH = app.isPackaged
   ? path.join(process.resourcesPath, 'assets')
@@ -205,6 +190,11 @@ ipcMain.on('removeParticipant', (_event, pid) => {
   log.info(`removing participant: ${pid}`);
   (global as any).faceIdsToRemove.push(pid);
   windowManager.killParticipantWindow(pid);
+});
+
+ipcMain.on('remove-alert', (_event, alertId) => {
+  log.info(`removing alert: ${alertId}`);
+  windowManager.killAlertWindow(alertId);
 });
 
 app.on('window-all-closed', () => {
@@ -490,7 +480,7 @@ ipcMain.handle(
     _event,
     json: {
       browserWindowParams: BrowserWindowConstructorOptions;
-      extra: { pid: string; message: string; type: string };
+      extra: { alertId: string; message: string; type: string };
     }
   ) => {
     // filter windows on type == notification, count how many are present
@@ -509,7 +499,8 @@ ipcMain.handle(
       HUD_HEIGHT +
       10 +
       numWindows * (ALERT_HEIGHT + SPACE_BETWEEN);
-    json.browserWindowParams.width = json.extra.pid === 'disclaimer' ? 500 : 80;
+    json.browserWindowParams.width =
+      json.extra.alertId === 'autodetect-disclaimer' ? 500 : 80;
     json.browserWindowParams.height = ALERT_HEIGHT;
 
     const alertWindow = new BrowserWindow(json.browserWindowParams);
@@ -521,11 +512,11 @@ ipcMain.handle(
     alertWindow.setResizable(false);
     alertWindow.setHasShadow(true);
     alertWindow.loadURL(
-      `file://${__dirname}/index.html#/alert/${json.extra.pid}`
+      `file://${__dirname}/index.html#/alert/${json.extra.alertId}`
     );
 
     windows.add({
-      id: json.extra.pid,
+      id: json.extra.alertId,
       window: alertWindow,
       type: WindowType.AlertWindow,
     });
@@ -553,6 +544,7 @@ ipcMain.handle('set-additional-msg-wait', (_event, wait) => {
 });
 
 ipcMain.handle('close-alert-window', (_event, json) => {
+  // should close participants windows too if alertwindowid is 'autodetect-disclaimer'
   windows.forEach((iWindow: IWindow) => {
     try {
       if (iWindow.type === WindowType.AlertWindow) {

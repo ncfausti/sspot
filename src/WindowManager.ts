@@ -112,6 +112,19 @@ export default class WindowManager {
     });
   }
 
+  public killAlertWindow(alertId: string) {
+    this.windows.forEach((iWindow) => {
+      try {
+        if (iWindow.id === alertId) {
+          iWindow.window.close();
+          this.windows.delete(iWindow);
+        }
+      } catch (e) {
+        log.error(e);
+      }
+    });
+  }
+
   public getWindows() {
     return this.windows;
   }

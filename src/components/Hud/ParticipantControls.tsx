@@ -147,13 +147,9 @@ export default function ParticipantControls() {
                     resizable: false,
                   },
                   extra: {
-                    pid: 'disclaimer',
-                    message: 'Must have consent to record users.',
-                    type: 'disclaimer',
+                    alertId: 'disclaimer',
                   },
                 });
-              } else {
-                ipcRenderer.invoke('close-disclaimer');
               }
               ipcRenderer.invoke('set-spotting');
             }}
