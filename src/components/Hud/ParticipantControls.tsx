@@ -10,6 +10,7 @@ import resetIconWhite from '../../../assets/reset-white.png';
 import spottingIconWhite from '../../../assets/user-add-white.png';
 import spottingIconBlack from '../../../assets/user-add.png';
 import spottingIconOn from '../../../assets/user-add-red.png';
+import WindowManager from '../../WindowManager';
 
 interface Face {
   id: string;
@@ -20,6 +21,29 @@ interface Face {
   image_path: string;
   status: number;
   directory: string;
+}
+
+function handleNewParticipant(pid: string) {
+  ipcRenderer.invoke('new-participant-window', {
+    browserWindowParams: {
+      frame: false,
+      alwaysOnTop: true,
+      transparent: true,
+      backgroundColor: '#00000000',
+      paintWhenInitiallyHidden: false,
+      webPreferences: {
+        nodeIntegration: true,
+        additionalArguments: [
+          `--USER-DATA-DIR=${remote.getGlobal('userDataDir')}`,
+        ],
+        nativeWindowOpen: false,
+        enableRemoteModule: true,
+      },
+      hasShadow: true,
+      resizable: false,
+    },
+    extra: { pid },
+  });
 }
 
 export default function ParticipantControls() {
@@ -41,6 +65,27 @@ export default function ParticipantControls() {
   const [inAppUI, setInAppUI] = useState(false);
   const [spotIcon, setSpotIcon] = useState(spottingIconWhite);
   const [resetIcon, setResetIcon] = useState(resetIconWhite);
+
+  // on faces.length changed
+  useEffect(() => {
+    // get the WindowManager instance
+    const windows = [...WindowManager.getInstance().getWindows()];
+    const windowIds = windows.map((window) => window.id);
+
+    // get the difference between the current participant windows and the new faces
+    const facesToOpenWindowsFor = faces.filter(
+      (newFace: Face) =>
+        windowIds.indexOf(newFace.id) === -1 &&
+        !newFace.image_path.startsWith('data')
+    );
+    log.info('opening windows for...');
+    log.info(facesToOpenWindowsFor);
+
+    // Open windows for the new faces
+    facesToOpenWindowsFor.forEach((newFace: Face) =>
+      handleNewParticipant(newFace.id)
+    );
+  }, [faces.length]);
 
   // on initial load only
   useEffect(() => {
