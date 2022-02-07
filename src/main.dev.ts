@@ -14,7 +14,7 @@ import 'regenerator-runtime/runtime';
 import log from 'electron-log';
 import path from 'path';
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
-import { app, screen, ipcMain, BrowserWindow } from 'electron';
+import { app, screen, ipcMain, BrowserWindow, Menu, Tray } from 'electron';
 import { arch } from 'os';
 import { autoUpdater } from 'electron-updater';
 import { Menubar, menubar } from 'menubar';
@@ -141,9 +141,22 @@ const createWindow = async () => {
 
   mb.on('ready', () => {
     log.info('menu bar is ready now');
-    log.info(mb.tray);
+    // log.info(mb.tray);
+    // mb.tray.setContextMenu(
+    // const tray = new Tray(getAssetPath('tray.png'));
+    const contextMenu = Menu.buildFromTemplate([
+      { label: 'Quit', type: 'radio' },
+    ]);
+
+    mb.tray.on('click', () => {
+      log.info('clicked tray icon');
+      mb.tray.setContextMenu(null);
+    });
+
     mb.tray.on('right-click', () => {
       log.info('right clicked tray icon');
+      mb.tray.setContextMenu(contextMenu);
+      mb.tray.popUpContextMenu();
     });
   });
 
