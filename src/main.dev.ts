@@ -141,9 +141,6 @@ const createWindow = async () => {
 
   mb.on('ready', () => {
     log.info('menu bar is ready now');
-    // log.info(mb.tray);
-    // mb.tray.setContextMenu(
-    // const tray = new Tray(getAssetPath('tray.png'));
     const contextMenu = Menu.buildFromTemplate([
       {
         label: 'Quit',
@@ -258,9 +255,9 @@ app.on('will-quit', () => {
 app.on('ready', () => {
   console.log('app is ready');
   (global as any).autoDetectOn = true;
-  (global as any).threshold = 20;
-  (global as any).ttf = 10;
-  (global as any).alertMsg = 'Nice job!';
+  (global as any).threshold = 60;
+  (global as any).ttf = 120;
+  (global as any).alertMsg = '🗣 Time to ask a Q';
   (global as any).alertWait = 30;
 
   resetGlobalParticipants();

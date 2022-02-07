@@ -6,9 +6,9 @@ import { ipcRenderer, remote } from 'electron';
 import { XIcon } from '@heroicons/react/solid';
 
 export default function AlertsConfig() {
-  (global as any).threshold = 20;
-  (global as any).ttf = 10;
-  (global as any).alertMsg = 'Nice job!';
+  (global as any).threshold = 60;
+  (global as any).ttf = 120;
+  (global as any).alertMsg = '🗣 Time to ask a Q';
   const [timeToFire, setTimeToFire] = useState(remote.getGlobal('ttf'));
   const [message, setMessage] = useState(remote.getGlobal('alertMsg'));
   const [threshold, setThreshold] = useState(remote.getGlobal('threshold'));
