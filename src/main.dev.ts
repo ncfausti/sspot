@@ -139,6 +139,20 @@ const createWindow = async () => {
     },
   });
 
+  mb.on('ready', () => {
+    log.info('menu bar is ready now');
+    log.info(mb.tray);
+    mb.tray.on('right-click', () => {
+      log.info('right clicked tray icon');
+    });
+  });
+
+  mb.on('create-window', (event, other) => {
+    log.info(event);
+    log.info(other);
+    log.info('creating window now');
+  });
+
   // store the user app data directory in a global variable
   (global as any).userDataDir = app.getPath('userData');
   log.info('SETTING GLOBAL USER DATA DIR', (global as any).userDataDir);
