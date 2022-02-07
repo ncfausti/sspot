@@ -145,7 +145,12 @@ const createWindow = async () => {
     // mb.tray.setContextMenu(
     // const tray = new Tray(getAssetPath('tray.png'));
     const contextMenu = Menu.buildFromTemplate([
-      { label: 'Quit', type: 'radio' },
+      {
+        label: 'Quit',
+        click: () => {
+          app.quit();
+        },
+      },
     ]);
 
     mb.tray.on('click', () => {
