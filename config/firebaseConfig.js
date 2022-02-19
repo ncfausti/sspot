@@ -1,5 +1,5 @@
-import firebase from 'firebase';
-import 'firebase/auth';
+// import firebase from 'firebase';
+// import 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyBCxZXaAR3YqoLaoKJboqkmrPcC9Zv_gDo',
@@ -11,7 +11,7 @@ const firebaseConfig = {
   measurementId: 'G-F39RES29EF',
 };
 
-const fb = firebase.initializeApp(firebaseConfig);
-export const auth = fb.auth();
-export const db = firebase.firestore();
-export default fb;
+// const fb = firebase.initializeApp(firebaseConfig);
+// export const auth = fb.auth();
+// export const db = firebase.firestore();
+export default firebaseConfig;

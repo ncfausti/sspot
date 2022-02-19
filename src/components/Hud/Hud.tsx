@@ -104,13 +104,13 @@ export default function Hud() {
   const [showParticipants, setShowParticipants] = useState(true);
   const [voiceMetrics, setVoiceMetrics] = useState(voiceMetricsDefault);
   const spottingBtn = useRef(null);
-  const refTalkRatio = useRef(null);
   const HUD_STARTING_WIDTH = 166;
   const mainHudWidth = process.platform === 'darwin' ? 166 : 163;
   const mainHudHeight = process.platform === 'darwin' ? 148 : 145;
   const [saleSpotLogo, setSaleSpotLogo] = useState(logo);
+  // const db = useRef(DataStore.getInstance());
 
-  // Swap icons for dark mode / light mode
+  // Swap icons for dark mode / light mode and
   useEffect(() => {
     if (
       window.matchMedia &&
@@ -277,7 +277,11 @@ export default function Hud() {
     });
   }, []);
 
-  function clickEnd() {
+  function clickEnd(meetingDuration: number) {
+    ipcRenderer.invoke('send-call-log', {
+      elapsed: meetingDuration,
+      logUid: localStorage.getItem('log-uuid'),
+    });
     ipcRenderer.invoke('bounce-server');
     window.close();
   }
@@ -314,6 +318,10 @@ export default function Hud() {
   }, []);
 
   useEffect(() => {
+    // setup uuid for the user
+    if (localStorage.getItem('log-uuid') === null) {
+      localStorage.setItem('log-uuid', uuid());
+    }
     if (remote.getGlobal('autoDetectOn')) {
       if (localStorage.getItem('seen-auto-disclaimer') !== 'true') {
         ipcRenderer.invoke('open-alert-window', {
@@ -400,7 +408,7 @@ export default function Hud() {
                       End SaleSpot Session
                     </span>
                     <button
-                      onClick={clickEnd}
+                      onClick={() => clickEnd(elapsed)}
                       className="cursor-pointer bg-white text-gray-900 dark:bg-spotgray dark:text-white dark:hover:bg-spotgraylt border dark:border-none
                   rounded text-sm w-[40px] h-[28px] font-semibold px-1 focus:outline-none"
                       type="button"

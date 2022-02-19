@@ -14,12 +14,21 @@ import 'regenerator-runtime/runtime';
 import log from 'electron-log';
 import path from 'path';
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
-import { app, screen, ipcMain, BrowserWindow, Menu, Tray } from 'electron';
+import {
+  app,
+  screen,
+  ipcMain,
+  BrowserWindow,
+  Menu,
+  Tray,
+  ipcRenderer,
+} from 'electron';
 import { arch } from 'os';
 import { autoUpdater } from 'electron-updater';
 import { Menubar, menubar } from 'menubar';
 import { BrowserWindowConstructorOptions } from 'electron/main';
 import WindowManager from './WindowManager';
+import DataStore from './DataStore';
 
 const HUD_WIDTH = 172;
 const HUD_HEIGHT = 148;
@@ -96,6 +105,19 @@ interface IWindow {
 // const windows: Set<IWindow> = new Set();
 const windowManager = WindowManager.getInstance();
 const windows = windowManager.getWindows();
+
+const ds = DataStore.getInstance();
+
+ipcMain.handle('send-call-log', (_event, data) => {
+  ds.sendCallLog(data.elapsed, data.logUid)
+    .then((docId) => {
+      if (docId) {
+        log.info(docId);
+      }
+      return docId;
+    })
+    .catch((err) => log.error(err));
+});
 
 const RESOURCES_PATH = app.isPackaged
   ? path.join(process.resourcesPath, 'assets')

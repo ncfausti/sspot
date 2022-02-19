@@ -68,8 +68,6 @@ export default function MeetingAlert(props: MeetingAlertProps) {
           } else {
             counter = 0;
           }
-          log.info('MeetingAlert: ');
-          log.info(counter, refTalkRatio.current);
         };
       })(0),
       1000
