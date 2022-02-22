@@ -93,12 +93,10 @@ export default function ParticipantControls() {
       window.matchMedia('(prefers-color-scheme: dark)').matches
     ) {
       // dark mode
-      log.info('dark mode');
       setSpotIcon(spottingIconWhite);
       setResetIcon(resetIconWhite);
     } else {
       // light mode
-      log.info('light mode');
       setSpotIcon(spottingIconBlack);
       setResetIcon(resetIconBlack);
     }

@@ -486,7 +486,7 @@ export default function Hud() {
                     {/* {connectionStatus === 'Open' ? ' Active' : ' Initializing'} */}
                   </span>
                 </div>
-                <div className="flex text-gray-700 space-x-8">
+                <div className="flex text-gray-700">
                   <span className="flex hidden space-x-1">
                     <span className="relative w-3 h-3">
                       <img
@@ -509,7 +509,7 @@ export default function Hud() {
                     </span>
                   </span>
                   <span className="has-tooltip">
-                    <span className="tooltip rounded shadow-lg translate-x-[-110px] w-4/5 py-1 px-3 -mt-6">
+                    <span className="tooltip rounded shadow-lg translate-x-[-110px] w-9/10 py-1 px-3 -mt-6">
                       Show Participants
                     </span>
                     <img
@@ -517,7 +517,7 @@ export default function Hud() {
                         showParticipants === false ? clickHide : clickExpand
                       }
                       src={expand}
-                      className={`w-[14px] h-[23px] cursor-pointer ${
+                      className={`w-[13px] h-[20px] cursor-pointer ${
                         showParticipants && 'transform rotate-180'
                       }`}
                       alt="expand"
