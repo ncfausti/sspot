@@ -18,6 +18,8 @@ export default function SignIn() {
   const history = useHistory();
   const { login } = useAuth();
 
+  window.resizeTo(300, 400);
+
   log.info('SignIn');
 
   async function handleSubmit(action: SyntheticEvent) {
@@ -37,7 +39,10 @@ export default function SignIn() {
     setLoading(true);
 
     try {
+      log.info('SignIn: calling login');
       await login(emailRef.current.value, passwordRef.current.value);
+
+      log.info('SignIn: login successful');
       history.push('/');
     } catch (e) {
       setError(e.message);
@@ -47,15 +52,10 @@ export default function SignIn() {
 
   return (
     <>
-      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
+      <div className="flex items-center justify-center bg-gray-100 dark:bg-black py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full">
           <div>
-            <img
-              className="mx-auto h-12 w-auto"
-              src="https://uploads-ssl.webflow.com/5e7e3e4593c0d71474b3b12d/5e7e410965a9e54b25ca4557_smileML%20Full%20Logo%20(small)_20200327-p-500.png"
-              alt="smileML"
-            />
-            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            <h2 className="text-center text-3xl font-extrabold text-gray-900">
               Sign In to SaleSpot
             </h2>
           </div>

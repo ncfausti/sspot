@@ -6,6 +6,7 @@ import log from 'electron-log';
 import { app, ipcRenderer, remote } from 'electron';
 import logo from '../../../assets/salespot-logo-long.png';
 import logoDark from '../../../assets/salespot-logo-long-dark.png';
+import { useAuth, logout } from '../../contexts/AuthContext';
 
 // import { startServer } from '../../utils';
 import Settings from './Settings';
@@ -21,6 +22,8 @@ export default function Meetings() {
 
   const [saleSpotLogo, setSaleSpotLogo] = useState(logo);
 
+  const { currentUser } = useAuth();
+  log.info(currentUser.email);
   // on initial load only
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000);
@@ -160,6 +163,11 @@ export default function Meetings() {
                   style={{ fontSize: '8px' }}
                   className="inline text-xs text-gray-400 font-light"
                 />
+              </div>
+              <div>
+                <button className="text-xs font-light" onClick={() => logout()}>
+                  X
+                </button>
               </div>
               <div className="text-gray-700 hover:delay-1000 has-tooltip ">
                 <CogIcon

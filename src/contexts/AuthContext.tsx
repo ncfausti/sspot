@@ -12,6 +12,7 @@ import {
   getAuth,
   onAuthStateChanged,
   signInWithEmailAndPassword,
+  signOut,
 } from 'firebase/auth';
 import log from 'electron-log';
 import firebaseConfig from '../../config/firebaseConfig';
@@ -25,8 +26,12 @@ export function useAuth() {
   return useContext(AuthContext);
 }
 
+export function logout() {
+  return signOut(auth);
+}
+
 export function AuthProvider({ children }) {
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState<User>({} as User);
   const [loading, setLoading] = useState(true);
 
   function login(email: string, password: string) {
@@ -35,13 +40,11 @@ export function AuthProvider({ children }) {
 
   function logout() {
     // returns a promise
-    return auth.signOut();
+    return signOut(auth);
   }
 
   useEffect(() => {
     return onAuthStateChanged(auth, (user: User) => {
-      // Do not render application until we have a user set for the
-      // first time
       log.info(user);
       setCurrentUser(user);
       setLoading(false);
