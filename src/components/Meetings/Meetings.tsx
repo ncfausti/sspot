@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { CogIcon } from '@heroicons/react/solid';
 import log from 'electron-log';
 import { app, ipcRenderer, remote } from 'electron';
+import MeetingsList from './MeetingsList';
 import logo from '../../../assets/salespot-logo-long.png';
 import logoDark from '../../../assets/salespot-logo-long-dark.png';
 import { useAuth, logout } from '../../contexts/AuthContext';
@@ -22,7 +23,30 @@ export default function Meetings() {
 
   const [saleSpotLogo, setSaleSpotLogo] = useState(logo);
 
+  // firebase auth + calendar data
   const { currentUser } = useAuth();
+  const [meetingIndex] = useState(0);
+  const [eventList, setEventList] = useState([
+    { startTime: '10:00AM', startDate: '1/1/2000', id: -1 },
+  ]);
+  const { logout } = useAuth();
+
+  function showPrev() {
+    setEventList((prevState) => ({
+      meetingIndex:
+        prevState.meetingIndex - 1 >= 0 ? prevState.meetingIndex - 1 : 0,
+    }));
+  }
+
+  function showNext() {
+    setEventList((prevState) => ({
+      meetingIndex:
+        prevState.meetingIndex + 1 < prevState.eventList.length
+          ? prevState.meetingIndex + 1
+          : prevState.meetingIndex,
+    }));
+  }
+
   log.info(currentUser.email);
   // on initial load only
   useEffect(() => {
@@ -141,12 +165,26 @@ export default function Meetings() {
               </div>
               <div className="text-xs font-light">{timeStyle.format(time)}</div>
             </div>
-            <div className="flex flex-grow">
+            <div className="flex">
               <button
                 type="button"
                 onClick={handleLaunchClick}
-                className="w-full border border-transparent text-xs font-semibold
+                className="w-full border border-transparent text-sm py-2 font-semibold
                 font-medium rounded-md shadow-sm text-white bg-spotblue focus:outline-none"
+              >
+                Join Meeting and Launch
+                {/* {autoDetect ? '(auto-detect)' : ''} */}
+              </button>
+            </div>
+            <div className="flex">
+              <MeetingsList />
+            </div>
+            <div className="flex">
+              <button
+                type="button"
+                onClick={handleLaunchClick}
+                className="w-full border border-transparent text-sm py-2 font-semibold
+                font-medium rounded-md shadow-sm text-white bg-spotgray focus:outline-none"
               >
                 Launch SaleSpot
                 {/* {autoDetect ? '(auto-detect)' : ''} */}
@@ -156,7 +194,7 @@ export default function Meetings() {
               <div className="">
                 <img
                   src={saleSpotLogo}
-                  className="inline w-20 mr-1"
+                  className="inline w-24 mr-1"
                   alt="SaleSpot"
                 />
                 <span
@@ -165,8 +203,11 @@ export default function Meetings() {
                 />
               </div>
               <div>
-                <button className="text-xs font-light" onClick={() => logout()}>
-                  X
+                <button
+                  className="text-xs font-light bg-gray-100 dark:bg-spotgray rounded-md px-6 py-2"
+                  onClick={() => logout()}
+                >
+                  Dashboard
                 </button>
               </div>
               <div className="text-gray-700 hover:delay-1000 has-tooltip ">
