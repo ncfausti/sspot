@@ -1,48 +1,48 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable jsx-a11y/label-has-for */
 /* eslint-disable react/prop-types */
-import React, { SyntheticEvent, useRef } from 'react';
+import React, { SyntheticEvent, useRef, useState } from 'react';
 import { LockClosedIcon } from '@heroicons/react/solid';
-// import { useHistory } from 'react-router-dom';
-// import { useAuth } from '../../contexts/AuthContext';
-// import { validEmail } from '../../utils';
-// import Error from '../Alerts/Error';
+import { useHistory } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+import { validEmail } from '../../utils';
+import Error from '../Alerts/Error';
 import 'regenerator-runtime/runtime';
+import log from 'electron-log';
 
 export default function SignIn() {
   const emailRef = useRef<HTMLInputElement>(null);
-  // const passwordRef = useRef();
-  // const [error, setError] = useState('');
-  // const [loading, setLoading] = useState(false);
-  // const history = useHistory();
-  // const { login } = useAuth();
+  const passwordRef = useRef();
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const history = useHistory();
+  const { login } = useAuth();
+
+  log.info('SignIn');
 
   async function handleSubmit(action: SyntheticEvent) {
     action.preventDefault();
 
-    // Dec 16, 2021 -- commenting out to pass CI
-    // because this part is not needed at this time
+    if (!validEmail(emailRef.current.value)) {
+      setError('Email is invalid');
+      return;
+    }
 
-    // if (!validEmail(emailRef.current.value)) {
-    //   setError('Email is invalid');
-    //   return;
-    // }
+    if (passwordRef.current.value === '') {
+      setError('Please specify a valid password');
+      return;
+    }
 
-    // if (passwordRef.current.value === '') {
-    //   setError('Please specify a valid password');
-    //   return;
-    // }
+    setError('');
+    setLoading(true);
 
-    // setError('');
-    // setLoading(true);
-
-    // try {
-    //   await login(emailRef.current.value, passwordRef.current.value);
-    //   history.push('/');
-    // } catch (e) {
-    //   setError(e.message);
-    // }
-    // setLoading(false);
+    try {
+      await login(emailRef.current.value, passwordRef.current.value);
+      history.push('/');
+    } catch (e) {
+      setError(e.message);
+    }
+    setLoading(false);
   }
 
   return (
@@ -60,7 +60,7 @@ export default function SignIn() {
             </h2>
           </div>
           <form className="mt-8 space-y-6">
-            {/* {error && <Error message={error} />} */}
+            {error && <Error message={error} />}
             <input type="hidden" name="remember" defaultValue="true" />
             <div className="rounded-md shadow-sm -space-y-px">
               <div>
@@ -90,7 +90,7 @@ export default function SignIn() {
                   required
                   className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                   placeholder="Password"
-                  // ref={passwordRef}
+                  ref={passwordRef}
                 />
               </div>
             </div>
@@ -123,7 +123,7 @@ export default function SignIn() {
 
             <div>
               <button
-                // disabled={loading}
+                disabled={loading}
                 type="submit"
                 onClick={handleSubmit}
                 className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"

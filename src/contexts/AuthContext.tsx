@@ -1,20 +1,36 @@
 /* eslint-disable react/prop-types */
-import React, { useContext, useEffect, useState } from 'react';
-import { auth } from '../../config/firebaseConfig';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { initializeApp, FirebaseApp } from 'firebase/app';
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  Firestore,
+} from 'firebase/firestore';
+import {
+  User,
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+} from 'firebase/auth';
+import log from 'electron-log';
+import firebaseConfig from '../../config/firebaseConfig';
 
-const AuthContext = React.createContext();
+const fbase = initializeApp(firebaseConfig);
+const auth = getAuth(fbase);
+
+const AuthContext = createContext();
 
 export function useAuth() {
   return useContext(AuthContext);
 }
 
 export function AuthProvider({ children }) {
-  const [currentUser, setCurrentUser] = useState();
+  const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  function login(email, password) {
-    // returns a promise
-    return auth.signInWithEmailAndPassword(email, password);
+  function login(email: string, password: string) {
+    return signInWithEmailAndPassword(auth, email, password);
   }
 
   function logout() {
@@ -22,15 +38,14 @@ export function AuthProvider({ children }) {
     return auth.signOut();
   }
 
-  // useEffect so not in render and only runs once
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    return onAuthStateChanged(auth, (user: User) => {
       // Do not render application until we have a user set for the
       // first time
+      log.info(user);
       setCurrentUser(user);
       setLoading(false);
     });
-    return unsubscribe;
   }, []);
 
   const value = {
