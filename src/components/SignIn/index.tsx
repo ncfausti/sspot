@@ -1,14 +1,22 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable jsx-a11y/label-has-for */
 /* eslint-disable react/prop-types */
-import React, { SyntheticEvent, useRef, useState } from 'react';
+import React, { SyntheticEvent, useEffect, useRef, useState } from 'react';
+// New way, via Firebase Auth with email only
+import {
+  getAuth,
+  sendSignInLinkToEmail,
+  isSignInWithEmailLink,
+  signInWithEmailLink,
+} from 'firebase/auth';
+import log from 'electron-log';
+import { ipcRenderer } from 'electron';
 import { LockClosedIcon } from '@heroicons/react/solid';
 import { useHistory } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { validEmail } from '../../utils';
 import Error from '../Alerts/Error';
 import 'regenerator-runtime/runtime';
-import log from 'electron-log';
 
 export default function SignIn() {
   const emailRef = useRef<HTMLInputElement>(null);
@@ -18,9 +26,36 @@ export default function SignIn() {
   const history = useHistory();
   const { login } = useAuth();
 
+  const nextUrl = `${window.document.location.href.split('#')[0]}#/`;
+  log.info(nextUrl);
+  const actionCodeSettings = {
+    // URL you want to redirect back to. The domain (www.example.com) for this
+    // URL must be in the authorized domains list in the Firebase Console.
+    // url: 'https://localhost/finishSignUp?cartId=1234',
+    url: nextUrl,
+    // This must be true.
+    handleCodeInApp: true,
+    iOS: {
+      bundleId: 'com.example.ios',
+    },
+    android: {
+      packageName: 'com.example.android',
+      installApp: true,
+      minimumVersion: '12',
+    },
+    // dynamicLinkDomain: 'example.page.link',
+  };
+
   window.resizeTo(300, 400);
 
   log.info('SignIn');
+  // Handle
+  useEffect(() => {
+    ipcRenderer.on('main-says-goto-meetings', () => {
+      log.info('going to meetings view now');
+      history.push('/');
+    });
+  }, [history]);
 
   async function handleSubmit(action: SyntheticEvent) {
     action.preventDefault();
@@ -38,15 +73,38 @@ export default function SignIn() {
     setError('');
     setLoading(true);
 
-    try {
-      log.info('SignIn: calling login');
-      await login(emailRef.current.value, passwordRef.current.value);
+    // Old, deprecated way
+    // try {
+    //   log.info('SignIn: calling login');
+    //   await login(emailRef.current.value, passwordRef.current.value);
 
-      log.info('SignIn: login successful');
-      history.push('/');
-    } catch (e) {
-      setError(e.message);
-    }
+    //   log.info('SignIn: login successful');
+    //   history.push('/');
+    // } catch (e) {
+    //   setError(e.message);
+    // }
+
+    // const email = window.localStorage.getItem('emailForSignIn')
+    //   ? window.localStorage.getItem('emailForSignIn')
+    //   : emailRef.current?.value;
+
+    const auth = getAuth();
+    sendSignInLinkToEmail(auth, emailRef.current?.value, actionCodeSettings)
+      .then(() => {
+        // The link was successfully sent. Inform the user.
+        // Save the email locally so you don't need to ask the user for it again
+        // if they open the link on the same device.
+        window.localStorage.setItem('emailForSignIn', email);
+
+        log.info('SignIn: sendSignInLinkToEmail successful');
+        // history.push('/');
+        // ...
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+      });
+
     setLoading(false);
   }
 

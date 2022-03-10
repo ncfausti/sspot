@@ -9,6 +9,7 @@
     "rebuild": "electron-rebuild --trace-deprecation --parallel --types prod,dev,optional --module-dir src",
     "lint": "cross-env NODE_ENV=development eslint . --cache --ext .js,.jsx,.ts,.tsx",
     "package": "rm -rf src/dist && yarn build && electron-builder build --publish never",
+    "package-nosign": "rm -rf src/dist && yarn build && electron-builder build --publish never -c.mac.identity=null",
     "package:win": "rm -rf src/dist && yarn build && electron-builder build --win --x64 --publish never",
     "package-gh": "rm -rf src/dist && yarn build && electron-builder build --publish always",
     "publish:x64": "rm -rf src/dist && yarn build && electron-builder build --mac --x64 --publish always",
@@ -94,6 +95,15 @@
       "acl": "private"
     }
   },
+  "protocols": [
+    {
+      "name": "salespot",
+      "role": "Viewer",
+      "schemes": [
+        "salespot"
+      ]
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/vizaiapp/salespot-desktop"

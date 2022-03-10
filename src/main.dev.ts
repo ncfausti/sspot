@@ -16,7 +16,9 @@ import path from 'path';
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import {
   app,
+  dialog,
   screen,
+  shell,
   ipcMain,
   BrowserWindow,
   Menu,
@@ -59,6 +61,18 @@ if (
   process.env.DEBUG_PROD === 'true'
 ) {
   require('electron-debug')();
+}
+
+// Handle Deep Links (to open web link with
+// the electron-salespot:// protocol  in the app instead of a browser)
+if (process.defaultApp) {
+  if (process.argv.length >= 2) {
+    app.setAsDefaultProtocolClient('electron-salespot', process.execPath, [
+      path.resolve(process.argv[1]),
+    ]);
+  }
+} else {
+  app.setAsDefaultProtocolClient('electron-salespot');
 }
 
 const installExtensions = async () => {
@@ -628,4 +642,23 @@ app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   // if (mainWindow === null) createWindow();
+});
+
+// Open app from salespot:// urls
+if (process.defaultApp) {
+  if (process.argv.length >= 2) {
+    app.setAsDefaultProtocolClient('salespot-app', process.execPath, [
+      path.resolve(process.argv[1]),
+    ]);
+  }
+} else {
+  app.setAsDefaultProtocolClient('salespot-app');
+}
+
+// Handle the protocol. In this case, we choose to show an Error Box.
+app.on('open-url', (_event, url) => {
+  dialog.showErrorBox('Welcome Back', `You arrived from: ${url}`);
+  // mb.window?.loadURL(`file://${__dirname}/../index.html#/`);
+  log.info('sending goto-meetings');
+  mb.window?.webContents.send('goto-meetings');
 });
