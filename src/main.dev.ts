@@ -644,21 +644,21 @@ app.on('activate', () => {
   // if (mainWindow === null) createWindow();
 });
 
-// Open app from salespot:// urls
+// Open app from salespot:/// urls
 if (process.defaultApp) {
   if (process.argv.length >= 2) {
-    app.setAsDefaultProtocolClient('salespot-app', process.execPath, [
+    app.setAsDefaultProtocolClient('salespot', process.execPath, [
       path.resolve(process.argv[1]),
     ]);
   }
 } else {
-  app.setAsDefaultProtocolClient('salespot-app');
+  app.setAsDefaultProtocolClient('salespot');
 }
 
 // Handle the protocol. In this case, we choose to show an Error Box.
 app.on('open-url', (_event, url) => {
-  dialog.showErrorBox('Welcome Back', `You arrived from: ${url}`);
-  // mb.window?.loadURL(`file://${__dirname}/../index.html#/`);
+  // log.info('_event', _event);
+  log.info('data inside open-url, url:', url);
   log.info('sending goto-meetings');
-  mb.window?.webContents.send('goto-meetings');
+  mb.window?.webContents.send('goto-meetings', url.split('qurl=')[1]);
 });

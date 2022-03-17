@@ -26,24 +26,15 @@ export default function SignIn() {
   const history = useHistory();
   const { login } = useAuth();
 
-  const nextUrl = `${window.document.location.href.split('#')[0]}#/`;
-  log.info(nextUrl);
+  // Callback link: when the user clicks the link in their email,
+  // the browser will go to nextUrl, and on load that page will redirect to
+  // the custom URL protocol (salespot-app:///), which will open SaleSpot
+  // to the signInComplete view
+  const nextUrl = `https://salespot-login.web.app`;
   const actionCodeSettings = {
-    // URL you want to redirect back to. The domain (www.example.com) for this
-    // URL must be in the authorized domains list in the Firebase Console.
-    // url: 'https://localhost/finishSignUp?cartId=1234',
     url: nextUrl,
     // This must be true.
     handleCodeInApp: true,
-    iOS: {
-      bundleId: 'com.example.ios',
-    },
-    android: {
-      packageName: 'com.example.android',
-      installApp: true,
-      minimumVersion: '12',
-    },
-    // dynamicLinkDomain: 'example.page.link',
   };
 
   window.resizeTo(300, 400);
@@ -51,9 +42,20 @@ export default function SignIn() {
   log.info('SignIn');
   // Handle
   useEffect(() => {
-    ipcRenderer.on('main-says-goto-meetings', () => {
-      log.info('going to meetings view now');
-      history.push('/');
+    ipcRenderer.on('goto-meetings', (_event, emailLink) => {
+      log.info('going to meetings handled in signin');
+      log.info('_event', _event);
+      log.info('emailLink', emailLink);
+      // Obtain emailLink from the user.
+      signInWithEmailLink(getAuth(), emailRef.current.value, emailLink)
+        .then(() => {
+          log.info('successful login, forwarding to meetings view now');
+          history.push('/');
+          return true;
+        })
+        .catch((error) => {
+          log.error(error);
+        });
     });
   }, [history]);
 
@@ -65,10 +67,10 @@ export default function SignIn() {
       return;
     }
 
-    if (passwordRef.current.value === '') {
-      setError('Please specify a valid password');
-      return;
-    }
+    // if (passwordRef.current.value === '') {
+    //   setError('Please specify a valid password');
+    //   return;
+    // }
 
     setError('');
     setLoading(true);
@@ -97,6 +99,10 @@ export default function SignIn() {
         window.localStorage.setItem('emailForSignIn', email);
 
         log.info('SignIn: sendSignInLinkToEmail successful');
+
+        // hide the sign in form and show some message to the user
+        // about looking for the link in their email
+
         // history.push('/');
         // ...
       })
@@ -136,7 +142,7 @@ export default function SignIn() {
                   ref={emailRef}
                 />
               </div>
-              <div>
+              <div className="hidden">
                 <label htmlFor="password" className="sr-only">
                   Password
                 </label>
