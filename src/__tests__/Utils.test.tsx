@@ -1,4 +1,6 @@
 import '@testing-library/jest-dom';
+import { assert } from 'console';
+import { getDifferenceInSeconds } from '../utils';
 
 describe('Utils', () => {
   it('should equal 1', () => {
@@ -27,5 +29,13 @@ describe('Utils', () => {
       4: 'def',
     };
     expect(alertMessage[AlertType.Success]).toBe('Some success message');
+  });
+
+  it('should get the difference between two dates', () => {
+    const diff = getDifferenceInSeconds(
+      new Date(2022, 3, 22, 16, 0, 0),
+      new Date(2022, 3, 22, 15, 0, 0)
+    );
+    expect(diff).toBe(60);
   });
 });

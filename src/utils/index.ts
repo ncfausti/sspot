@@ -18,3 +18,28 @@ export function userDataDir() {
     return null;
   }
 }
+
+export function executeCallbackAtSpecificTime(
+  callback: () => void,
+  time: number
+) {
+  const now = Date.now();
+  const diff = time - now;
+  if (diff > 0) {
+    setTimeout(callback, diff);
+  } else {
+    callback();
+  }
+}
+
+// get difference between two dates in seconds
+function getDifferenceInSeconds(date1: Date, date2: Date) {
+  const diff = date1.getTime() - date2.getTime();
+  return diff / 60 / 1000;
+}
+console.log(new Date());
+const diff = getDifferenceInSeconds(
+  new Date(2022, 3, 22, 16, 0, 0),
+  new Date(2022, 3, 22, 15, 0, 0)
+);
+console.log(diff);
