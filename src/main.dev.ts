@@ -11,20 +11,11 @@
  */
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
+import AutoLaunch from 'auto-launch';
 import log from 'electron-log';
 import path from 'path';
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
-import {
-  app,
-  dialog,
-  screen,
-  shell,
-  ipcMain,
-  BrowserWindow,
-  Menu,
-  Tray,
-  ipcRenderer,
-} from 'electron';
+import { app, screen, ipcMain, BrowserWindow, Menu } from 'electron';
 import { arch } from 'os';
 import { autoUpdater } from 'electron-updater';
 import { Menubar, menubar } from 'menubar';
@@ -662,3 +653,25 @@ app.on('open-url', (_event, url) => {
   log.info('sending goto-meetings');
   mb.window?.webContents.send('goto-meetings', url.split('qurl=')[1]);
 });
+
+const saleSpotAutoLauncher = new AutoLaunch({
+  name: 'SaleSpot',
+  path: '/Applications/SaleSpot.app',
+});
+
+saleSpotAutoLauncher.enable();
+
+// saleSpotAutoLauncher.disable();
+
+saleSpotAutoLauncher
+  .isEnabled()
+  .then((isEnabled) => {
+    if (isEnabled) {
+      log.info('AutoLauncher is enabled');
+    }
+    saleSpotAutoLauncher.enable();
+    return true;
+  })
+  .catch(function (err) {
+    log.error(err);
+  });
