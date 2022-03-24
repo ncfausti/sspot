@@ -37,8 +37,6 @@ export default function SignIn() {
     handleCodeInApp: true,
   };
 
-  window.resizeTo(300, 400);
-
   log.info('SignIn');
   // Handle
   useEffect(() => {

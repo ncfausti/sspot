@@ -148,7 +148,7 @@ const createWindow = async () => {
     browserWindow: {
       show: false,
       width: 300,
-      height: 120,
+      height: 400,
       icon: getAssetPath('salespot-logo.png'),
       acceptFirstMouse: true,
       frame: false,
@@ -660,8 +660,6 @@ const saleSpotAutoLauncher = new AutoLaunch({
 });
 
 saleSpotAutoLauncher.enable();
-
-// saleSpotAutoLauncher.disable();
 
 saleSpotAutoLauncher
   .isEnabled()

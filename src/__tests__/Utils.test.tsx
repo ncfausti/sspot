@@ -1,5 +1,4 @@
 import '@testing-library/jest-dom';
-import { assert } from 'console';
 import { getDifferenceInSeconds } from '../utils';
 
 describe('Utils', () => {

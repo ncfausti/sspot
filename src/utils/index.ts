@@ -33,13 +33,7 @@ export function executeCallbackAtSpecificTime(
 }
 
 // get difference between two dates in seconds
-function getDifferenceInSeconds(date1: Date, date2: Date) {
-  const diff = date1.getTime() - date2.getTime();
+export function getDifferenceInSeconds(startDate: Date, laterDate: Date) {
+  const diff = startDate.getTime() - laterDate.getTime();
   return diff / 60 / 1000;
 }
-console.log(new Date());
-const diff = getDifferenceInSeconds(
-  new Date(2022, 3, 22, 16, 0, 0),
-  new Date(2022, 3, 22, 15, 0, 0)
-);
-console.log(diff);
