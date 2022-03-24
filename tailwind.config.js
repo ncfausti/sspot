@@ -36,6 +36,7 @@ module.exports = {
       colors: {
         spotblue: '#3190FF',
         spotred: 'rgba(219, 61, 72, 1)',
+        spotred100: '#FF4343',
         // spotgray: '#303030',
         spotgray: '#3E3E3E',
         spotgraylt: '#404040',
