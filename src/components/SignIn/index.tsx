@@ -124,7 +124,7 @@ export default function SignIn() {
 
   return (
     <>
-      <div className="flex items-center justify-center bg-gray-100 dark:bg-black py-12 px-4 sm:px-6 lg:px-8">
+      <div className="flex items-center justify-center h-screen bg-gray-100 dark:bg-black py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-5/6">
           <div>{WelcomeMessage()}</div>
           <form className="mt-8 space-y-6">
