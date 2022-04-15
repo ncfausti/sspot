@@ -10,8 +10,8 @@ import {
   signInWithEmailLink,
 } from 'firebase/auth';
 import log from 'electron-log';
-import { ipcRenderer } from 'electron';
-import { LockClosedIcon } from '@heroicons/react/solid';
+import { ipcRenderer, shell } from 'electron';
+import { LockClosedIcon, CalendarIcon } from '@heroicons/react/solid';
 import { useHistory } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { validEmail } from '../../utils';
@@ -21,7 +21,10 @@ import LongLogo from '../Logo/LongLogo';
 
 export default function SignIn() {
   const emailRef = useRef<HTMLInputElement>(null);
+  const emailLinkRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef();
+
+  const [emailAddress, setEmailAddress] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const history = useHistory();
@@ -39,6 +42,7 @@ export default function SignIn() {
   };
 
   log.info('SignIn');
+
   // Handle
   useEffect(() => {
     ipcRenderer.on('goto-meetings', (_event, emailLink) => {
@@ -58,6 +62,23 @@ export default function SignIn() {
     });
   }, [history]);
 
+  const devSignIn = () => {
+    // Obtain emailLink from the user.
+    signInWithEmailLink(
+      getAuth(),
+      emailRef.current.value,
+      emailLinkRef.current.value
+    )
+      .then(() => {
+        log.info('successful login, forwarding to meetings view now');
+        history.push('/');
+        return true;
+      })
+      .catch((error) => {
+        log.error(error);
+      });
+  };
+
   async function handleSubmit(action: SyntheticEvent) {
     action.preventDefault();
 
@@ -71,6 +92,9 @@ export default function SignIn() {
     //   return;
     // }
 
+    // hide email input and button
+
+    setEmailAddress(emailRef.current.value);
     setError('');
     setLoading(true);
 
@@ -144,9 +168,15 @@ export default function SignIn() {
                   type="email"
                   autoComplete="email"
                   required
-                  className="appearance-none bg-white text-center text-black dark:bg-black dark:text-white
+                  className={`appearance-none bg-white text-center text-black dark:bg-black dark:text-white
                   relative block w-full px-3 py-2 placeholder-gray-300
-                  text-gray-100 rounded-full outline-none focus:outline-none focus:z-10 sm:text-sm ring-white focus:ring-0 focus:ring-white border-2 border-white focus:border-red-50"
+                  text-gray-100 rounded-full outline-none focus:outline-none focus:z-10 sm:text-sm ring-white
+                  focus:ring-0 focus:ring-white border-2 border-white focus:border-red-50
+                  ${
+                    emailAddress.length > 0 && emailAddress.indexOf('@') >= 1
+                      ? 'hidden'
+                      : ''
+                  }`}
                   placeholder="Email"
                   ref={emailRef}
                 />
@@ -194,7 +224,13 @@ export default function SignIn() {
               </div>
             </div>
 
-            <div>
+            <div
+              className={
+                emailAddress.length > 0 &&
+                emailAddress.indexOf('@') >= 1 &&
+                'hidden'
+              }
+            >
               <button
                 disabled={loading}
                 type="submit"
@@ -210,6 +246,23 @@ export default function SignIn() {
                 Sign in
               </button>
             </div>
+            <div
+              className={`text-white text-center ${
+                emailAddress.length === 0 ? 'hidden' : ''
+              } `}
+            >
+              <span className="">
+                We&apos;ve sent a login link to {emailAddress}!
+              </span>
+              <div>
+                <div>manual link copy/paste</div>
+                <div>
+                  <input className="bg-black" type="text" ref={emailLinkRef} />{' '}
+                </div>
+                <button onClick={() => devSignIn()}>go</button>
+              </div>
+            </div>
+            <div />
           </form>
         </div>
       </div>

@@ -1,9 +1,9 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable react/forbid-prop-types */
 import React, { useCallback, useEffect, useState } from 'react';
-import { CogIcon } from '@heroicons/react/solid';
+import { CogIcon, CalendarIcon } from '@heroicons/react/solid';
 import log from 'electron-log';
-import { app, ipcRenderer, remote } from 'electron';
+import { app, ipcRenderer, remote, shell } from 'electron';
 import MeetingsList from './MeetingsList';
 import logo from '../../../assets/salespot-logo-long.png';
 import logoDark from '../../../assets/salespot-logo-long-dark.png';
@@ -179,6 +179,19 @@ export default function Meetings() {
             <div className="flex">
               <MeetingsList />
             </div>
+            <button
+              type="button"
+              onClick={() => shell.openExternal('http://localhost:8000')}
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-full text-white bg-spotblue hover:bg-spotred100 focus:outline-none"
+            >
+              <span className="absolute left-0 inset-y-0 flex items-center pl-3">
+                <CalendarIcon
+                  className="h-5 w-5 text-white-500 group-hover:text-white-400"
+                  aria-hidden="true"
+                />
+              </span>
+              Link Google Calendar
+            </button>
             <div className="flex">
               <button
                 type="button"

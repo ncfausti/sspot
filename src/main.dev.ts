@@ -178,12 +178,10 @@ const createWindow = async () => {
     ]);
 
     mb.tray.on('click', () => {
-      log.info('clicked tray icon');
       mb.tray.setContextMenu(null);
     });
 
     mb.tray.on('right-click', () => {
-      log.info('right clicked tray icon');
       mb.tray.setContextMenu(contextMenu);
       mb.tray.popUpContextMenu();
     });
