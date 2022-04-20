@@ -1,14 +1,18 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable react/forbid-prop-types */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { CogIcon, CalendarIcon } from '@heroicons/react/solid';
 import log from 'electron-log';
 import { app, ipcRenderer, remote, shell } from 'electron';
+import url from 'url';
+import fetch from 'node-fetch';
+import { getAuth } from 'firebase/auth';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, doc, updateDoc } from 'firebase/firestore';
 import MeetingsList from './MeetingsList';
 import logo from '../../../assets/salespot-logo-long.png';
 import logoDark from '../../../assets/salespot-logo-long-dark.png';
 import { useAuth, logout } from '../../contexts/AuthContext';
-
 // import { startServer } from '../../utils';
 import Settings from './Settings';
 
@@ -26,6 +30,8 @@ export default function Meetings() {
   // firebase auth + calendar data
   const { currentUser } = useAuth();
   const [meetingIndex] = useState(0);
+  const authCodeRef = useRef<HTMLInputElement>(null);
+
   const [eventList, setEventList] = useState([
     { startTime: '10:00AM', startDate: '1/1/2000', id: -1 },
   ]);
@@ -140,6 +146,41 @@ export default function Meetings() {
     setAutoDetect((prev) => !prev);
   }, []);
 
+  // Handle
+  useEffect(() => {
+    ipcRenderer.on('init-calendar', (_event, authCode) => {
+      // log.info('_event', _event);
+      log.info('auth code:', authCode);
+      // Obtain emailLink from the user.
+
+      // The user WILL ONLY HAVE ACCESS TO AN AUTH CODE IF THEY HAVE
+      // SUCCESSFULLY LOGGED IN WITH GOOGLE.
+
+      // when we send the auth code to the client, it is ONLY FOR THE USER
+      // WHO JUST AUTHENTICATED WITH GOOGLE.
+
+      // Sooo...the person then has access to an auth code, which they can
+      // exchange for an access token and a refresh token
+
+      // and register with the watch service
+
+      // they can then use the access token to make requests to their OWN calendar
+
+      // at this point, we use firebase auth client in electron to obtain
+      // the
+
+      // handle the auth code -> refresh token, access_token swap here
+      // passing currentUser.email, currentUser.accessToken, refreshToken
+      // to backend link-accounts endpoint
+
+      // axios.post('/link-accounts',
+
+      // Get access and refresh tokens (if access_type is offline)
+      // let { tokens } = await oauth2Client.getToken(q.code);
+      // oauth2Client.setCredentials(tokens);
+    });
+  }, []);
+
   // on initial load only
   useEffect(() => {
     if (
@@ -152,7 +193,89 @@ export default function Meetings() {
       // light mode
       setSaleSpotLogo(logoDark);
     }
+
+    if (currentUser && currentUser.eventsDocRef) {
+      currentUser.eventsDocRef
+        .get()
+        .then((doc) => {
+          if (doc.exists) {
+            const data = doc.data();
+            log.info('data: ', data);
+            setEventList(data.eventList);
+            return 1;
+          }
+          log.info('No such document!');
+          return 0;
+        })
+        .catch((err) => log.error(err));
+    }
   }, []);
+
+  // setup an async function to get the events from the db
+  // useEffect(() => {
+  //   async function getEvents() {
+  //     if (currentUser && currentUser.eventsDocRef) {
+  //       const doc = await currentUser.eventsDocRef.get();
+  //       if (doc.exists) {
+  //         const data = doc.data();
+  //         log.info('data: ', data);
+  //         setEventList(data.eventList);
+  //         return 1;
+  //       }
+  //       log.info('No such document!');
+  //       return 0;
+  //     }
+  //   }
+  //   getEvents();
+  // }, []);
+
+  const linkGoogleFirebase = async () => {
+    // In prod, this comes from ipc call instead of user input
+    // This will actually stay on main in production because the
+    // custom protocol link will be handled there
+    log.info(authCodeRef.current?.value);
+
+    // send the link
+    ipcRenderer.invoke('link-google-firebase', {
+      uri: authCodeRef.current?.value,
+      userId: currentUser.uid,
+    });
+
+    // const washingtonRef = doc(db, 'users', currentUser.uid);
+
+    // Set the "capital" field of the city 'DC'
+    // await updateDoc(washingtonRef, {
+    //   gcalRefreshToken: 'xyz',
+    // });
+  };
+
+  // fetch request to link-calendar-account endpoint
+  const linkCalendarAccount = async () => {
+    log.info('link calendar account');
+    // send the email and
+
+    //   const response = await fetch('https://httpbin.org/post', {
+    //     method: 'POST',
+    //     body: JSON.stringify(body),
+    // headers: {'Content-Type': 'application/json'}
+    //   });
+    // const data = await response.json();
+
+    log.info(getAuth());
+    // log.info(data);
+    // axios
+    //   .post('/link-calendar-account', {
+    //     email: currentUser.email,
+    //     accessToken: currentUser.accessToken,
+    //     refreshToken: currentUser.refreshToken,
+    //   })
+    //   .then((res) => {
+    //     log.info('link calendar account response: ', res);
+    //   })
+    //   .catch((err) => {
+    //     log.info('link calendar account error: ', err);
+    //   });
+  };
 
   return (
     <div className="flex rounded-hud bg-gray-100 dark:bg-black dark:text-white flex-grow flex-col p-3 min-h-screen content-center">
@@ -181,7 +304,11 @@ export default function Meetings() {
             </div>
             <button
               type="button"
-              onClick={() => shell.openExternal('http://localhost:8000')}
+              onClick={() =>
+                shell.openExternal(
+                  'https://google-cal-webhooks-handler.nickfausti.repl.co'
+                )
+              }
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-full text-white bg-spotblue hover:bg-spotred100 focus:outline-none"
             >
               <span className="absolute left-0 inset-y-0 flex items-center pl-3">
@@ -201,6 +328,18 @@ export default function Meetings() {
               >
                 Launch SaleSpot
                 {/* {autoDetect ? '(auto-detect)' : ''} */}
+              </button>
+              dev:
+              <input
+                className="bg-black w-1/2"
+                type="text"
+                ref={authCodeRef}
+              />{' '}
+              <button
+                className="bg-spotblue"
+                onClick={() => linkGoogleFirebase()}
+              >
+                mock open sspot
               </button>
             </div>
             <div className="flex flex-grow flex-wrap justify-between items-center">

@@ -15,11 +15,20 @@ import AutoLaunch from 'auto-launch';
 import log from 'electron-log';
 import path from 'path';
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
-import { app, screen, ipcMain, BrowserWindow, Menu } from 'electron';
+import {
+  app,
+  screen,
+  ipcMain,
+  BrowserWindow,
+  Menu,
+  webContents,
+} from 'electron';
 import { arch } from 'os';
 import { autoUpdater } from 'electron-updater';
 import { Menubar, menubar } from 'menubar';
 import { BrowserWindowConstructorOptions } from 'electron/main';
+import url from 'url';
+import google from 'googleapis';
 import WindowManager from './WindowManager';
 import DataStore from './DataStore';
 
@@ -33,6 +42,36 @@ const ALERT_HEIGHT = 30;
 const DIFF = 20;
 const PARTICIPANT_HEIGHT =
   HUD_HEIGHT - DIFF - (process.platform === 'darwin' ? 0 : 3);
+
+/**
+ * Lists the next 10 events on the user's primary calendar.
+ * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
+ */
+function listEvents(auth) {
+  const calendar = google.calendar({ version: 'v3', auth });
+  calendar.events.list(
+    {
+      calendarId: 'primary',
+      timeMin: new Date().toISOString(),
+      maxResults: 10,
+      singleEvents: true,
+      orderBy: 'startTime',
+    },
+    (err, res) => {
+      if (err) return console.log(`The API returned an error: ${err}`);
+      const events = res.data.items;
+      if (events.length) {
+        console.log('Upcoming 10 events:');
+        events.map((event, i) => {
+          const start = event.start.dateTime || event.start.date;
+          console.log(`${start} - ${event.summary}`);
+        });
+      } else {
+        console.log('No upcoming events found.');
+      }
+    }
+  );
+}
 
 export default class AppUpdater {
   constructor() {
@@ -122,6 +161,51 @@ ipcMain.handle('send-call-log', (_event, data) => {
       return docId;
     })
     .catch((err) => log.error(err));
+});
+
+ipcMain.handle('link-google-firebase', async (_event, data) => {
+  // get the refresh token, access token, and store them to the current user
+  // in firestore
+  log.info('link-google-firebase:');
+  log.info(data);
+
+  if (data.uri.indexOf('access_token=') !== -1) {
+    const access_token = data.uri
+      .split('access_token=')
+      .slice(-1)[0]
+      .split('&')[0];
+
+    // use access_token to pull data from google
+  }
+
+  if (data.uri.indexOf('refresh_token=') !== -1) {
+    const refreshToken = data.uri
+      .split('refresh_token=')
+      .slice(-1)[0]
+      .split('&')[0];
+
+    // Store refresh token to firestore on the current user's document
+    ds.saveRefreshToken(data.userId, refreshToken)
+      .then((docId) => {
+        if (docId) {
+          log.info(docId);
+        }
+        return docId;
+      })
+      .catch((err) => log.error(err));
+  }
+
+  // get the code
+  // use access_token from url to pull events from google calendar
+  // and store in firebase
+
+  // store gruid -> refresh_token in firebase
+
+  // use access_token to pull calendar data
+  // store calendar data in firebase, noting the document id
+  // associate newly saved document id with currentUser.uid
+  // setup watch event for calendar data
+  // save refresh token to current firebase user
 });
 
 const RESOURCES_PATH = app.isPackaged
@@ -644,12 +728,22 @@ if (process.defaultApp) {
   app.setAsDefaultProtocolClient('salespot');
 }
 
-// Handle the protocol. In this case, we choose to show an Error Box.
-app.on('open-url', (_event, url) => {
-  // log.info('_event', _event);
-  log.info('data inside open-url, url:', url);
+// Handle the custom protocol salespot:///...
+app.on('open-url', (_event, uri) => {
+  log.info('_event', _event);
+  log.info('data inside open-url, url:', uri);
   log.info('sending goto-meetings');
-  mb.window?.webContents.send('goto-meetings', url.split('qurl=')[1]);
+
+  // from link calendar
+  if (uri.indexOf('oauthcallback') > -1) {
+    const q = url.parse(uri, true).query;
+    log.info(q.code);
+    mb.window?.webContents.send('init-calendar', q.code);
+    return;
+  }
+
+  // from signin
+  mb.window?.webContents.send('goto-meetings', uri.split('qurl=')[1]);
 });
 
 const saleSpotAutoLauncher = new AutoLaunch({

@@ -2,7 +2,9 @@ import { initializeApp, FirebaseApp } from 'firebase/app';
 import {
   getFirestore,
   collection,
+  doc,
   addDoc,
+  updateDoc,
   Firestore,
 } from 'firebase/firestore';
 import log from 'electron-log';
@@ -61,6 +63,25 @@ export default class DataStore {
           callLength: len,
           userId: machineUid,
           timestamp: new Date(),
+        });
+        log.info('Document written with ID: ', docRef.id);
+        return docRef.id;
+      } catch (e) {
+        log.error('Error adding document: ', e);
+        return null;
+      }
+    } catch (e) {
+      log.error(e);
+      return null;
+    }
+  };
+
+  public saveRefreshToken = async (userId: string, refreshToken: string) => {
+    try {
+      try {
+        const docRef = doc(this.database, 'users', userId);
+        await updateDoc(docRef, {
+          gcalRefreshToken: refreshToken,
         });
         log.info('Document written with ID: ', docRef.id);
         return docRef.id;
