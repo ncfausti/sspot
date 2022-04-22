@@ -4,6 +4,7 @@ import {
   collection,
   doc,
   addDoc,
+  setDoc,
   updateDoc,
   Firestore,
 } from 'firebase/firestore';
@@ -85,6 +86,30 @@ export default class DataStore {
         });
         log.info('Document written with ID: ', docRef.id);
         return docRef.id;
+      } catch (e) {
+        log.error('Error adding document: ', e);
+        return null;
+      }
+    } catch (e) {
+      log.error(e);
+      return null;
+    }
+  };
+
+  public saveGruidRefreshTokenMap = async (
+    gruid: string,
+    refreshToken: string
+  ) => {
+    try {
+      try {
+        // Add a new document in collection "cities"
+        await setDoc(doc(this.database, 'gcal-gruid-token', gruid), {
+          gcalRefreshToken: refreshToken,
+        });
+        log.info(
+          'Document written to gcal-gruid-token for resource ID: ',
+          'zzzzzz'
+        );
       } catch (e) {
         log.error('Error adding document: ', e);
         return null;

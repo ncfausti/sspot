@@ -28,9 +28,21 @@ import { autoUpdater } from 'electron-updater';
 import { Menubar, menubar } from 'menubar';
 import { BrowserWindowConstructorOptions } from 'electron/main';
 import url from 'url';
-import google from 'googleapis';
+import { uuid } from 'uuidv4';
+import { GoogleAuth } from 'google-auth-library';
 import WindowManager from './WindowManager';
 import DataStore from './DataStore';
+
+const CLIENT_ID =
+  '753837304939-ild5obrqqk35vt3u3h45ta6ko02t8dto.apps.googleusercontent.com';
+// REPLACE WITH API KEY VERSION OF GOOGLE AUTH:
+const CLIENT_SECRET = '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';
+const GCAL_WEB_HOOK_ENDPOINT =
+  'https://google-cal-webhooks-handler.nickfausti.repl.co/webhook';
+// import google from 'googleapis';
+const { google } = require('googleapis');
+
+const { OAuth2 } = google.auth;
 
 const HUD_WIDTH = 172;
 const HUD_HEIGHT = 148;
@@ -163,26 +175,67 @@ ipcMain.handle('send-call-log', (_event, data) => {
     .catch((err) => log.error(err));
 });
 
+function saveGruidRefreshTokenMap(refreshToken: string, accessToken: string) {
+  ds.saveGruidRefreshTokenMap(refreshToken, accessToken);
+}
+
+// email => google resource uid (gruid)
+async function setupWatchEvents(userEmail: string, auth: GoogleAuth) {
+  // send a post request to https://www.googleapis.com/calendar/v3/calendars/<calendar-user@gmail.com>/events/watch
+  // <calendar-user> obtained via auth object that's passed in
+
+  const calendar = google.calendar({ version: 'v3', auth });
+  const res = await calendar.events.watch({
+    calendarId: 'primary',
+    requestBody: {
+      id: uuid(), // gruid used to make everything else work
+      type: 'web_hook',
+      // server endpoint that handles the web hook that Google sends to
+      address: GCAL_WEB_HOOK_ENDPOINT,
+    },
+  });
+  log.info('WATCH EVENT RESPONSE: ');
+  log.info(res.data);
+}
+
 ipcMain.handle('link-google-firebase', async (_event, data) => {
   // get the refresh token, access token, and store them to the current user
   // in firestore
   log.info('link-google-firebase:');
-  log.info(data);
+  // log.info(data);
 
+  // check for then parse out access token
   if (data.uri.indexOf('access_token=') !== -1) {
     const access_token = data.uri
       .split('access_token=')
       .slice(-1)[0]
       .split('&')[0];
-
-    // use access_token to pull data from google
+  } else {
+    log.info('ERROR: *** NO ACCESS TOKEN ***');
   }
 
+  // check for then parse out refresh token
   if (data.uri.indexOf('refresh_token=') !== -1) {
     const refreshToken = data.uri
       .split('refresh_token=')
       .slice(-1)[0]
       .split('&')[0];
+
+    // Create an OAuth2 client with the given credentials to use
+    // to access calendar resources
+    try {
+      const oAuth2Client = new OAuth2(CLIENT_ID, CLIENT_SECRET);
+      oAuth2Client.setCredentials({ refresh_token: refreshToken });
+      listEvents(oAuth2Client);
+
+      // instead of listEvents, save them to firestore
+    } catch (err) {
+      log.error('list events error', err);
+    }
+
+    // setup watch events
+
+    // store gruid to refresh_token map in firestore
 
     // Store refresh token to firestore on the current user's document
     ds.saveRefreshToken(data.userId, refreshToken)
@@ -193,13 +246,15 @@ ipcMain.handle('link-google-firebase', async (_event, data) => {
         return docId;
       })
       .catch((err) => log.error(err));
+  } else {
+    log.info('NO REFRESH TOKEN');
   }
 
-  // get the code
   // use access_token from url to pull events from google calendar
   // and store in firebase
 
   // store gruid -> refresh_token in firebase
+  // cqZpZjQmrtHgM-6DYSAZS3Nwf5Q --> refreshToken
 
   // use access_token to pull calendar data
   // store calendar data in firebase, noting the document id

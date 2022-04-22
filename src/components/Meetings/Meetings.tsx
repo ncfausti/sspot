@@ -53,7 +53,7 @@ export default function Meetings() {
     }));
   }
 
-  log.info(currentUser.email);
+  log.info(currentUser.gcalRefreshToken);
   // on initial load only
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000);
@@ -246,7 +246,7 @@ export default function Meetings() {
     // Set the "capital" field of the city 'DC'
     // await updateDoc(washingtonRef, {
     //   gcalRefreshToken: 'xyz',
-    // });
+    // }); x
   };
 
   // fetch request to link-calendar-account endpoint
@@ -262,19 +262,6 @@ export default function Meetings() {
     // const data = await response.json();
 
     log.info(getAuth());
-    // log.info(data);
-    // axios
-    //   .post('/link-calendar-account', {
-    //     email: currentUser.email,
-    //     accessToken: currentUser.accessToken,
-    //     refreshToken: currentUser.refreshToken,
-    //   })
-    //   .then((res) => {
-    //     log.info('link calendar account response: ', res);
-    //   })
-    //   .catch((err) => {
-    //     log.info('link calendar account error: ', err);
-    //   });
   };
 
   return (
