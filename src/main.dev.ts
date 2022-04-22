@@ -180,10 +180,10 @@ function saveGruidRefreshTokenMap(refreshToken: string, accessToken: string) {
 }
 
 // email => google resource uid (gruid)
-async function setupWatchEvents(userEmail: string, auth: GoogleAuth) {
+async function setupWatchEvents(auth: GoogleAuth, refreshToken: string) {
   // send a post request to https://www.googleapis.com/calendar/v3/calendars/<calendar-user@gmail.com>/events/watch
   // <calendar-user> obtained via auth object that's passed in
-
+  log.info('SETTING UP WATCH EVENTS');
   const calendar = google.calendar({ version: 'v3', auth });
   const res = await calendar.events.watch({
     calendarId: 'primary',
@@ -196,20 +196,27 @@ async function setupWatchEvents(userEmail: string, auth: GoogleAuth) {
   });
   log.info('WATCH EVENT RESPONSE: ');
   log.info(res.data);
+
+  // save the gruid -> refresh token map now after a successful watch event response
+  // res.data.resourceId ->
+  log.info('SAVING GRUID REFRESH TOKEN MAP');
+  log.info(`${res.data.resourceId} -> ${refreshToken}`);
+  ds.saveGruidRefreshTokenMap(res.data.resourceId, refreshToken);
 }
 
 ipcMain.handle('link-google-firebase', async (_event, data) => {
-  // get the refresh token, access token, and store them to the current user
-  // in firestore
   log.info('link-google-firebase:');
-  // log.info(data);
+
+  const oAuth2Client = new OAuth2(CLIENT_ID, CLIENT_SECRET);
 
   // check for then parse out access token
   if (data.uri.indexOf('access_token=') !== -1) {
-    const access_token = data.uri
+    const accessToken = data.uri
       .split('access_token=')
       .slice(-1)[0]
       .split('&')[0];
+    log.info('ACCESS TOKEN FOUND: ');
+    log.info(accessToken);
   } else {
     log.info('ERROR: *** NO ACCESS TOKEN ***');
   }
@@ -221,19 +228,19 @@ ipcMain.handle('link-google-firebase', async (_event, data) => {
       .slice(-1)[0]
       .split('&')[0];
 
+    oAuth2Client.setCredentials({ refresh_token: refreshToken });
+
     // Create an OAuth2 client with the given credentials to use
     // to access calendar resources
     try {
-      const oAuth2Client = new OAuth2(CLIENT_ID, CLIENT_SECRET);
-      oAuth2Client.setCredentials({ refresh_token: refreshToken });
       listEvents(oAuth2Client);
-
       // instead of listEvents, save them to firestore
     } catch (err) {
       log.error('list events error', err);
     }
 
     // setup watch events
+    setupWatchEvents(oAuth2Client, refreshToken);
 
     // store gruid to refresh_token map in firestore
 

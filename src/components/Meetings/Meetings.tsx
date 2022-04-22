@@ -53,7 +53,6 @@ export default function Meetings() {
     }));
   }
 
-  log.info(currentUser.gcalRefreshToken);
   // on initial load only
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000);
@@ -239,14 +238,8 @@ export default function Meetings() {
     ipcRenderer.invoke('link-google-firebase', {
       uri: authCodeRef.current?.value,
       userId: currentUser.uid,
+      userEmail: currentUser.email,
     });
-
-    // const washingtonRef = doc(db, 'users', currentUser.uid);
-
-    // Set the "capital" field of the city 'DC'
-    // await updateDoc(washingtonRef, {
-    //   gcalRefreshToken: 'xyz',
-    // }); x
   };
 
   // fetch request to link-calendar-account endpoint

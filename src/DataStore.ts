@@ -4,6 +4,7 @@ import {
   collection,
   doc,
   addDoc,
+  getDoc,
   setDoc,
   updateDoc,
   Firestore,
@@ -96,20 +97,44 @@ export default class DataStore {
     }
   };
 
+  public getRefreshToken = async (userId: string) => {
+    try {
+      try {
+        const docRef = doc(this.database, 'users', userId);
+        const userDoc = await getDoc(docRef);
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          log.info('user found: ', data);
+          return data.gcalRefreshToken;
+        }
+        log.info('No such document!');
+        return null;
+      } catch (e) {
+        log.error('Error getting document: ', e);
+        return null;
+      }
+    } catch (e) {
+      log.error(e);
+      return null;
+    }
+  };
+
   public saveGruidRefreshTokenMap = async (
     gruid: string,
     refreshToken: string
   ) => {
     try {
       try {
-        // Add a new document in collection "cities"
         await setDoc(doc(this.database, 'gcal-gruid-token', gruid), {
           gcalRefreshToken: refreshToken,
         });
         log.info(
           'Document written to gcal-gruid-token for resource ID: ',
-          'zzzzzz'
+          gruid,
+          ' with refresh token: ',
+          refreshToken
         );
+        return null;
       } catch (e) {
         log.error('Error adding document: ', e);
         return null;
