@@ -43,6 +43,13 @@ export default function SignIn() {
 
   log.info('SignIn');
 
+  useEffect(() => {
+    (async () => {
+      const result = await ipcRenderer.invoke('an-action', [1, 2, 3]);
+      log.info('inside renderer for an-action', result);
+    })();
+  });
+
   // Handle
   useEffect(() => {
     ipcRenderer.on('goto-meetings', (_event, emailLink) => {

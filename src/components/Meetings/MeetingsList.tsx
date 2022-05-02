@@ -1,34 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
-/* This example requires Tailwind CSS v2.0+ */
-const people = [
-  {
-    name: '12:00-1:00PM',
-    title: 'Meeting Name',
-    role: 'Admin',
-    email: '📆',
-  },
-  {
-    name: '12:00-1:00PM',
-    title: 'Meeting Name',
-    role: 'Admin',
-    email: '📆',
-  },
-  {
-    name: '2:00-4:00PM',
-    title: 'Meeting Name',
-    role: 'Admin',
-    email: '📆',
-  },
-  {
-    name: '4:00-5:00PM',
-    title: 'Meeting Name',
-    role: 'Admin',
-    email: '📆',
-  },
-];
-
-export default function MeetingsList() {
+export default function MeetingsList(props: { meetings: any }) {
+  const { meetings } = props;
   return (
     <div className="flex flex-col">
       <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -61,21 +34,38 @@ export default function MeetingsList() {
                 </tr>
               </thead>
               <tbody className="bg-spotgray  divide-y divide-gray-200">
-                {people.map((person) => (
-                  <tr key={person.email}>
-                    <td className="px-2 py-1 whitespace-nowrap text-sm font-medium text-white">
-                      {person.name}
-                    </td>
-                    <td className="px-2 py-1 whitespace-nowrap text-sm text-white">
-                      {person.title}
-                    </td>
-                    <td className="px-2 py-1 whitespace-nowrap text-sm text-white">
-                      {person.email}
-                    </td>
-                    {/* <td className="px-2 py-1 whitespace-nowrap text-sm text-gray-500">
+                {meetings.map(
+                  (person: {
+                    email: {} | null | undefined;
+                    name:
+                      | boolean
+                      | React.ReactChild
+                      | React.ReactFragment
+                      | React.ReactPortal
+                      | null
+                      | undefined;
+                    title:
+                      | boolean
+                      | React.ReactChild
+                      | React.ReactFragment
+                      | React.ReactPortal
+                      | null
+                      | undefined;
+                  }) => (
+                    <tr key={person.email}>
+                      <td className="px-2 py-1 whitespace-nowrap text-sm font-medium text-white">
+                        {person.name}
+                      </td>
+                      <td className="px-2 py-1 whitespace-nowrap text-sm text-white">
+                        {person.title}
+                      </td>
+                      <td className="px-2 py-1 whitespace-nowrap text-sm text-white">
+                        {person.email}
+                      </td>
+                      {/* <td className="px-2 py-1 whitespace-nowrap text-sm text-gray-500">
                       {person.role}
                     </td> */}
-                    {/* <td className="px-2 py-1 whitespace-nowrap text-right text-sm font-medium">
+                      {/* <td className="px-2 py-1 whitespace-nowrap text-right text-sm font-medium">
                       <a
                         href="#"
                         className="text-indigo-600 hover:text-indigo-900"
@@ -83,8 +73,9 @@ export default function MeetingsList() {
                         Edit
                       </a>
                     </td> */}
-                  </tr>
-                ))}
+                    </tr>
+                  )
+                )}
               </tbody>
             </table>
           </div>

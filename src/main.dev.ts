@@ -175,9 +175,21 @@ ipcMain.handle('send-call-log', (_event, data) => {
     .catch((err) => log.error(err));
 });
 
-function saveGruidRefreshTokenMap(refreshToken: string, accessToken: string) {
-  ds.saveGruidRefreshTokenMap(refreshToken, accessToken);
-}
+ipcMain.handle('an-action', async (event, arg) => {
+  // do stuff
+
+  const data = await ds.getUserEvents('6jrJ5eVSvmTU4BNrrxPWnaEdWKA2');
+  log.info('an-action handler', data);
+  return data;
+});
+// ipcMain.handle('get-user-events', (_event, data) => {
+//   return ds
+//     .getUserEvents(data.userId)
+//     .then((events) => {
+//       return events;
+//     })
+//     .catch((err) => log.error(err));
+// });
 
 // email => google resource uid (gruid)
 async function setupWatchEvents(auth: GoogleAuth, refreshToken: string) {
@@ -188,7 +200,7 @@ async function setupWatchEvents(auth: GoogleAuth, refreshToken: string) {
   const res = await calendar.events.watch({
     calendarId: 'primary',
     requestBody: {
-      id: uuid(), // gruid used to make everything else work
+      id: uuid(),
       type: 'web_hook',
       // server endpoint that handles the web hook that Google sends to
       address: GCAL_WEB_HOOK_ENDPOINT,
@@ -202,6 +214,7 @@ async function setupWatchEvents(auth: GoogleAuth, refreshToken: string) {
   log.info('SAVING GRUID REFRESH TOKEN MAP');
   log.info(`${res.data.resourceId} -> ${refreshToken}`);
   ds.saveGruidRefreshTokenMap(res.data.resourceId, refreshToken);
+  return res.data.resourceId;
 }
 
 ipcMain.handle('link-google-firebase', async (_event, data) => {
@@ -240,7 +253,9 @@ ipcMain.handle('link-google-firebase', async (_event, data) => {
     }
 
     // setup watch events
-    setupWatchEvents(oAuth2Client, refreshToken);
+    const gruid = await setupWatchEvents(oAuth2Client, refreshToken);
+    console.log('GRUID: ');
+    console.log(gruid);
 
     // store gruid to refresh_token map in firestore
 
@@ -256,18 +271,6 @@ ipcMain.handle('link-google-firebase', async (_event, data) => {
   } else {
     log.info('NO REFRESH TOKEN');
   }
-
-  // use access_token from url to pull events from google calendar
-  // and store in firebase
-
-  // store gruid -> refresh_token in firebase
-  // cqZpZjQmrtHgM-6DYSAZS3Nwf5Q --> refreshToken
-
-  // use access_token to pull calendar data
-  // store calendar data in firebase, noting the document id
-  // associate newly saved document id with currentUser.uid
-  // setup watch event for calendar data
-  // save refresh token to current firebase user
 });
 
 const RESOURCES_PATH = app.isPackaged

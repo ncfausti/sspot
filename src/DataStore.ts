@@ -39,7 +39,7 @@ export default class DataStore {
   private constructor() {
     // setup firebase connection
     this.firebaseApp = initializeApp(firebaseConfig);
-    this.database = getFirestore();
+    this.database = getFirestore(this.firebaseApp);
     return this;
   }
 
@@ -108,6 +108,45 @@ export default class DataStore {
           return data.gcalRefreshToken;
         }
         log.info('No such document!');
+        return null;
+      } catch (e) {
+        log.error('Error getting document: ', e);
+        return null;
+      }
+    } catch (e) {
+      log.error(e);
+      return null;
+    }
+  };
+
+  public getUserEvents = async (userId: string) => {
+    try {
+      try {
+        const docRef = doc(this.database, 'users', userId);
+
+        // Get the current user's document
+        const userDoc = await getDoc(docRef);
+
+        if (userDoc.exists()) {
+          // Get the gcalResourceId from the user's document
+          const data = userDoc.data();
+          log.info('user found with gcalResourceId: ', data.gcalResourceId);
+
+          // Use the gcalResourceId to get the events from the events collection
+          const docRef2 = doc(this.database, 'events', data.gcalResourceId);
+          const eventsDoc = await getDoc(docRef2);
+
+          // If there are events for the current user, return them
+          if (eventsDoc.exists()) {
+            const eventsData = eventsDoc.data();
+            log.info('events found: ', eventsData);
+            return eventsData;
+          }
+
+          log.info('Found user, but no events found.');
+
+          return null;
+        }
         return null;
       } catch (e) {
         log.error('Error getting document: ', e);

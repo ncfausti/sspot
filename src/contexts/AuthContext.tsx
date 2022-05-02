@@ -3,6 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { initializeApp, FirebaseApp } from 'firebase/app';
 import {
   getFirestore,
+  doc,
   collection,
   addDoc,
   Firestore,
@@ -32,6 +33,9 @@ export function logout() {
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState<User>({} as User);
+  const [currentUserData, setCurrentUserData] = useState<typeof doc>(
+    {} as typeof doc
+  );
   const [loading, setLoading] = useState(true);
 
   function login(email: string, password: string) {

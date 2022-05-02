@@ -7,8 +7,17 @@ import { app, ipcRenderer, remote, shell } from 'electron';
 import url from 'url';
 import fetch from 'node-fetch';
 import { getAuth } from 'firebase/auth';
-import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, updateDoc } from 'firebase/firestore';
+import { initializeApp, FirebaseApp } from 'firebase/app';
+import {
+  getFirestore,
+  collection,
+  doc,
+  addDoc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  Firestore,
+} from 'firebase/firestore';
 import MeetingsList from './MeetingsList';
 import logo from '../../../assets/salespot-logo-long.png';
 import logoDark from '../../../assets/salespot-logo-long-dark.png';
@@ -32,26 +41,44 @@ export default function Meetings() {
   const [meetingIndex] = useState(0);
   const authCodeRef = useRef<HTMLInputElement>(null);
 
-  const [eventList, setEventList] = useState([
-    { startTime: '10:00AM', startDate: '1/1/2000', id: -1 },
+  const [events, setEvents] = useState([
+    {
+      name: '',
+      title: '',
+      role: '',
+      email: 'a',
+      startTime: '10:00AM',
+      startDate: '1/1/2000',
+      id: -1,
+    },
   ]);
+
   const { logout } = useAuth();
 
-  function showPrev() {
-    setEventList((prevState) => ({
-      meetingIndex:
-        prevState.meetingIndex - 1 >= 0 ? prevState.meetingIndex - 1 : 0,
-    }));
-  }
+  // need to display the events from main process
+  useEffect(() => {
+    ipcRenderer.on('events', (_event, eventList) => {
+      log.info('events**', events);
 
-  function showNext() {
-    setEventList((prevState) => ({
-      meetingIndex:
-        prevState.meetingIndex + 1 < prevState.eventList.length
-          ? prevState.meetingIndex + 1
-          : prevState.meetingIndex,
-    }));
-  }
+      setEvents(eventList);
+    });
+  }, [events]);
+
+  // function showPrev() {
+  //   setEventList((prevState) => ({
+  //     meetingIndex:
+  //       prevState.meetingIndex - 1 >= 0 ? prevState.meetingIndex - 1 : 0,
+  //   }));
+  // }
+
+  // function showNext() {
+  //   setEventList((prevState) => ({
+  //     meetingIndex:
+  //       prevState.meetingIndex + 1 < prevState.eventList.length
+  //         ? prevState.meetingIndex + 1
+  //         : prevState.meetingIndex,
+  //   }));
+  // }
 
   // on initial load only
   useEffect(() => {
@@ -150,33 +177,6 @@ export default function Meetings() {
     ipcRenderer.on('init-calendar', (_event, authCode) => {
       // log.info('_event', _event);
       log.info('auth code:', authCode);
-      // Obtain emailLink from the user.
-
-      // The user WILL ONLY HAVE ACCESS TO AN AUTH CODE IF THEY HAVE
-      // SUCCESSFULLY LOGGED IN WITH GOOGLE.
-
-      // when we send the auth code to the client, it is ONLY FOR THE USER
-      // WHO JUST AUTHENTICATED WITH GOOGLE.
-
-      // Sooo...the person then has access to an auth code, which they can
-      // exchange for an access token and a refresh token
-
-      // and register with the watch service
-
-      // they can then use the access token to make requests to their OWN calendar
-
-      // at this point, we use firebase auth client in electron to obtain
-      // the
-
-      // handle the auth code -> refresh token, access_token swap here
-      // passing currentUser.email, currentUser.accessToken, refreshToken
-      // to backend link-accounts endpoint
-
-      // axios.post('/link-accounts',
-
-      // Get access and refresh tokens (if access_type is offline)
-      // let { tokens } = await oauth2Client.getToken(q.code);
-      // oauth2Client.setCredentials(tokens);
     });
   }, []);
 
@@ -193,40 +193,32 @@ export default function Meetings() {
       setSaleSpotLogo(logoDark);
     }
 
-    if (currentUser && currentUser.eventsDocRef) {
-      currentUser.eventsDocRef
-        .get()
-        .then((doc) => {
-          if (doc.exists) {
-            const data = doc.data();
-            log.info('data: ', data);
-            setEventList(data.eventList);
-            return 1;
-          }
-          log.info('No such document!');
-          return 0;
+    // if currentUser has a refreshToken on users/{uid}
+    // then pull the events from events/{users/{uid}/user.gcalResourceId}
+    async function getEvents() {
+      // send the link
+      ipcRenderer
+        .invoke('get-user-events', {
+          userId: currentUser.uid,
+          userEmail: currentUser.email,
         })
-        .catch((err) => log.error(err));
+        .then((data) => {
+          log.info('inside ipcRenderer: ');
+          log.info(data);
+          setEvents(data);
+          return data;
+        })
+        .catch((e) => log.error(e));
     }
-  }, []);
 
-  // setup an async function to get the events from the db
-  // useEffect(() => {
-  //   async function getEvents() {
-  //     if (currentUser && currentUser.eventsDocRef) {
-  //       const doc = await currentUser.eventsDocRef.get();
-  //       if (doc.exists) {
-  //         const data = doc.data();
-  //         log.info('data: ', data);
-  //         setEventList(data.eventList);
-  //         return 1;
-  //       }
-  //       log.info('No such document!');
-  //       return 0;
-  //     }
-  //   }
-  //   getEvents();
-  // }, []);
+    getEvents()
+      .then((data) => {
+        log.info('inside ipcRenderer: ');
+        log.info(data);
+        return data;
+      })
+      .catch(log.error);
+  }, [currentUser.email, currentUser.uid]);
 
   const linkGoogleFirebase = async () => {
     // In prod, this comes from ipc call instead of user input
@@ -240,21 +232,6 @@ export default function Meetings() {
       userId: currentUser.uid,
       userEmail: currentUser.email,
     });
-  };
-
-  // fetch request to link-calendar-account endpoint
-  const linkCalendarAccount = async () => {
-    log.info('link calendar account');
-    // send the email and
-
-    //   const response = await fetch('https://httpbin.org/post', {
-    //     method: 'POST',
-    //     body: JSON.stringify(body),
-    // headers: {'Content-Type': 'application/json'}
-    //   });
-    // const data = await response.json();
-
-    log.info(getAuth());
   };
 
   return (
@@ -280,16 +257,19 @@ export default function Meetings() {
               </button>
             </div>
             <div className="flex">
-              <MeetingsList />
+              <MeetingsList meetings={events} />
             </div>
             <button
               type="button"
-              onClick={() =>
-                shell.openExternal(
-                  'https://google-cal-webhooks-handler.nickfausti.repl.co'
-                )
-              }
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-full text-white bg-spotblue hover:bg-spotred100 focus:outline-none"
+              onClick={() => {
+                const calendarInitLink = `https://google-cal-webhooks-handler.nickfausti.repl.co/?state=${currentUser.uid}0`;
+                log.info('calendarInitLink: ', calendarInitLink);
+                return shell.openExternal(calendarInitLink);
+              }}
+              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent
+              text-sm font-medium rounded-full text-white bg-spotblue hover:bg-spotred100 focus:outline-none ${
+                currentUser.gcalResourceId ? 'hidden' : ''
+              }`}
             >
               <span className="absolute left-0 inset-y-0 flex items-center pl-3">
                 <CalendarIcon
