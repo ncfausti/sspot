@@ -56,13 +56,21 @@ export default function Meetings() {
   const { logout } = useAuth();
 
   // need to display the events from main process
-  useEffect(() => {
-    ipcRenderer.on('events', (_event, eventList) => {
-      log.info('events**', events);
+  // useEffect(() => {
+  //   ipcRenderer.on('events', (_event, eventList) => {
+  //     log.info('events**', events);
 
-      setEvents(eventList);
-    });
-  }, [events]);
+  //     setEvents(eventList);
+  //   });
+  // }, [events]);
+
+  useEffect(() => {
+    (async () => {
+      const results = await ipcRenderer.invoke('an-action', [1, 2, 3]);
+      log.info('IN MEETINGS: ', results);
+      setEvents(Object.values(results));
+    })();
+  }, [currentUser.userId]);
 
   // function showPrev() {
   //   setEventList((prevState) => ({
@@ -195,29 +203,29 @@ export default function Meetings() {
 
     // if currentUser has a refreshToken on users/{uid}
     // then pull the events from events/{users/{uid}/user.gcalResourceId}
-    async function getEvents() {
-      // send the link
-      ipcRenderer
-        .invoke('get-user-events', {
-          userId: currentUser.uid,
-          userEmail: currentUser.email,
-        })
-        .then((data) => {
-          log.info('inside ipcRenderer: ');
-          log.info(data);
-          setEvents(data);
-          return data;
-        })
-        .catch((e) => log.error(e));
-    }
+    // async function getEvents() {
+    //   // send the link
+    //   ipcRenderer
+    //     .invoke('get-user-events', {
+    //       userId: currentUser.uid,
+    //       userEmail: currentUser.email,
+    //     })
+    //     .then((data) => {
+    //       log.info('inside ipcRenderer: ');
+    //       log.info(data);
+    //       setEvents(data);
+    //       return data;
+    //     })
+    //     .catch((e) => log.error(e));
+    // }
 
-    getEvents()
-      .then((data) => {
-        log.info('inside ipcRenderer: ');
-        log.info(data);
-        return data;
-      })
-      .catch(log.error);
+    // getEvents()
+    //   .then((data) => {
+    //     log.info('inside ipcRenderer: ');
+    //     log.info(data);
+    //     return data;
+    //   })
+    //   .catch(log.error);
   }, [currentUser.email, currentUser.uid]);
 
   const linkGoogleFirebase = async () => {

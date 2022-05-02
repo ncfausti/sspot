@@ -1,7 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import log from 'electron-log';
 
 export default function MeetingsList(props: { meetings: any }) {
   const { meetings } = props;
+  // log.info('IN MEETINGS LIST: ');
+  log.info(meetings);
+  if (meetings.length >= 1) {
+    meetings[0].forEach((meeting) => log.info(meeting.summary));
+  }
   return (
     <div className="flex flex-col">
       <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -34,38 +40,21 @@ export default function MeetingsList(props: { meetings: any }) {
                 </tr>
               </thead>
               <tbody className="bg-spotgray  divide-y divide-gray-200">
-                {meetings.map(
-                  (person: {
-                    email: {} | null | undefined;
-                    name:
-                      | boolean
-                      | React.ReactChild
-                      | React.ReactFragment
-                      | React.ReactPortal
-                      | null
-                      | undefined;
-                    title:
-                      | boolean
-                      | React.ReactChild
-                      | React.ReactFragment
-                      | React.ReactPortal
-                      | null
-                      | undefined;
-                  }) => (
-                    <tr key={person.email}>
-                      <td className="px-2 py-1 whitespace-nowrap text-sm font-medium text-white">
-                        {person.name}
-                      </td>
-                      <td className="px-2 py-1 whitespace-nowrap text-sm text-white">
-                        {person.title}
-                      </td>
-                      <td className="px-2 py-1 whitespace-nowrap text-sm text-white">
-                        {person.email}
-                      </td>
-                      {/* <td className="px-2 py-1 whitespace-nowrap text-sm text-gray-500">
+                {meetings[0].map((meeting) => (
+                  <tr key={meeting.id}>
+                    <td className="px-2 py-1 whitespace-nowrap text-sm font-medium text-white">
+                      {meeting.summary}
+                    </td>
+                    <td className="px-2 py-1 whitespace-nowrap text-sm text-white">
+                      {meeting.kind}
+                    </td>
+                    <td className="px-2 py-1 whitespace-nowrap text-sm text-white">
+                      {meeting.start.dateTime}
+                    </td>
+                    {/* <td className="px-2 py-1 whitespace-nowrap text-sm text-gray-500">
                       {person.role}
                     </td> */}
-                      {/* <td className="px-2 py-1 whitespace-nowrap text-right text-sm font-medium">
+                    {/* <td className="px-2 py-1 whitespace-nowrap text-right text-sm font-medium">
                       <a
                         href="#"
                         className="text-indigo-600 hover:text-indigo-900"
@@ -73,9 +62,8 @@ export default function MeetingsList(props: { meetings: any }) {
                         Edit
                       </a>
                     </td> */}
-                    </tr>
-                  )
-                )}
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
