@@ -15,14 +15,7 @@ import AutoLaunch from 'auto-launch';
 import log from 'electron-log';
 import path from 'path';
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
-import {
-  app,
-  screen,
-  ipcMain,
-  BrowserWindow,
-  Menu,
-  webContents,
-} from 'electron';
+import { app, screen, ipcMain, BrowserWindow, Menu } from 'electron';
 import { arch } from 'os';
 import { autoUpdater } from 'electron-updater';
 import { Menubar, menubar } from 'menubar';
@@ -74,7 +67,7 @@ function listEvents(auth) {
       const events = res.data.items;
       if (events.length) {
         console.log('Upcoming 10 events:');
-        events.map((event, i) => {
+        events.map((event) => {
           const start = event.start.dateTime || event.start.date;
           console.log(`${start} - ${event.summary}`);
         });
@@ -163,6 +156,9 @@ const windowManager = WindowManager.getInstance();
 const windows = windowManager.getWindows();
 
 const ds = DataStore.getInstance();
+
+const unsub = ds.listen();
+log.info(unsub);
 
 ipcMain.handle('send-call-log', (_event, data) => {
   ds.sendCallLog(data.elapsed, data.logUid)

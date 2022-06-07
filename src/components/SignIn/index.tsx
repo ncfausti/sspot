@@ -18,6 +18,7 @@ import { validEmail } from '../../utils';
 import Error from '../Alerts/Error';
 import 'regenerator-runtime/runtime';
 import LongLogo from '../Logo/LongLogo';
+import OpenBrowserButton from '../Buttons/OpenBrowserButton';
 
 export default function SignIn() {
   const emailRef = useRef<HTMLInputElement>(null);
@@ -42,13 +43,6 @@ export default function SignIn() {
   };
 
   log.info('SignIn');
-
-  useEffect(() => {
-    (async () => {
-      const result = await ipcRenderer.invoke('an-action', [1, 2, 3]);
-      log.info('inside renderer for an-action', result);
-    })();
-  });
 
   // Handle
   useEffect(() => {
@@ -233,9 +227,9 @@ export default function SignIn() {
 
             <div
               className={
-                emailAddress.length > 0 &&
-                emailAddress.indexOf('@') >= 1 &&
-                'hidden'
+                emailAddress.length > 0 && emailAddress.indexOf('@') >= 1
+                  ? 'hidden'
+                  : ''
               }
             >
               <button
@@ -253,6 +247,12 @@ export default function SignIn() {
                 Sign in
               </button>
             </div>
+            <div>
+              <OpenBrowserButton
+                uri="https://app.salespot.io"
+                text="Create Account"
+              />
+            </div>
             <div
               className={`text-white text-center ${
                 emailAddress.length === 0 ? 'hidden' : ''
@@ -261,7 +261,7 @@ export default function SignIn() {
               <span className="">
                 We&apos;ve sent a login link to {emailAddress}!
               </span>
-              <div>
+              <div className="">
                 <div>manual link copy/paste</div>
                 <div>
                   <input className="bg-black" type="text" ref={emailLinkRef} />{' '}

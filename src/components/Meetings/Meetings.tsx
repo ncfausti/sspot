@@ -4,26 +4,12 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { CogIcon, CalendarIcon } from '@heroicons/react/solid';
 import log from 'electron-log';
 import { app, ipcRenderer, remote, shell } from 'electron';
-import url from 'url';
-import fetch from 'node-fetch';
-import { getAuth } from 'firebase/auth';
-import { initializeApp, FirebaseApp } from 'firebase/app';
-import {
-  getFirestore,
-  collection,
-  doc,
-  addDoc,
-  getDoc,
-  setDoc,
-  updateDoc,
-  Firestore,
-} from 'firebase/firestore';
 import MeetingsList from './MeetingsList';
 import logo from '../../../assets/salespot-logo-long.png';
 import logoDark from '../../../assets/salespot-logo-long-dark.png';
 import { useAuth, logout } from '../../contexts/AuthContext';
-// import { startServer } from '../../utils';
 import Settings from './Settings';
+import calendarIcon from '../../../assets/calendar.png';
 
 export default function Meetings() {
   const [time, setTime] = useState(new Date());
@@ -41,37 +27,21 @@ export default function Meetings() {
   const [meetingIndex] = useState(0);
   const authCodeRef = useRef<HTMLInputElement>(null);
 
-  const [events, setEvents] = useState([
-    {
-      name: '',
-      title: '',
-      role: '',
-      email: 'a',
-      startTime: '10:00AM',
-      startDate: '1/1/2000',
-      id: -1,
-    },
-  ]);
+  const [events, setEvents] = useState([]);
 
   const { logout } = useAuth();
 
-  // need to display the events from main process
-  // useEffect(() => {
-  //   ipcRenderer.on('events', (_event, eventList) => {
-  //     log.info('events**', events);
-
-  //     setEvents(eventList);
-  //   });
-  // }, [events]);
-
   useEffect(() => {
     (async () => {
-      const results = await ipcRenderer.invoke('an-action', [1, 2, 3]);
+      const results = await ipcRenderer.invoke('an-action', {
+        userId: currentUser.uid,
+      });
       log.info('IN MEETINGS: ', results);
       setEvents(Object.values(results));
     })();
-  }, [currentUser.userId]);
+  }, [currentUser.uid]);
 
+  log.info(currentUser.uid);
   // function showPrev() {
   //   setEventList((prevState) => ({
   //     meetingIndex:
@@ -105,7 +75,6 @@ export default function Meetings() {
   const timeStyle = new Intl.DateTimeFormat('en', {
     hour: 'numeric',
     minute: 'numeric',
-    timeZoneName: 'short',
   });
 
   function handleLaunchClick() {
@@ -200,32 +169,6 @@ export default function Meetings() {
       // light mode
       setSaleSpotLogo(logoDark);
     }
-
-    // if currentUser has a refreshToken on users/{uid}
-    // then pull the events from events/{users/{uid}/user.gcalResourceId}
-    // async function getEvents() {
-    //   // send the link
-    //   ipcRenderer
-    //     .invoke('get-user-events', {
-    //       userId: currentUser.uid,
-    //       userEmail: currentUser.email,
-    //     })
-    //     .then((data) => {
-    //       log.info('inside ipcRenderer: ');
-    //       log.info(data);
-    //       setEvents(data);
-    //       return data;
-    //     })
-    //     .catch((e) => log.error(e));
-    // }
-
-    // getEvents()
-    //   .then((data) => {
-    //     log.info('inside ipcRenderer: ');
-    //     log.info(data);
-    //     return data;
-    //   })
-    //   .catch(log.error);
   }, [currentUser.email, currentUser.uid]);
 
   const linkGoogleFirebase = async () => {
@@ -243,15 +186,20 @@ export default function Meetings() {
   };
 
   return (
-    <div className="flex rounded-hud bg-gray-100 dark:bg-black dark:text-white flex-grow flex-col p-3 min-h-screen content-center">
+    <div className="flex rounded-hud bg-gray-100 dark:bg-black dark:text-white flex-grow flex-col p-3 min-h-screen content-start">
       <>
         {!showSettingsView && (
           <>
             <div className="flex flex-grow flex-wrap justify-between">
+              <div className="text-xs text-gray-800 dark:text-white font-thin">
+                Next Meeting
+              </div>
               <div className="text-xs text-gray-800 dark:text-white font-semibold">
+                {timeStyle.format(time)}
+              </div>
+              <div className="text-xs font-light font-semibold">
                 {dateStyle.format(time)}
               </div>
-              <div className="text-xs font-light">{timeStyle.format(time)}</div>
             </div>
             <div className="flex">
               <button
@@ -264,30 +212,33 @@ export default function Meetings() {
                 {/* {autoDetect ? '(auto-detect)' : ''} */}
               </button>
             </div>
-            <div className="flex">
+            <div className="flex max-h-[150px]">
               <MeetingsList meetings={events} />
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                const calendarInitLink = `https://google-cal-webhooks-handler.nickfausti.repl.co/?state=${currentUser.uid}0`;
-                log.info('calendarInitLink: ', calendarInitLink);
-                return shell.openExternal(calendarInitLink);
-              }}
-              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent
+            <div className={`${events.length > 0 ? 'hidden' : ''}`}>
+              <button
+                type="button"
+                onClick={() => {
+                  const platformIdentificationValue = '0'; // '1' on salespot-web
+                  const calendarInitLink = `https://google-cal-webhooks-handler.nickfausti.repl.co/?state=${currentUser.uid}${platformIdentificationValue}`;
+                  return shell.openExternal(calendarInitLink);
+                }}
+                className={`group relative w-full flex justify-center py-2 px-4 border border-transparent
               text-sm font-medium rounded-full text-white bg-spotblue hover:bg-spotred100 focus:outline-none ${
                 currentUser.gcalResourceId ? 'hidden' : ''
               }`}
-            >
-              <span className="absolute left-0 inset-y-0 flex items-center pl-3">
-                <CalendarIcon
-                  className="h-5 w-5 text-white-500 group-hover:text-white-400"
-                  aria-hidden="true"
-                />
-              </span>
-              Link Google Calendar
-            </button>
-            <div className="flex">
+              >
+                <span className="absolute left-0 inset-y-0 flex items-center pl-3">
+                  <img
+                    src={calendarIcon}
+                    alt="Link Google Calendar"
+                    className="h-4 w-4"
+                  />
+                </span>
+                Link Google Calendar
+              </button>
+            </div>
+            <div className="flex hidden">
               <button
                 type="button"
                 onClick={handleLaunchClick}
@@ -304,6 +255,7 @@ export default function Meetings() {
                 ref={authCodeRef}
               />{' '}
               <button
+                type="button"
                 className="bg-spotblue"
                 onClick={() => linkGoogleFirebase()}
               >
@@ -324,6 +276,7 @@ export default function Meetings() {
               </div>
               <div>
                 <button
+                  type="button"
                   className="text-xs font-light bg-gray-100 dark:bg-spotgray rounded-md px-6 py-2"
                   onClick={() => logout()}
                 >

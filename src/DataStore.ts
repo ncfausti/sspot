@@ -5,6 +5,7 @@ import {
   doc,
   addDoc,
   getDoc,
+  onSnapshot,
   setDoc,
   updateDoc,
   Firestore,
@@ -56,6 +57,15 @@ export default class DataStore {
 
     return DataStore.instance;
   }
+
+  public listen = () => {
+    return onSnapshot(
+      doc(this.database, 'events', 'cqZpZjQmrtHgM-6DYSAZS3Nwf5Q'),
+      (watchedDoc) => {
+        log.info('new data found: ', watchedDoc.data());
+      }
+    );
+  };
 
   public sendCallLog = async (callLength: number, machineUid: string) => {
     try {
