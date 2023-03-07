@@ -28,11 +28,9 @@ import DataStore from './DataStore';
 
 const CLIENT_ID =
   '753837304939-ild5obrqqk35vt3u3h45ta6ko02t8dto.apps.googleusercontent.com';
-// REPLACE WITH API KEY VERSION OF GOOGLE AUTH:
-const CLIENT_SECRET = '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';
+const CLIENT_SECRET = process.env.SECRET;
 const GCAL_WEB_HOOK_ENDPOINT =
   'https://google-cal-webhooks-handler.nickfausti.repl.co/webhook';
-// import google from 'googleapis';
 const { google } = require('googleapis');
 
 const { OAuth2 } = google.auth;
@@ -63,13 +61,11 @@ function listEvents(auth) {
       orderBy: 'startTime',
     },
     (err, res) => {
-      if (err) return console.log(`The API returned an error: ${err}`);
+      if (err) return console.error(`The API returned an error: ${err}`);
       const events = res.data.items;
       if (events.length) {
-        console.log('Upcoming 10 events:');
         events.map((event) => {
           const start = event.start.dateTime || event.start.date;
-          console.log(`${start} - ${event.summary}`);
         });
       } else {
         console.log('No upcoming events found.');
@@ -120,7 +116,7 @@ const installExtensions = async () => {
       extensions.map((name) => installer[name]),
       forceDownload
     )
-    .catch(console.log);
+    .catch(console.error);
 };
 
 enum WindowType {
@@ -178,14 +174,6 @@ ipcMain.handle('an-action', async (event, arg) => {
   log.info('an-action handler', data);
   return data;
 });
-// ipcMain.handle('get-user-events', (_event, data) => {
-//   return ds
-//     .getUserEvents(data.userId)
-//     .then((events) => {
-//       return events;
-//     })
-//     .catch((err) => log.error(err));
-// });
 
 // email => google resource uid (gruid)
 async function setupWatchEvents(auth: GoogleAuth, refreshToken: string) {
@@ -250,8 +238,7 @@ ipcMain.handle('link-google-firebase', async (_event, data) => {
 
     // setup watch events
     const gruid = await setupWatchEvents(oAuth2Client, refreshToken);
-    console.log('GRUID: ');
-    console.log(gruid);
+    console.log(`GRUID: ${gruid}`);
 
     // store gruid to refresh_token map in firestore
 
@@ -433,8 +420,7 @@ app.on('ready', () => {
   resetGlobalParticipants();
 
   const primaryDisplay = screen.getPrimaryDisplay();
-  console.log('primary display', primaryDisplay);
-  console.log(primaryDisplay.size);
+  console.log(`primary display: ${primaryDisplay}`);
 });
 
 export const startServer = () => {
@@ -770,7 +756,7 @@ ipcMain.on('close-me', () => {
   app.quit();
 });
 
-app.whenReady().then(createWindow).catch(console.log);
+app.whenReady().then(createWindow).catch(console.error);
 
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
